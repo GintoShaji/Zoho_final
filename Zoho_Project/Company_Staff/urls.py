@@ -338,6 +338,24 @@ urlpatterns = [
     path('delete_godown/<int:pk>',views.delete_godown,name='delete_godown'),
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+    
+
+    #---------------- Zoho Final Sales order - Ginto Shaji - Start--------------------
+    
+    path('salesorder',views.salesorder,name='salesorder'),
+    path('salesorder_list',views.salesorder_list,name='salesorder_list'),
+    path('add_salesorder/',views.add_salesorder,name='add_salesorder'),
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
+        
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

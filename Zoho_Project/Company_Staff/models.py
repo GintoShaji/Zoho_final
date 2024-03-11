@@ -835,7 +835,6 @@ class SaleOrder(models.Model):
     expiration_date = models.DateField()
     reference_number = models.CharField(max_length=255)
     sales_order_number = models.CharField(max_length=255)
-    
     PAYMENT_METHOD_CHOICES = [
         ('Cash', 'Cash'),
         ('Cheque', 'Cheque'),
@@ -843,6 +842,7 @@ class SaleOrder(models.Model):
         ('Bank', 'Bank'),
     ]
     payment_method = models.CharField(max_length=255, choices=PAYMENT_METHOD_CHOICES)
+    
     
     cheque_number = models.CharField(max_length=255, blank=True, null=True)
     upi_number = models.CharField(max_length=255, blank=True, null=True)
@@ -859,17 +859,12 @@ class SaleOrder(models.Model):
     grand_total = models.DecimalField(max_digits=10, decimal_places=2)
     advanced_paid = models.DecimalField(max_digits=10, decimal_places=2)
     balance = models.DecimalField(max_digits=10, decimal_places=2)
-    
     STATUS_CHOICES = [
         ('Draft', 'Draft'),
         ('Save', 'Save'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    
-    converted_from_estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE, blank=True, null=True)
-    converted_to_sales_invoice = models.ForeignKey(SalesInvoice, on_delete=models.CASCADE, blank=True, null=True)
-    converted_to_recurring_invoice = models.ForeignKey(RecurringInvoice, on_delete=models.CASCADE, blank=True, null=True)
-    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES)    
+ 
 
 class SalesOrderItems(models.Model):
     item = models.ForeignKey(Items, on_delete=models.CASCADE, blank=True, null=True)
