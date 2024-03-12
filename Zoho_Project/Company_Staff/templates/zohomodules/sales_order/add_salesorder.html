@@ -49,12 +49,8 @@
         font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
         font-size:0.875rem;
     }
-    }
-   
-       
+    }     
 </style>
-
-
 
 <div class="body-wrapper">
     <div class="container-fluid">
@@ -68,87 +64,93 @@
         </nav>
   
         <div class="card bg-black shadow p-3 rounded">
-           
             <h3  class="mb-4 mt-2  " style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Sales Order</h3>
-            
             <form  method="post" action="{% url 'add_salesorder' %}"  enctype="multipart/form-data" class="mb-3">
                 {% csrf_token %}
-        
-
 
                 <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Select Customer</label>
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Select Customer</label></div>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <select class="form-control bg-light text-dark"  name="v_display_name" id="v_display_name">    
+                        </select> 
                     </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>  
+                    <div class="col-md-4 ">
+                        <a href="#" class="btn btn-warning ml-1" role="button" data-toggle="modal" data-target="#customerModal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
                     </div>
                 </div>
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="email" class="form-control bg-light text-dark" name="vendor_email"  id="vendor-email"  required> 
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <input  type="email" class="form-control bg-light text-dark" name="customer_email" required> 
                         <span class=" text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
                     </div>
                 </div>
 
                 <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Billing Address</label>
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Billing Address</label></div>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
+                </div>
+
+
+                <fieldset2 class="other details">
+                    <div class="form-group row mt-4">
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
+                        <div class=" col-sm-12 col-md-3 col-lg-3">
+                            <select name="gst" id="GSTT" class="form-control bg-light text-dark" onclick="gstPan_function()">
+                                <option value="Select a Gst Treatment" selected>Select a Gst Treatment</option>
+                                <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
+                                <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">
+                                    Registered Business-Composition Business that is registered under the Composition schemen in GST
+                                </option>
+                                <option value="Unregistered Business-not Registered under GST">Unregistered Business-not Registered under GST</option>
+                                <option value="Overseas- Persons with who you do import or exports of supplies outside india">Overseas- Persons with who you do import or exports of supplies outside india</option>
+                                <option value="Special Economic Zone">Special Economic Zone</option>
+                            </select><br>
+                        </div>
+                    </div>
+                    <fieldset3 id="gst" style="display: none;">
+                        <div class="row mt-4">
+                            <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN</label>
+                            <div class=" col-sm-12 col-md-3 col-lg-3">
+                                <input type="text" class="form-control bg-light text-dark" name="gst_number" id="gstInput" > 
+                                <span id="gstMessage"></span>       
+                            </div>
+                        </div>
+                    </fieldset3>
+                    <!-- <fieldset4 id="pan" style="display: none;">
+                        <div class=" row mt-4">
+                            <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > PAN</label>
+                            <div class=" col-sm-12 col-md-3 col-lg-3">
+                                <input type="text" class="form-control bg-light text-dark"  id="panInput"  name="pan_number">  
+                                <span id="panMessage"></span>    
+                            </div>
+                        </div>
+                    </fieldset4> -->
+
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order No</label></div>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
                         <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
 
                 <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>GST Type</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Referance Number</label></div>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
                         <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
 
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>GSTIN</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
-                    </div>
-                </div>
-
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Sales Order No</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
-                    </div>
-                </div>
-
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Referance Number</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
-                    </div>
-                </div>
-
-            
                 <div class="form-group row mt-4">
                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Place of Supply*</label>
-                    
-                    <div class=" col-sm-12 col-md-6 col-lg-7">
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
                         <select name="source_supply" id="PLACE" class="form-control bg-light text-dark">
                             <option value="value" selected></option>
                             <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
@@ -191,58 +193,66 @@
                             <option value="[OT]-Other Territory">[OT]-Other Territory</option>
                         </select>
                     </div>
-                </div>                   
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order Date</label></div>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <input  type="Date" class="form-control bg-light text-dark " name="company_name" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Expected Shippment Date</label></div>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <input  type="type" class="form-control bg-light text-dark " name="company_name" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">
+                            {% for pay_terms in comp_payment_terms %}
+                            <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
+                        {% endfor %} 
+                        </select>
+                    </div>
+                    <div class="col-md-4 ">
+                        <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Payment Type</label></div>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <select class="form-control my-select bg-light" id="pay_method" name="payment_method"  required style="color: black;">
+                            <option value="" selected hidden>Choose Payment</option>
+                            <option value="cash">Cash</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="upi">UPI</option>
+                            {% for i in bank %}
+                            <option value="{{i.bnk_name}}"> {{i.bnk_name}} (...{{ i.last_digit}})</option>
+                          {% endfor %}
+                          </select>
+                    </div>
                 
+                    <div class="col-md-1"></div>
+                    <div class="col-sm-12 col-md-3 col-lg-3" style="display:none;"  id="chequediv">
+                        <label class="col-form-label text-light" >Cheque No</label>
+                        <input type="text" class="form-control bg-light" name="cheque_id"  id="cheque_id" placeholder="Enter Cheque No" style="color: black;">
+                    </div>
 
-                <!-- <div class=" form-group row">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Primary Contact</label>
+                    <div class="col-sm-12 col-md-3 col-lg-3 "  style="display:none; " id="upidiv">
+                        <label class="col-form-label text-light" >UPI ID</label>
+                        <input type="text" class="form-control bg-light" name="upi_id"  id="upi_id" placeholder="Enter UPI ID" style="color: black;">
                     </div>
-                    <div class="col-sm-12 col-md-2 col-lg-3" >
-                        <input  type="text" class="form-control bg-light text-dark mt-2 change-disply " id="fname" name="first_name" placeholder="first name" required >
-                    </div>
-                    <div class="col-sm-12 col-md-2 col-lg-3" >
-                        <input type="text" class="form-control bg-light text-dark mt-2 " id="lname" name="last_name" placeholder="last name" required >
-                    </div>
-                </div> -->
-
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Sales Order Date</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
-                    </div>
-                </div>
-
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Expected shippment Date</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
-                    </div>
-                </div>
-
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Terms</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
-                    </div>
-                </div>
-
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                        <label>Payment Type</label>
-                    </div>
-                    <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
+                   
+                    <div class="col-sm-12 col-md-3 col-lg-3"  style="display:none;" id="bnkdiv">
+                        <label class="col-form-label text-light" >Bank Account</label>
+                        <input type="text" class="form-control bg-light" name="bnk_id" id="bnk_id"  style="background-color: #43596c;" readonly style="color: black;">
                     </div>
                 </div>
 
@@ -269,15 +279,9 @@
                                 <td></td>
                                 <td><input type="text" class=" form-control border-1 bg-transparent text-white"></td>
                                 <td><input type="text"class="form-control border-1 bg-transparent text-white"></td>
-                                <td>
-                                    <input type="text" class="form-control border-1 bg-transparent text-white">
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control border-1 bg-transparent text-white">
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control border-1 bg-transparent text-white" onclick="sample1()">
-                                </td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white"></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white"></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white" onclick="sample1()"></td>
                                 <td><input type="text" class="form-control border-1 bg-transparent text-white"  onclick="sample()"></td>
                                 <td><input type="text" class="form-control border-1 bg-transparent text-white"></td>
                                 <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
@@ -291,569 +295,22 @@
                             <span class="text-small" style="margin-left: 0.30rem;">
                                 Add More Items
                             </span>
-                        </div>
-                           
+                        </div>    
                     </div>
                 </div>
 
-
-
-                
-               
-                
-                
-                <hr style="border: none; height: 2px; background-color: #ffcc00; margin: 20px 0;">
-                <div class="toggle1 section-toggle">
-                    <a href="">Add More Details</a>
-                    </div>
-                </div>
-                
-                <fieldset1 id="more_detail" class="more details" style="display: none;">
-
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                            <label>Skype name/Number</label>
-                        </div>
-                        <div class="col-sm-12 col-md-6 col-lg-6">
-                            <input  type="text" class="form-control bg-light text-dark" name="skype_number">      
-                        </div>
-
-                    </div>
-
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                            <label>Designation</label>
-                        </div>
-                        <div class="col-sm-12 col-md-6 col-lg-6">
-                            <input  type="text" class="form-control bg-light text-dark" name="designation">      
-                        </div>
-
-                    </div>
-
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                            <label>Department</label>
-                        </div>
-                        <div class="col-sm-12 col-md-6 col-lg-6">
-                            <input  type="text" class="form-control bg-light text-dark" name="department">      
-                        </div>
-
-                    </div>
-
-                <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Website</label></div>
-                    <div class="col-sm-12 col-md-6 col-lg-6">
-                        <input id="web" type="text" class="form-control bg-light text-dark" onclick="mobile_phone()"    name="website">      
-                    </div>
-                </div>
-            </fieldset1>
-
-
-
-
-
-
-                <hr style="border: none; height: 2px; background-color: #ffcc00; margin: 20px 0;">
-
-                <div class="section-3">
-
-                    <div class="toggle2 section-toggle"> <a href="" >Other Details </a> </div>
-                    <div class="toggle3 section-toggle" > <a href="">Address </a> </div>
-                    <div class="toggle4 section-toggle"><a href="" >Contact Persons </a></div>
-                    <div class="toggle7 section-toggle"><a href="">Remarks</a></div>
-
-                </div>
-
-               
-                <fieldset2 class="other details">
-
-                    <div class="form-group row mt-2">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
-                        
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="gst" id="GSTT" class="form-control bg-light text-dark" onclick="gstPan_function()">
-                                <option value="Select a Gst Treatment" selected>Select a Gst Treatment</option>
-                                <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
-                                <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">
-                                    Registered Business-Composition Business that is registered under the Composition schemen in GST
-                                </option>
-                                <option value="Unregistered Business-not Registered under GST">Unregistered Business-not Registered under GST</option>
-                                <option value="Overseas- Persons with who you do import or exports of supplies outside india">Overseas- Persons with who you do import or exports of supplies outside india</option>
-                                <option value="Special Economic Zone">Special Economic Zone</option>
-                            </select><br>
-                        </div>
-
-
-                    </div>
-
-                    <fieldset3 id="gst" style="display: none;">
-                        <div class="row mt-4">
-                            <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN/UIN*</label>
-                            
-                            <div class=" col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark" name="gst_number" id="gstInput" > 
-                                <span id="gstMessage"></span>       
-        
-                            </div>
-        
-        
-                        </div>
-
-                    </fieldset3>
-
-                    <fieldset4 id="pan" style="display: none;">
-                        <div class=" row mt-4">
-                            <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > PAN</label>
-                            
-                            <div class=" col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark"  id="panInput"  name="pan_number">  
-                                <span id="panMessage"></span>    
-
-        
-                            </div>
-        
-        
-                        </div>
-
-                    </fieldset4>
-
-
-                    
-
-                    <div class="form-group row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:rgb(214, 75, 75) ;">Tax Preference*</label>
-                        
-                    <div class="col-sm-12 col-md-3 col-lg-4 d-flex align-items-center">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="tax1" id="Taxable" value="Taxable" required>
-                            <label class="form-check-label text-white" for="vehicle1">Taxable</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="tax1" id="Tax_Exempt" value="Tax Exempt" required>
-                            <label class="form-check-label text-white" for="vehicle2">Tax Exempt</label>
-                        </div>
-                    </div>
-                </div>
-
-     
-                    <!-- </div> -->
-                    
-                    <div class="form-group row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Currency*</label>
-                        
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="currency" id="PLACE" class="form-control bg-light text-dark">
-                                <option value="Indian Rupee" selected>Indian Rupee</option>
-                                <!-- <option value="Indian Rupee">Indian Rupee</option> -->
-                    
-                            </select>
-                        </div>
-    
-    
-                    </div>
-
-                    <div class="form-group row mt-2">
-                        <div class="col-sm-12 col-md-3 col-lg-3 ">
-                           <label class="col-form-label text-white mb-3"> Opening Balance Type</label>
-                        </div>
-                        <div class="col-sm-12 col-md-3 col-lg-4 d-flex align-items-center">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="op_type" id="debit" value="debit">
-                                <label class="form-check-label text-white" for="debit">Debit</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="op_type" id="credit" value="credit">
-                                <label class="form-check-label text-white" for="credit">Credit</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Opening Balance Amount</label>                    
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <input  type="number" class="form-control bg-light text-dark" name="opening_bal" id="opa" value="0.00">      
-                        </div>
-                    </div>
-
-                    <div class="form-group row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" >Credit Limit</label>                    
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <input  type="number" class="form-control bg-light text-dark" name="credit_lm" id="cl" value="0.00">      
-                        </div>
-                    </div>
-                
-                  <!-- Alert -->
-                    <div id="custom-alert" class="alert">
-                        <span class="close-btn">&times;</span>
-                        <div class="alert-content">
-                          Credit limit should not exceed opening balance amount.
-                        </div>
-                      </div>
-                      <style>
-                        .alert {
-                                display: none;
-                                position: fixed;
-                                top: 30%;
-                                left: 50%;
-                                transform: translate(-50%, -50%);
-                                background-color: #f44336;
-                                color: white;
-                                padding: 15px;
-                                border-radius: 5px;
-                                }
-
-                                .close-btn {
-                                float: right;
-                                cursor: pointer;
-                                }
-
-                                .alert-content {
-                                margin-bottom: 10px;
-                                }
-                      </style>
-
-
-
-
-                    
-                    <div class="form-group row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
-                        
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">
-                               
-
-                                {% for pay_terms in comp_payment_terms %}
-                                <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
-                            {% endfor %}
-                                
-                            </select>
-
-                        </div>
-    
-                        <div class="col-md-4 ">
-                            <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
-                        </div>
-                    
-                    </div>
-
-        
-                    <div class="form-group row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">Price List </label>
-                         
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="plst" id="PLACE" id="PLACE" class="form-control bg-light text-dark">
-                                <option value="0">Not selected</option>
-
-                                
-                                {% for price_list in price_lists %}
-
-                                <option value="{{price_list.id}}">{{price_list.name}}</option>
-    
-                                    
-                                {% endfor %}
-
-                                 
-                                 
-                                  
-                                 </select>
-                           
-                        </div>
             
-            
-                    </div>
-                 
-                         
-    
-                          
-    
-    
-    
-    
-    
-    
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:white ;">
-                                        Portal Language</label>
-                                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                                            <select name="plang" id="PLACE" style="width: 100%;" class="form-control bg-light text-dark">
-                                                <option selected value="0" >Choose..</option>
-                                                <option value="ENGLISH">ENGLISH</option>
-                                              </select>
-                                    </div></div>   
-                                    <div class="form-group row mt-4">
-                                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:white ;">Facebook </label>
-                                            <div class=" col-sm-12 col-md-3 col-lg-3"> 
-                                                <input type="text" id="cn" name="fbk" class="form-control bg-light text-dark" >
-                                                
-                                        </div></div>
-                                    <div class="form-group row mt-4">
-                                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:white ;">Twitter</label>
-                                            <div class=" col-sm-12 col-md-3 col-lg-3">
-                                                <input type="text" id="cn" name="twtr" class="form-control bg-light text-dark" >
-                                              
-                                        </div></div>
-                                        
-
-
-
-
-                </fieldset2>
-
-
-                <!------------------ Address Section Start------------- -->
-
-                <fieldset5 id="address" style="display: none;">
-                    <div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-6 col-lg-6">
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <label for="">BILLING ADDRESS</label>
-                                    </div>
-                                    <div class="col"></div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Attention</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark" name="battention" id="batten">      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Country</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <select name="bcountry" id="btry" class="form-control bg-light text-dark">
-                                            <option value="India" selected>India</option>
-                                        </select>      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Address</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <textarea class="form-control bg-light " style="border: none;color: rgb(7, 7, 7);" cols="26" rows="4" name="baddress" id="badd1"></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > City</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark" name="bcity" id="bcty">      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > State</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input type="text" class="form-control bg-light text-dark" name="bstate" id="bste">      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Zip Code </label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="number" class="form-control bg-light text-dark" name="bzip" id="bzp">      
-                                    </div>
-                                </div>
-                            
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Phone </label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input id="bphone_num"  type="tel" pattern="[0-9]{10}" class="form-control bg-light text-dark" name="bphone" >
-                                        <label for="" id="bphone_label"></label>      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Fax </label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{7}" onmouseout="fax_number()"  onclick="bphone_number()"                                       name="bfax" id="bfx">  
-                                    
-                                        <label for="" id="fax_label"></label> 
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="col-sm-12 col-md-6 col-lg-6">
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <label for="">SHIPPING ADDRESS</label>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="checkbox" id="myCheckT" onclick="myCopyAddressFunction()">&nbsp;
-                                        <label for="myCheck">Same as Billing Address:</label>
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Attention</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark " style="color: white;" name="sattention" id="satten">      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Country</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <select name="s_country" id="sctry" class="form-control bg-light text-dark">
-                                            <option value="India" selected>India</option>
-                                        </select>      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Address</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <textarea class="form-control bg-light" style="border: none;color: rgb(10, 10, 10);" id="sadd1" cols="26" rows="4" name="saddress"></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > City</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark" name="scity" id="scty">      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > State</label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input type="text" class="form-control bg-light text-dark" name="sstate" id="sste">      
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Zip Code </label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="number" class="form-control bg-light text-dark" name="szip" id="szp">      
-                                    </div>
-                                </div>
-                            
-
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Phone </label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{10}" style="color: white;" name="sphone" id="sphone_num">  
-                                        <label for="" id="sphone_label"></label>    
-                                    </div>
-                                </div>
-                                <div class="form-group row mt-4">
-                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Fax </label>                    
-                                    <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{7}" style="color: white;" name="sfax" onclick="sphone_number()" onmouseout="sfax_number()" id="sfx"> 
-                                        <label for="" id="sfax_label"></label>     
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </fieldset5>
-
-                <!---------------------Address  Section End -------------->
-
-
-                <!------------------ Contact Person Section Start------------- -->
-
-                <fieldset6 id="contact_person" style="display: none;" >
-                    <div class="row">
-                        <div class="col-sm-12 ">
-                            
-                            <div class="table-responsive">
-                            
-                                <table id="tbl" class="table text-white" style="background-color: rgba(250, 227, 198, 0.5);">
-                                    <thead>
-                                        <tr>
-                                            
-                                        <th>Salutation</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email Address</th>
-                                        <th >Work Phone <br><span id="twph_label"></span></th>
-                                        <th >Mobile <br><span id="tlabel"></span>    </th>
-                                        <th >Skype Name/No</th>
-                                        <th >Designation</th>
-                                        <th >Department</th>
-                                        <th>Action</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                    <td><select name="salutation[]" class="form-control bg-transparent border-1 text-white"  id="PLACE" >
-                                        <option class="text-dark"  >Select</option>
-                                        <option class="text-dark" value="Mr" >Mr.</option>
-                                        <option class="text-dark" value="Mrs">Mrs.</option>
-                                        <option class="text-dark" value="Ms">Ms.</option>
-                                        <option class="text-dark" value="Miss">Miss.</option>
-                                        <option class="text-dark" value="Dr">Dr.</option>
-                                        </select></td>
-                                    <td><input type="text" class=" form-control border-1 bg-transparent text-white"    name="first_name[]"  ></td>
-                                    <td><input type="text"class="form-control border-1 bg-transparent text-white"  name="last_name[]" /></td>
-                                    <td>
-                                        <input type="text" class="form-control border-1 bg-transparent text-white" name="email[]" />
-                                        
-                                        
-                                    </td>
-                                    
-                                    <td>
-                                        <input type="tel" pattern="[0-9]{7}" class="form-control border-1 bg-transparent text-white"  id="twphone" name="wphone[]"/>
-                                       
-                                    </td>
-                                    <td>
-                                        <input type="tel" pattern="[0-9]{10}"  class="form-control border-1 bg-transparent text-white"  id="tmobile" onclick="sample1()"   name="mobile[]" />
-                                        
-                                    </td>
-                                    <td><input type="number" class="form-control border-1 bg-transparent text-white"  onclick="sample()" name="skype[]" /></td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white"  name="designation[]" /></td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white"  name="department[]" /></td>
-                                    <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
-                                    </tr>
-                                </tbody>
-                                </table>
-                                
-                            </div>
-                            
-                            <div class="button add_another mt-3 ">
-                                <i class="fa fa-user-plus" aria-hidden="true"></i> 
-                                <span class="text-small" style="margin-left: 0.30rem;">
-                                    Add Contact Person
-                                </span>
-                            </div>
-                               
-                            
-                        </div>
-                        
-                    </div>
-
-                </fieldset6>
-
-                <!---------------------Contact Person Section End -------------->
-
-
-                <!------------------ Remark Section Start------------- -->
-
-                <fieldset7 class="remarks" style="display: none;">
-                    <div class="row">
-                        <div class="col-sm-12 col-md-8 col-lg-8">
-                            <div class="form-group row mt-4">
-                                <div class=" col-sm-12 col-md-6 col-lg-6">
-                                    <textarea class="bg-light w-100" style="border: none;color: rgb(5, 5, 5);"   rows="5" name="remark"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12 col-md-2 col-lg-2"></div>
-                    </div>
-
-                </fieldset7>
-
-                <!---------------------Remark Section End -------------->
                 
+
+
                 <div class="row mt-5">
                     <div class="col-sm-12 col-md-2 col-lg-2 mt-3">
                         <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;">Save</button>
-                       
                     </div>
-                    
                     <div class=" col-sm-12 col-md-2 col-lg-2 mt-3">
                         <button type="reset" class="form-control  bg-warning text-dark" style="font-weight: bold;">Cancel</button>
-                       
                     </div> 
-
-
                 </div>
-
-       
-
             </form>
       
                
@@ -871,26 +328,18 @@
                     <div class="modal-body" style="background: rgb(32, 35, 37);">
                     <div class="card p-3 m-3" style="background-color: #141414a2;">
                         <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
-                        
-            
-            
                         <div class="row mt-2">
-            
                             <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
                                 <label for="termname" style="color: white">Term Name *</label>
-
                             <input type="text " class="form-control text-dark bg-light mt-2" id="tname" name="term_name" autocapitalize="characters" required> 
                             <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
                             <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
                             </div>
-            
                             <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
                                 <label for="termdays" style="color: white">Number of Days *</label>
-
                             <input type="number" class="form-control text-dark bg-light mt-2" id="tdays" name="term_days" autocapitalize="characters" required>
                             </div>
                             <div class="col-md-2 mt-2"></div>
-            
                         </div>
                         
                         <div class="row mt-5">
@@ -899,8 +348,7 @@
                                 <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
                                 type="submit" data-dismiss="modal" id="termSave">Save
                                 </button> 
-                                
-            
+        
                                 <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
                                 data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">Cancel</span>
@@ -916,6 +364,512 @@
             </div> 
 
             <!------------------- Payments  Section End -------------->
+
+
+            
+        
+        <!-- Modal for Employee Form -->
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="customerModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-xl" role="document" >
+        <div class="modal-content bg-dark" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerModalLabel"></h5>
+                <button type="button" class="btn btn-warning  float-right" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Your entire form code goes here -->
+                <div class="header pb-5">
+                    <h2 style="text-align: center;color:white;" id="customerModalLabel">New Customer</h2>
+                    <hr class="text-warning font-weight-bold">
+                  
+                </div>
+                <div class="container pl-5" style="color:white;">
+                <form method="POST" action="" enctype="multipart/form-data" id="myForms">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="data   col-md-6 ">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Title</label>
+                                </div>
+                                <div class=" col-6">
+                                    <select class="form-control text-dark bg-light" name="title" id="title" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Mr">Mr</option>
+                                        <option value="Mrs">Mrs</option>
+                                        <option value="Miss">Miss</option>
+                                        <option value="Ms">Ms</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">First Name</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="fname" id="fname" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Last Name</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="lname" id="lname" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Alias</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="alias" id="alias">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Date of joining</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="date" class="form-control text-dark bg-light" name="joindate2" id="joindate2" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="sdate">Salary Date</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <select class="form-control text-dark bg-light" name="salary" id="sdate" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1-10">1-10</option>
+                                        <option value="11-15">11-15</option>
+                                        <option value="16-31">16-31</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Define salary details</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="saltype" id="sal" onchange="salFunction()" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Fixed">Fixed</option>
+                                        <option value="Temporary">Temporary</option>
+                                        <option value="Variable">Time Based</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="fixed" style="display: none;">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Salary Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="fsalary" id="fsalary" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="variable" style="display: none;">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Amount per Hour</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="amnthr" id="amnthr" value="0">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Total working Hours</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="hours" id="hours" onkeyup="calculateAmount()" value="0">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Salary Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="vsalary" id="vsalary" value="0" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div class="image col-6 col-lg-6 col-md-6 col-sm-5">
+                            <div class="row">
+                                <div class="col-5 col-lg-5 col-md-10 col-sm-5 text-center">
+                                    <label for="">Upload Image</label>
+                                </div>
+                                <div class="col-6 col-lg-7 col-md-10 col-sm-5">
+                                    <br><br><br><br>
+                                    <label for="image-input">
+                                        <img class="img-fluid" src="" alt="profile image" id="img"
+                                            style="background-color: rgba(156, 156, 156, 0.267); border-radius: 30px;">
+                                    </label>
+                                    <input id="image-input" type="file" name="file" class="form-control" accept="image/*" onchange="loadFile(event)" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="gen-info row pt-5">
+                       
+                            <h4 class="text-center py-2 text-light">General information</h4>
+                            <hr class="text-warning font-weight-bold">
+                            <div class="left col-lg-6 col-sm-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Employee Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="empnum" id="empnum" onkeyup="empValidation(document.getElementById('empnum'))" required >
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Designation</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="designation" required  id="designation">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Location</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="location" required id="location">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Gender</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="gender" id="dropId3" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female" >Female</option>
+                                        <option value="Transgender" >Transgender</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Date of Birth</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" class="form-control text-dark bg-light"  id="dob" name="dob" onchange="calculateAge()" required >
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Age</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type=""  class="form-control text-dark bg-light"  id="age" name="age" readonly>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Blood Group</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" id="blood" name="blood" required>
+                                        <!-- <option value="A+">A+</option>
+                                        <option value="B+">B+</option> -->
+                                     
+                                        {% for i in blood %}
+                                        <option value="{{i.Blood_group}}" >{{i.Blood_group}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <a class="btn-outline-warning"  data-toggle="modal" data-target="#commentModal" data-toggle="tooltip" title="comment">
+                                        Add Blood group
+                                       </a>
+                                </div>
+                                
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Father's Name/Mother's Name</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="fm_name" id="fm_name">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Spouse's Name</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="s_name" id="s_name">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Contact Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control text-dark bg-light" name="phone" id="phone" required 
+                                        onkeyup="phoneValidate(document.getElementById('phone'),document.getElementById('pherror'))">
+                                    <div id="pherror" class="text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Emergency Contact Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control text-dark bg-light" name="ephone" id="ephone"
+                                        onkeyup="phoneValidate(document.getElementById('ephone'),document.getElementById('epherror'))">
+                                    <div id="epherror" class="text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Email</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="email"  class="form-control text-dark bg-light" name="email2" id="email2"
+                                        required onkeyup="emailvalidate()">
+                                    <div id="error" class="text-danger"></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-lg-5 col-sm-5">
+
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Permanent Address</label>
+                                </div>
+                                <div class="col-6">
+                                    <textarea class="form-control text-dark bg-light mb-2 pt-0" name="paddress" id="padrs1" onkeyup="clearaddreass(this.id)" required value=""></textarea>
+                                    <textarea class="form-control text-dark bg-light pt-0" name="paddress2" id="padrs2" onkeyup="clearaddreass(this.id)"></textarea>
+                                </div>
+                            </div>
+                            <div class="row pb-4">
+                                <div class="col-6">
+                                    <label for="">Temporary Address</label>
+                                </div>
+                                <div class="col-6">
+                                    <input class="mx-2" type="checkbox" id="filladdress" name="filladdress">
+                                    <label style="font-size: .8rem;">Same as permanent address</label>
+                                    <textarea class="form-control text-dark bg-light mb-2 pt-0" name="address" id="adrs1" onkeyup="clearaddreass(this.id)"></textarea>
+                                    <textarea class="form-control text-dark bg-light pt-0" name="address2" id="adrs2" onkeyup="clearaddreass(this.id)"></textarea>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Attachments</label>
+                                </div>
+                                <div class="col-6">
+                                    <input class="form-control" id="file-upload" type="file" name="attach" style="background: transparent;">
+                                </div>
+                            </div>
+                            <div class="row pb-4">
+                                <div class="col-6">
+                                    <label for="">Provide Bank Details</label>
+                                </div>
+                                <div class="col-6"><select class="form-control text-dark bg-light" name="bank" id="dropId"
+                                        onchange="bankdisplay()" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="bank" id="bank" style="display: none;">
+                                <br>
+                                <br>
+                                <h4 class="text-center py-2 text-light">Bank information</h4>
+                                <hr class="text-warning font-weight-bold">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Account Number</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text"  class="form-control text-dark bg-light" name="acc_no" id="acc_no" pattern="[0-9]{14}">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">IFSC</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="ifsc" id="ifsc">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Name of Bank</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="b_name" id="b_name">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Branch Name</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="branch" id="branch">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Transaction Type</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <select class="form-control text-dark bg-light" name="ttype" id="ttype">
+                                            <option value="" selected hidden>Select</option>
+                                            <option value="ATM">ATM</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Check">Check</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                                
+
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">TDS Applicable</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="tds" id="tds" onchange="tdsFunction()"
+                                        required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="tds-div" style="display: none;">
+                                <br>
+                                <br>
+                                <h5 class="text-center py-1 text-light">For Banking</h5>
+                                <hr class="text-warning font-weight-bold">
+                                
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Percentage/Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <select class="form-control text-dark bg-light" name="pora" id="pora" onchange="tdsFunction2()">
+                                            <option value="" selected hidden>Select</option>
+                                            <option value="Percentage">Percentage</option>
+                                            <option value="Amount">Amount</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="p" style="display: none;">
+                                    <div class="row pb-3">
+                                        <div class="col-6">
+                                            <label for="">Percentage</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control text-dark bg-light" name="pcnt" id="pcnt">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="a" style="display: none;">
+                                    <div class="row pb-3">
+                                        <div class="col-6">
+                                            <label for="">Amount</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control text-dark bg-light" name="amnt" id="amnt" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <br>
+                        <br>
+                      
+
+                        </div>
+                        <br>
+                        <br>
+                        <div class="row">
+                            <h4 class="text-center py-2 text-light">Statutary information</h4>
+                            <hr class="text-warning font-weight-bold">
+                            <div class=" col-sm-9 col-lg-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Income Tax Number(PAN)</label>
+                                </div>
+                                <div class="col-6"><input type="text" class="form-control text-dark bg-light" name="itn" id="itn" pattern="^[A-Z]{5}[0-9]{4}[A-Z]$" placeholder="ABCDE0051C"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Aadhar Number(*)</label>
+                                </div>
+                                <div class="col-6"><input type="text"class="form-control text-dark bg-light" name="an" id="an" requiredpattern="[0-9\s]{14}"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Universal Account Number(UAN)</label>
+                                </div>
+                                <div class="col-6"><input type="number"  class="form-control text-dark bg-light" name="uan" id="uan" ></div>
+                            </div>
+                            </div>
+                            <div class=" col-sm-9 col-lg-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">PF Account Number (PFN)</label>
+                                </div>
+                                <div class="col-6"><input type="number"  class="form-control text-dark bg-light" name="pfn"  id="pfn"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">PR Account Number (PRAN)</label>
+                                </div>
+                                <div class="col-6"><input type="text"  class="form-control text-dark bg-light" name="pran" id="pran" ></div>
+                            </div>
+                        </div>
+                        </div>
+        
+                    </div>
+                    <hr>
+                    <div class="action-button">
+                        <button class="btn text-light" type="submit" style="background-color: chocolate; width: 150px; font-size: medium;" id="saveEmployee" onclick="validateform()">Add</button>
+                        <button class="btn btn-danger" type="reset" style="background-color: chocolate; width: 150px; font-size: medium;" onclick="goToTop()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         </div>
     </div>
@@ -952,6 +906,60 @@
 </script>
 
 <!-- jQuery script to compare values and show alert -->
+
+
+<!--payment method -->
+<script>
+    $(document).ready(function() {
+      $("#pay_method").change(function() {
+        var x=$('#pay_method').val();
+        if(x==='cash'){
+          $('#chequediv').hide()
+          $('#bnkdiv').hide()
+          $('#upidiv').hide()
+          document.getElementById('cheque_id').value=null
+          document.getElementById('upi_id').value=null
+        }else if(x==='cheque'){
+          $('#chequediv').show()
+          $('#bnkdiv').hide()
+          $('#upidiv').hide()
+          document.getElementById('upi_id').value=null
+        }else if(x==='upi'){
+          $('#upidiv').show()
+          $('#bnkdiv').hide()
+          $('#chequediv').hide()
+          document.getElementById('cheque_id').value=null
+        }else{
+          $('#bnkdiv').show()
+          $('#chequediv').hide()
+          $('#upidiv').hide()
+          document.getElementById('cheque_id').value=null
+          document.getElementById('upi_id').value=null
+
+          $.ajax({
+              type: "GET",
+              url: "{% url 'bankdata1' %}",
+              data: {
+                  id: x,
+              },
+              success: function (response) {
+                  data = response.bank
+                  document.getElementById('cheque_id').value=null
+                  document.getElementById('upi_id').value=null
+                  document.getElementById("bnk_id").value = data
+              }
+          });
+        }
+      });
+    });
+</script>
+
+<!--payment method end-->
+
+
+
+
+
 <script>
    
 
@@ -1192,12 +1200,10 @@ function updateOutputFields() {
 
  
  
-
-
     $('document').ready(function () {
         $('.add_another').click(function () {
           $("#tbl").append(`<tr>
-            <td> </td>
+            <td></td>
             <td>
                 <input type="text" name="first_name[]" class="form-control border-1 bg-transparent text-white"  value="" />
             </td>
@@ -1224,8 +1230,6 @@ function updateOutputFields() {
         </tr>`);
         });
       })
-
-
 
       function fieldset5_function()
       {

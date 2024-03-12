@@ -158,31 +158,15 @@
              
               <tbody>
                 {% for v in data %}
-       
-                <tr id="over" class="clickable-row" data-href="{% url 'view_customer_details' v.id %}">
-
-                  <td style="text-align: center;">{{forloop.counter}}</td>
-                  <td>{{v.first_name}} {{v.last_name}}</td>
-                  <td>{{v.customer_email}}</td>
-
-                  <td ><textarea class="bg-transparent text-white border-0" name="" id="" cols="45" rows="2">{{v.GST_treatement}}</textarea></td>
-                  <td>{{v.GST_number}}</td>
-                 
-                  <td> {% if v.opening_balance_type == 'credit' %}-{{v.opening_balance}}
-                      {% else %}
-                      {{v.opening_balance}}
-                      {% endif %}
-
-                  </td>
-                  
-                  <td>{{v.customer_status}}</td>
-                 
-                  <td>
-                    {{v.current_balance}}
-                  </td>
-
-  
-                 
+                <tr id="over" class="clickable-row" data-href="">
+                  <!-- <td style="text-align: center;">{{forloop.counter}}</td> -->
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -299,28 +283,29 @@
     
     <!-- Check if there's a success message and trigger SweetAlert -->
     <script>
-        {% if messages %}
-            {% for message in messages %}
-                {% if message.tags == 'success' %}
-                swal.fire({  
-                  title: "Success!",  
-                  text: '{{ message }}',  
-                  icon: "success",  
-                  showConfirmButton: false,
-                  timer: 2900
-                });  
-                {% elif message.tags == 'error' %}
-                Swal.fire({
-                    icon: 'error',
-                    title: "Ooops Error !",  
-                    text: '{{ message }}',  
-                    showConfirmButton: false,
-                    timer: 2900
-                });
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+      {% if messages %}
+          {% for message in messages %}
+              {% if message.tags == 'success' %}
+                  swal.fire({  
+                      title: "Success!",  
+                      text: '{{ message }}',  
+                      icon: "success",  
+                      showConfirmButton: false,
+                      timer: 2900
+                  });  
+              {% elif message.tags == 'error' %}
+                  swal.fire({
+                      icon: 'error',
+                      title: "Oops, Error!",  
+                      text: '{{ message }}',  
+                      showConfirmButton: false,
+                      timer: 2900
+                  });
+              {% endif %}
+          {% endfor %}
+      {% endif %}
     </script>
+  
 
 
   <script>
