@@ -69,9 +69,13 @@
                 {% csrf_token %}
 
                 <div class="form-group row mt-4">
-                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Select Customer</label></div>
+                    <div for="select" class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <select class="form-control bg-light text-dark"  name="v_display_name" id="v_display_name">    
+                        <select class="form-control bg-light text-dark"  name="select" > 
+                        <option selected>Select Customer</option>
+                        {% for c in customer %}
+                        <option value="{{ c.id }}">{{c.first_name}}</option>
+                        {% endfor %}   
                         </select> 
                     </div>
                     <div class="col-md-4 ">
@@ -82,7 +86,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="email" class="form-control bg-light text-dark" name="customer_email" required> 
+                        <input  type="email" class="form-control bg-light text-dark" id="customer_email" name="customer_email" required> 
                         <span class=" text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
                     </div>
                 </div>
@@ -90,7 +94,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Billing Address</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
+                        <input  type="text" class="form-control bg-light text-dark" id="customer_billing_address" name="customer_billing_address" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -100,7 +104,7 @@
                     <div class="form-group row mt-4">
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
                         <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="gst" id="GSTT" class="form-control bg-light text-dark" onclick="gstPan_function()">
+                            <select class="form-control bg-light text-dark" id="GSTT" name="customer_gst_type" onclick="gstPan_function()">
                                 <option value="Select a Gst Treatment" selected>Select a Gst Treatment</option>
                                 <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
                                 <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">
@@ -116,7 +120,7 @@
                         <div class="row mt-4">
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN</label>
                             <div class=" col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark" name="gst_number" id="gstInput" > 
+                                <input type="text" class="form-control bg-light text-dark" id="customer_gst_number" name="customer_gst_number" > 
                                 <span id="gstMessage"></span>       
                             </div>
                         </div>
@@ -135,7 +139,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order No</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
+                        <input  type="text" class="form-control bg-light text-dark" id="sales_order_number" name="sales_order_number" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -143,7 +147,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Referance Number</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
+                        <input  type="text" class="form-control bg-light text-dark" id="reference_number" name="reference_number" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -151,7 +155,7 @@
                 <div class="form-group row mt-4">
                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Place of Supply*</label>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <select name="source_supply" id="PLACE" class="form-control bg-light text-dark">
+                        <select id="customer_place_of_supply" name="customer_place_of_supply" class="form-control bg-light text-dark">
                             <option value="value" selected></option>
                             <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                             <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
@@ -198,7 +202,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order Date</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="Date" class="form-control bg-light text-dark " name="company_name" required>     
+                        <input  type="Date" class="form-control bg-light text-dark" id="sales_order_date" name="sales_order_date" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -206,7 +210,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Expected Shippment Date</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="type" class="form-control bg-light text-dark " name="company_name" required>     
+                        <input  type="Date" class="form-control bg-light text-dark" id="expiration_date" name="expiration_date" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -214,7 +218,7 @@
                 <div class="form-group row mt-4">
                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">
+                        <select id="paytearm_select" name="payment_terms" class="form-control bg-light text-dark">
                             {% for pay_terms in comp_payment_terms %}
                             <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
                         {% endfor %} 
@@ -242,17 +246,17 @@
                     <div class="col-md-1"></div>
                     <div class="col-sm-12 col-md-3 col-lg-3" style="display:none;"  id="chequediv">
                         <label class="col-form-label text-light" >Cheque No</label>
-                        <input type="text" class="form-control bg-light" name="cheque_id"  id="cheque_id" placeholder="Enter Cheque No" style="color: black;">
+                        <input type="text" class="form-control bg-light" name="cheque_number"  id="cheque_id" placeholder="Enter Cheque No" style="color: black;">
                     </div>
 
                     <div class="col-sm-12 col-md-3 col-lg-3 "  style="display:none; " id="upidiv">
                         <label class="col-form-label text-light" >UPI ID</label>
-                        <input type="text" class="form-control bg-light" name="upi_id"  id="upi_id" placeholder="Enter UPI ID" style="color: black;">
+                        <input type="text" class="form-control bg-light" name="upi_number"  id="upi_id" placeholder="Enter UPI ID" style="color: black;">
                     </div>
                    
                     <div class="col-sm-12 col-md-3 col-lg-3"  style="display:none;" id="bnkdiv">
                         <label class="col-form-label text-light" >Bank Account</label>
-                        <input type="text" class="form-control bg-light" name="bnk_id" id="bnk_id"  style="background-color: #43596c;" readonly style="color: black;">
+                        <input type="text" class="form-control bg-light" name="bank_account_number" id="bnk_id"  style="background-color: #43596c;" readonly style="color: black;">
                     </div>
                 </div>
 

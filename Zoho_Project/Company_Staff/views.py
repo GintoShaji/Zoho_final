@@ -12966,7 +12966,6 @@ def salesorder_list(request):
             log_id = request.session['login_id']   
         else:
            return redirect('/')
-       
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
             dash_details = StaffDetails.objects.get(login_details=log_details)
@@ -12977,13 +12976,14 @@ def salesorder_list(request):
 
         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
         data=Customer.objects.filter(company=comp_details)
-        return render(request,'zohomodules/sales_order/salesorder_list.html',{'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
     else:
         return redirect('/')
     
-           
-def add_salesorder(request):
+    sale = SaleOrder.objects.all()
+    return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale': sale,'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
     
+          
+def add_salesorder(request):
     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
@@ -12998,35 +12998,60 @@ def add_salesorder(request):
             comp_details=CompanyDetails.objects.get(login_details=log_details)
   
         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
-        
+        data=Customer.objects.filter(company=comp_details)
+    else:
+        return redirect('/')
+    
         
     if request.method=="POST":
-        sales_data=SaleOrder()
-        sales_data.company=comp_details
-        sales_data.login_details=log_details
-        sales_data.customer_type = request.POST.get('type')
+        # customer=Customer.objects.get()
+        payment_terms = Company_Payment_Term.objects.filter(company=comp_details).first()
         
-        # company_id = request.GET.get('company_id')
+        select=request.POST["select"]
+        customer=Customer.objects.get(id=select)
         
-        # sales_data.customer=request.POST['customer']
-        # sales_data.customer=Customer.objects.filter(company_id=company_id, status='Active')
+        customer_email=request.POST['customer_email']
+        customer_billing_address=request.POST['customer_billing_address']
+        customer_gst_type=request.POST['customer_gst_type']
+        customer_gst_number=request.POST['customer_gst_number']
+        customer_place_of_supply=request.POST['customer_place_of_supply']
+        sales_order_date=request.POST['sales_order_date']
+        # payment_terms=request.POST['payment_terms']
+        expiration_date=request.POST['expiration_date']
+        reference_number=request.POST['reference_number']
+        sales_order_number=request.POST['sales_order_number']
+        payment_method=request.POST['payment_method']
         
-        sales_data.customer_email=request.POST['customer_email']
-        sales_data.customer_billing_address=request.POST['customer_billing_address']
-        sales_data.customer_gst_type=request.POST['customer_gst_type']
-        sales_data.customer_gst_number=request.POST['customer_gst_number']
-        # sales_data.customer_place_of_supply=request.POST['customer_place_of_supply']
-        sales_data.sales_order_date=request.POST['sales_order_date']
-        # sales_data.payment_terms=request.POST['payment_terms']
-        sales_data.expiration_date=request.POST['expiration_date']
-        sales_data.reference_number=request.POST['reference_number']
-        sales_data.sales_order_number=request.POST['sales_order_number']
-        sales_data.payment_method=request.POST['payment_method']
+        cheque_number=request.POST['cheque_number']
+        upi_number=request.POST['upi_number']
+        bank_account_number=request.POST['bank_account_number']
         
         
-        # sales_data.cheque_number=request.POST['cheque_number']
-        # sales_data.upi_number=request.POST['upi_number']
-        # sales_data.bank_account_number=request.POST['bank_account_number']
+        sale=SaleOrder.objects.create(customer=customer,
+                                      payment_terms=payment_terms,
+                                      login_details=log_details,
+                                      company=comp_details,
+                                      customer_email=customer_email,
+                                      customer_billing_address=customer_billing_address,
+                                      customer_gst_type=customer_gst_type,
+                                      customer_gst_number=customer_gst_number,
+                                      customer_place_of_supply=customer_place_of_supply,
+                                      sales_order_date=sales_order_date,
+                                    #   payment_terms=payment_terms,
+                                      expiration_date=expiration_date,
+                                      reference_number=reference_number,
+                                      sales_order_number=sales_order_number,
+                                      payment_method=payment_method,
+                                      
+                                      cheque_number=cheque_number,
+                                      upi_number=upi_number,
+                                      bank_account_number=bank_account_number)
+        sale.save()
+        messages.success(request, 'Sales Order created successfully!')   
+    return render(request,'zohomodules/sales_order/salesorder_list.html',{'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
+
+
+
         # sales_data.description=request.POST['description']
         # sales_data.terms_and_condition=request.POST['terms_and_condition']
         # sales_data.document=request.POST['document']
@@ -13041,9 +13066,7 @@ def add_salesorder(request):
         # sales_data.balance=request.POST['balance']
         # sales_data.status=request.POST['status']
         
-        messages.success(request, 'Sales Order created successfully!')   
 
-    return redirect('salesorder_list')
 
 
         

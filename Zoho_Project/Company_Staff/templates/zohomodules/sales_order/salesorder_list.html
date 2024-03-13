@@ -157,12 +157,13 @@
               </thead>
              
               <tbody>
-                {% for v in data %}
+                {% for i in sale %}
                 <tr id="over" class="clickable-row" data-href="">
-                  <!-- <td style="text-align: center;">{{forloop.counter}}</td> -->
+                  <td style="text-align: center;">{{forloop.counter}}</td>
+                  <td>{{i.sales_order_date}}</td>
+                  <td>{{i.sales_order_number}}</td>
                   <td></td>
-                  <td></td>
-                  <td></td>
+                  <td>{{i.customer_email}}</td>
                   <td></td>
                   <td></td>
                   <td></td>

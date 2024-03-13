@@ -831,7 +831,7 @@ class SaleOrder(models.Model):
     customer_gst_number = models.CharField(max_length=255)
     customer_place_of_supply = models.CharField(max_length=255)
     sales_order_date = models.DateField()
-    payment_terms = models.ForeignKey(Company_Payment_Term, on_delete=models.CASCADE)
+    payment_terms = models.ForeignKey(Company_Payment_Term, on_delete=models.CASCADE,blank=True, null=True)
     expiration_date = models.DateField()
     reference_number = models.CharField(max_length=255)
     sales_order_number = models.CharField(max_length=255)
@@ -843,22 +843,23 @@ class SaleOrder(models.Model):
     ]
     payment_method = models.CharField(max_length=255, choices=PAYMENT_METHOD_CHOICES)
     
-    
     cheque_number = models.CharField(max_length=255, blank=True, null=True)
     upi_number = models.CharField(max_length=255, blank=True, null=True)
     bank_account_number = models.CharField(max_length=255, blank=True, null=True)
+    
+    
     description = models.CharField(max_length=255)
     terms_and_condition = models.TextField()
     document = models.FileField(upload_to='documents/')
-    sub_total = models.DecimalField(max_digits=10, decimal_places=2)
-    cgst = models.DecimalField(max_digits=10, decimal_places=2)
-    sgst = models.DecimalField(max_digits=10, decimal_places=2)
-    tax_amount_igst = models.DecimalField(max_digits=10, decimal_places=2)
-    shipping_charge = models.DecimalField(max_digits=10, decimal_places=2)
-    adjustment = models.DecimalField(max_digits=10, decimal_places=2)
-    grand_total = models.DecimalField(max_digits=10, decimal_places=2)
-    advanced_paid = models.DecimalField(max_digits=10, decimal_places=2)
-    balance = models.DecimalField(max_digits=10, decimal_places=2)
+    sub_total = models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True)
+    cgst = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    sgst = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    tax_amount_igst = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    shipping_charge = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    adjustment = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    grand_total = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    advanced_paid = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    balance = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     STATUS_CHOICES = [
         ('Draft', 'Draft'),
         ('Save', 'Save'),
