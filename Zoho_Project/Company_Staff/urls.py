@@ -345,6 +345,10 @@ urlpatterns = [
     path('salesorder',views.salesorder,name='salesorder'),
     path('salesorder_list',views.salesorder_list,name='salesorder_list'),
     path('add_salesorder/',views.add_salesorder,name='add_salesorder'),
+    path('sort_customer_name',views.sort_customer_name,name='sort_customer_name'),
+    path('sort_sales_order',views.sort_sales_order,name='sort_sales_order'),
+    path('view_salesorder_save',views.view_salesorder_save,name='view_salesorder_save'),
+    path('view_salesorder_draft',views.view_salesorder_draft,name='view_salesorder_draft'),
     
     
     

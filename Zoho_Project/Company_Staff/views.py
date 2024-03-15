@@ -10141,7 +10141,6 @@ def sort_customer_by_name(request):
      if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
-           
         else:
             return redirect('/')
     
@@ -10149,12 +10148,9 @@ def sort_customer_by_name(request):
         if log_details.user_type=='Staff':
             dash_details = StaffDetails.objects.get(login_details=log_details)
             comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
-
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
-            comp_details=CompanyDetails.objects.get(login_details=log_details)
-
-            
+            comp_details=CompanyDetails.objects.get(login_details=log_details) 
         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
   
         data=Customer.objects.filter(login_details=log_details).order_by('first_name')
@@ -10298,18 +10294,16 @@ def import_customer_excel(request):
                                          shipping_state=vendorsheet[31],shipping_pincode=vendorsheet[32],
                                          shipping_mobile=vendorsheet[33], shipping_fax=vendorsheet[34], remarks=vendorsheet[35],current_balance=opn_blc,customer_status="Active",company=comp_details,login_details=log_details)
                     Vendor_object.save()
-
     
-                   
                 messages.warning(request,'file imported')
                 return redirect('view_customer_list')    
-
-    
+            
             messages.error(request,'File upload Failed!11')
             return redirect('view_customer_list')
         else:
             messages.error(request,'File upload Failed!11')
             return redirect('view_customer_list') 
+
 
 def view_customer_details(request,pk):
     if 'login_id' in request.session:
@@ -12953,9 +12947,12 @@ def salesorder(request):
    
         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
         
+        customer=Customer.objects.all()
+        item=Items.objects.all()
+         
         comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
         price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
-        return render(request,'zohomodules/sales_order/add_salesorder.html',{'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details,'price_lists':price_lists}) 
+        return render(request,'zohomodules/sales_order/add_salesorder.html',{'item':item, 'customer':customer, 'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details,'price_lists':price_lists}) 
     else:
         return redirect('/')  
 
@@ -12996,16 +12993,14 @@ def add_salesorder(request):
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
             comp_details=CompanyDetails.objects.get(login_details=log_details)
-  
+   
         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
         data=Customer.objects.filter(company=comp_details)
+
     else:
         return redirect('/')
-    
-        
+     
     if request.method=="POST":
-        # customer=Customer.objects.get()
-        payment_terms = Company_Payment_Term.objects.filter(company=comp_details).first()
         
         select=request.POST["select"]
         customer=Customer.objects.get(id=select)
@@ -13015,8 +13010,9 @@ def add_salesorder(request):
         customer_gst_type=request.POST['customer_gst_type']
         customer_gst_number=request.POST['customer_gst_number']
         customer_place_of_supply=request.POST['customer_place_of_supply']
+    
         sales_order_date=request.POST['sales_order_date']
-        # payment_terms=request.POST['payment_terms']
+        payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
         expiration_date=request.POST['expiration_date']
         reference_number=request.POST['reference_number']
         sales_order_number=request.POST['sales_order_number']
@@ -13027,8 +13023,8 @@ def add_salesorder(request):
         bank_account_number=request.POST['bank_account_number']
         
         
+        
         sale=SaleOrder.objects.create(customer=customer,
-                                      payment_terms=payment_terms,
                                       login_details=log_details,
                                       company=comp_details,
                                       customer_email=customer_email,
@@ -13037,7 +13033,7 @@ def add_salesorder(request):
                                       customer_gst_number=customer_gst_number,
                                       customer_place_of_supply=customer_place_of_supply,
                                       sales_order_date=sales_order_date,
-                                    #   payment_terms=payment_terms,
+                                      payment_terms=payment_terms,
                                       expiration_date=expiration_date,
                                       reference_number=reference_number,
                                       sales_order_number=sales_order_number,
@@ -13047,8 +13043,30 @@ def add_salesorder(request):
                                       upi_number=upi_number,
                                       bank_account_number=bank_account_number)
         sale.save()
+        
+        
+        select=request.POST["select"]
+        item=Items.objects.get(id=select)
+        hsn=request.POST['hsn']
+        quantity=request.POST['quantity']
+        price=request.POST['price']
+        tax_rate=request.POST['tax_rate']
+        discount=request.POST['discount']
+        total=request.POST['total']
+
+        orderitem=SalesOrderItems.objects.create(
+                                                 item=item,
+                                                 hsn=hsn,
+                                                 quantity=quantity,
+                                                 price=price,
+                                                 tax_rate=tax_rate,
+                                                 discount=discount,
+                                                 total=total)
+        orderitem.save()
+        
         messages.success(request, 'Sales Order created successfully!')   
-    return render(request,'zohomodules/sales_order/salesorder_list.html',{'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
+    return render(request,'zohomodules/sales_order/salesorder_list.html',{ 
+        'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
 
 
 
@@ -13064,10 +13082,94 @@ def add_salesorder(request):
         # sales_data.grand_total=request.POST['grand_total']
         # sales_data.advanced_paid=request.POST['advanced_paid']
         # sales_data.balance=request.POST['balance']
-        # sales_data.status=request.POST['status']
+       
         
+def sort_customer_name(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details) 
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+  
+        sale = SaleOrder.objects.all().order_by('customer__first_name')
+        return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale':sale,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+            return redirect('/')  
 
 
+def sort_sales_order(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details) 
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+  
+        sale=SaleOrder.objects.all().order_by('sales_order_number')
+        return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale':sale,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+            return redirect('/')  
+        
+                    
+def view_salesorder_save(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id'] 
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+  
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+        
+        sale=SaleOrder.objects.filter(status='Save').order_by('-id')
+        return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale':sale,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+        return redirect('/')
+    
+    
+def view_salesorder_draft(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id'] 
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+  
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+        
+        sale=SaleOrder.objects.filter(status='Draft').order_by('-id')
+        return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale':sale,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+        return redirect('/') 
+   
+        
 
         
         

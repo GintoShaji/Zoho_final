@@ -860,11 +860,13 @@ class SaleOrder(models.Model):
     grand_total = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     advanced_paid = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    Save='Save'
+    Draft='Draft'
     STATUS_CHOICES = [
         ('Draft', 'Draft'),
         ('Save', 'Save'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=Save)    
  
 
 class SalesOrderItems(models.Model):

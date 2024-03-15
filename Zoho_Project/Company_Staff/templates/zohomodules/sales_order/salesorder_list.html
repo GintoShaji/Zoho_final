@@ -87,9 +87,9 @@
                         </a>
                        
                         <div class="dropdown-menu m-1">
-                          <a class="dropdown-item" href="{% url 'view_customer_list' %}">All</a>
-                          <a class="dropdown-item" href="{% url 'sort_customer_by_name' %}">Customer Name</a>
-                          <a class="dropdown-item" href="{% url 'sort_customer_by_amount' %}">Sales Order No</a>
+                          <a class="dropdown-item" href="{% url 'salesorder_list' %}">All</a>
+                          <a class="dropdown-item" href="{% url 'sort_customer_name' %}">Customer Name</a>
+                          <a class="dropdown-item" href="{% url 'sort_sales_order' %}">Sales Order No</a>
                         </div>
                       </div>
                     </div>
@@ -106,11 +106,10 @@
                         <a class="btn text-center  pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
                           <i class="fa fa-filter mt-1"></i>
                         </a>
-
                         <div class="dropdown-menu m-1 ">
-                          <a class="dropdown-item" href="{% url 'view_customer_list' %}">All</a>
-                          <a class="dropdown-item" href="{% url 'view_customer_active' %}">Draft</a>
-                          <a class="dropdown-item" href="{% url 'view_customer_inactive' %}">Saved</a>
+                          <a class="dropdown-item" href="{% url 'salesorder_list' %}">All</a>
+                          <a class="dropdown-item" href="{% url 'view_salesorder_draft' %}">Draft</a>
+                          <a class="dropdown-item" href="{% url 'view_salesorder_save' %}">Saved</a>
                         </div>
                         </div>
                         <a  class="btn btn-outline-warning text-right px-3 py-2 flex-sm-row" role="button"  href="{% url 'salesorder' %}">
@@ -162,21 +161,18 @@
                   <td style="text-align: center;">{{forloop.counter}}</td>
                   <td>{{i.sales_order_date}}</td>
                   <td>{{i.sales_order_number}}</td>
-                  <td></td>
+                  <td>{{i.customer.first_name}} {{i.customer.last_name}}</td>
                   <td>{{i.customer_email}}</td>
                   <td></td>
-                  <td></td>
+                  <td>{{i.status}}</td>
                   <td></td>
                   <td></td>
                 </tr>
                 {% endfor %}
               </tbody>
-
             </table>
 
-            
           </div>
-          
         </div>
        
         <div class="row" hidden>
@@ -252,7 +248,7 @@
                 <form action="{% url 'import_customer_excel' %}" method="post" class="needs-validation" enctype="multipart/form-data"  id="excelForm">
                   {% csrf_token %}
                   <div class="form-group mt-3" style="margin-left: 2vh;">
-                    <label for="file" style="font-size: medium;">Choose Excel File for Customers - </label> <br><br>
+                    <label for="file" style="font-size: medium;">Choose Excel File for Salesorder - </label> <br><br>
                     <input type="file" class="form-control-file" id="empfile" name="empfile" accept=".xls,.xlsx"><br>
                   </div>
                   <div class="modal-footer">
@@ -340,7 +336,7 @@
       const table = document.getElementById('myTable'); // Replace 'myTable' with your table's ID
       const wb = XLSX.utils.table_to_book(table);
   
-      XLSX.writeFile(wb, 'customer_list.xlsx');
+      XLSX.writeFile(wb, 'salesorder_list.xlsx');
   }
   </script>
   

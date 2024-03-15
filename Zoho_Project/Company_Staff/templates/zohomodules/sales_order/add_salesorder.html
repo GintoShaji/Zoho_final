@@ -74,7 +74,7 @@
                         <select class="form-control bg-light text-dark"  name="select" > 
                         <option selected>Select Customer</option>
                         {% for c in customer %}
-                        <option value="{{ c.id }}">{{c.first_name}}</option>
+                        <option value="{{ c.id }}">{{c.first_name}}{{c.last_name}}</option>
                         {% endfor %}   
                         </select> 
                     </div>
@@ -86,7 +86,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="email" class="form-control bg-light text-dark" id="customer_email" name="customer_email" required> 
+                        <input  type="email" class="form-control bg-light text-dark"  id="customer_email" name="customer_email" required> 
                         <span class=" text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
                     </div>
                 </div>
@@ -281,13 +281,22 @@
                             <tbody>
                                 <tr>
                                 <td></td>
-                                <td><input type="text" class=" form-control border-1 bg-transparent text-white"></td>
-                                <td><input type="text"class="form-control border-1 bg-transparent text-white"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white" onclick="sample1()"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white"  onclick="sample()"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white"></td>
+                                <td>
+                                    <!-- <input type="text" class=" form-control border-1 bg-transparent text-white" name="item"> -->
+                                    <select class="form-control bg-light text-dark"  name="select" > 
+                                        <option selected>Select item</option>
+                                        {% for i in item %}
+                                        <option value="{{ i.id }}">{{i.item_name}}</option>
+                                        {% endfor %}   
+                                        </select> 
+                                </td>
+                                <td><input type="text"class="form-control border-1 bg-transparent text-white" name="hsn">
+                                </td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="quantity"></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="price"></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="tax_rate" onclick="sample1()"></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="discount"  onclick="sample()"></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="total"></td>
                                 <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
                                 </tr>
                             </tbody>
@@ -880,6 +889,8 @@
 </div>
 
 
+
+
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" ></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" ></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -1209,25 +1220,25 @@ function updateOutputFields() {
           $("#tbl").append(`<tr>
             <td></td>
             <td>
-                <input type="text" name="first_name[]" class="form-control border-1 bg-transparent text-white"  value="" />
+                <input type="text" name="item" class="form-control border-1 bg-transparent text-white"  value="" />
             </td>
             <td>
-                <input type="text" name="last_name[]" class="form-control border-1 bg-transparent text-white"   value="" />
+                <input type="text" name="hsn" class="form-control border-1 bg-transparent text-white"   value="" />
             </td>
             <td>
-                <input type="email" name="email[]" class="form-control border-1 bg-transparent text-white" value="" />
+                <input type="text" name="quantity" class="form-control border-1 bg-transparent text-white" value="" />
             </td>
             <td>
-                <input type="tel" pattern="[0-9]{7}" id="twphone" name="wphone[]" class="form-control border-1 bg-transparent text-white"  value="" />
+                <input type="text"  id="twphone" name="price" class="form-control border-1 bg-transparent text-white"  value="" />
             </td>
             <td>
-                <input type="tel" pattern="[0-9]{10}" id="tmobile" onclick="sample1()" name="mobile[]" class="form-control border-1 bg-transparent text-white"  value="" />
+                <input type="text" id="tmobile" onclick="sample1()" name="tax_rate" class="form-control border-1 bg-transparent text-white"  value="" />
             </td>
             <td>
-                <input type="number" onclick="sample()" name="skype[]" class="form-control border-1 bg-transparent text-white"  value="" />
+                <input type="text" onclick="sample()" name="discount" class="form-control border-1 bg-transparent text-white"  value="" />
             </td>
             <td>
-                <input type="text" name="designation[]" class="form-control border-1 bg-transparent text-white" value="" />
+                <input type="text" name="total" class="form-control border-1 bg-transparent text-white" value="" />
             </td>
             
             <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
