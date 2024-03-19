@@ -1,259 +1,201 @@
-def payroll_employee_create(request):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        if 'login_id' not in request.session:
-            return redirect('/')
-    log_details= LoginDetails.objects.get(id=log_id)
-    blood=Bloodgroup.objects.all()
-    if log_details.user_type == "Company":
-        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-    if log_details.user_type == "Staff":
-        dash_details = StaffDetails.objects.get(login_details=log_details)
-        allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-    content = {
-            'details': dash_details,
-            'allmodules': allmodules,
-            'log_id':log_details,
-            'blood':blood
-            
-    }
-    return render(request,'zohomodules/payroll-employee/payroll_create_employee.html',content)
-    
-def employee_list(request):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        if 'login_id' not in request.session:
-            return redirect('/')
-    log_details= LoginDetails.objects.get(id=log_id)
-    if log_details.user_type == 'Staff':
-        dash_details = StaffDetails.objects.get(login_details=log_details)
-        pay=payroll_employee.objects.filter(company=dash_details.company)
-        allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-        content = {
-                'details': dash_details,
-                'pay':pay,
-                'allmodules': allmodules,
-                'log_id':log_details
-        }
-        return render(request,'zohomodules/payroll-employee/payroll_list.html',content)
-    if log_details.user_type == 'Company':
-        dash_details = CompanyDetails.objects.get(login_details=log_details)
-        pay=payroll_employee.objects.filter(company=dash_details)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-        content = {
-                'details': dash_details,
-                'pay':pay,
-                'allmodules': allmodules,
-                'log_id':log_details
-        }
-        return render(request,'zohomodules/payroll-employee/payroll_list.html',content)
+<div class="card bg-black shadow p-3 rounded">
+    <h3  class="mb-4 mt-2  " style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Sales Order</h3>
+    <form  method="post" action="{% url 'add_salesorder' %}"  enctype="multipart/form-data" class="mb-3">
+        {% csrf_token %}
+
+        <div class="form-group row mt-4">
+            <div for="select" class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer</label></div>
+            <div class=" col-sm-12 col-md-3 col-lg-3">
+                <select class="form-control bg-light text-dark"  name="select" > 
+                <option selected>Select Customer</option>
+                {% for c in customer %}
+                <option value="{{ c.id }}">{{c.first_name}}{{c.last_name}}</option>
+                {% endfor %}   
+                </select> 
+            </div>
+            <div class="col-md-4 ">
+                <a href="#" class="btn btn-warning ml-1" role="button" data-toggle="modal" data-target="#customerModal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+            </div>
+        </div>
+
         
-def employee_overview(request,pk):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        if 'login_id' not in request.session:
-            return redirect('/')
-    log_details= LoginDetails.objects.get(id=log_id)
-    if log_details.user_type =='Company':
-        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-        pay=payroll_employee.objects.filter(company=dash_details)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-        p=payroll_employee.objects.get(id=pk)
-        comment_data=payroll_employee_comment.objects.filter(employee=pk)
-        history=employee_history.objects.filter(employee=pk)
-    if log_details.user_type =='Staff':
-        dash_details = StaffDetails.objects.get(login_details=log_details)
-        pay=payroll_employee.objects.filter(company=dash_details.company)
-        allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-        p=payroll_employee.objects.get(id=pk)
-        comment_data=payroll_employee_comment.objects.filter(employee=pk)
-        history=employee_history.objects.filter(employee=pk)
-    content = {
-                'details': dash_details,
-                'pay':pay,
-                'p':p,
-                'allmodules': allmodules,
-                'comment':comment_data,
-                'history':history,
-                'log_id':log_details,
-        }
-    return render(request,'zohomodules/payroll-employee/overview_page.html',content)
+        <div class="form-group row mt-4">
+            <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
+            <div class=" col-sm-12 col-md-3 col-lg-3">
+                {% for c in customer %}
+                <input  type="email" class="form-control bg-light text-dark" value="{{c.customer_email}}"  id="customer_email" name="customer_email" required> 
+                {% endfor %} 
+                <span class=" text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
+            </div>
+        </div>
+
+        <div class="form-group row mt-4">
+            <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Billing Address</label></div>
+            <div class=" col-sm-12 col-md-3 col-lg-3">
+                {% for c in customer %}
+                <input  type="text" class="form-control bg-light text-dark" value="{{c.customer_billing_address}}" id="customer_billing_address" name="customer_billing_address" required>
+                {% endfor %}    
+                <div class="invalid-feedback">Please fill out this field.</div>   
+            </div>
+        </div>
+
+            <div class="form-group row mt-4">
+                <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
+                <div class=" col-sm-12 col-md-3 col-lg-3">
+                {% for c in customer %}
+                <input type="text" class="form-control bg-light text-dark" value="{{c.customer_gst_type}}" id="customer_gst_type" name="customer_gst_type" >
+                {% endfor %}     
+                </div>
+            </div>
     
-def create_employee(request):
-    if request.method=='POST':
-        if 'login_id' in request.session:
-            log_id = request.session['login_id']
-        if 'login_id' not in request.session:
-            return redirect('/')
-        log_details= LoginDetails.objects.get(id=log_id)
-        if log_details.user_type == 'Company':    
-            company_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-            title=request.POST['title']
-            fname=request.POST['fname']
-            lname=request.POST['lname']
-            alias=request.POST['alias']
-            joindate=request.POST['joindate']
-            salarydate=request.POST['salary']
-            saltype=request.POST['saltype']
-            if (saltype == 'Fixed'):
-                salary=request.POST['fsalary']
-            else:
-                salary=request.POST['vsalary']
-            image=request.FILES.get('file')
-            amountperhr=request.POST['amnthr']
-            workhr=request.POST['hours'] 
-            empnum=request.POST['empnum']
-            if payroll_employee.objects.filter(emp_number=empnum,company=company_details):
-                messages.info(request,'employee number all ready exists')
-                return redirect('payroll_employee_create')
-            designation = request.POST['designation']
-            location=request.POST['location']
-            gender=request.POST['gender']
-            dob=request.POST['dob']
-            blood=request.POST['blood']
-            fmname=request.POST['fm_name']
-            sname=request.POST['s_name']        
-            add1=request.POST['address']
-            add2=request.POST['address2']
-            address=add1+" "+add2
-            padd1=request.POST['paddress'] 
-            padd2=request.POST['paddress2'] 
-            paddress= padd1+padd2
-            phone=request.POST['phone']
-            ephone=request.POST['ephone']
-            result_set1 = payroll_employee.objects.filter(company=company_details,Phone=phone)
-            result_set2 = payroll_employee.objects.filter(company=company_details,emergency_phone=ephone)
-            if result_set1:
-                messages.error(request,'phone no already exists')
-                return redirect('payroll_employee_create')
-            if result_set2:
-                messages.error(request,'phone no already exists')
-                return redirect('payroll_employee_create')
-            email=request.POST['email']
-            result_set = payroll_employee.objects.filter(company=company_details,email=email)
-            if result_set:
-                messages.error(request,'email already exists')
-                return redirect('payroll_employee_create')
-            isdts=request.POST['tds']
-            attach=request.FILES.get('attach')
-            if isdts == '1':
-                istdsval=request.POST['pora']
-                if istdsval == 'Percentage':
-                    tds=request.POST['pcnt']
-                elif istdsval == 'Amount':
-                    tds=request.POST['amnt']
-            else:
-                istdsval='No'
-                tds = 0
-            itn=request.POST['itn']
-            an=request.POST['an']
-            if payroll_employee.objects.filter(Aadhar=an,company=company_details):
-                    messages.error(request,'Aadhra number already exists')
-                    return redirect('payroll_employee_create')   
-            uan=request.POST['uan'] 
-            pfn=request.POST['pfn']
-            pran=request.POST['pran']
-            age=request.POST['age']
-            bank=request.POST['bank']
-            accno=request.POST['acc_no']       
-            ifsc=request.POST['ifsc']       
-            bname=request.POST['b_name']       
-            branch=request.POST['branch']
-            ttype=request.POST['ttype']
-            if log_details.user_type == 'Company':
-                dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-                payroll= payroll_employee(title=title,first_name=fname,last_name=lname,alias=alias,image=image,joindate=joindate,salary_type=saltype,salary=salary,age=age,
-                            emp_number=empnum,designation=designation,location=location, gender=gender,dob=dob,blood=blood,parent=fmname,spouse_name=sname,workhr=workhr,
-                            amountperhr = amountperhr, address=address,permanent_address=paddress ,Phone=phone,emergency_phone=ephone, email=email,Income_tax_no=itn,Aadhar=an,
-                            UAN=uan,PFN=pfn,PRAN=pran,uploaded_file=attach,isTDS=istdsval,TDS_percentage=tds,salaryrange = salarydate,acc_no=accno,IFSC=ifsc,bank_name=bname,branch=branch,transaction_type=ttype,company=dash_details,login_details=log_details)
-                payroll.save()
-                history=employee_history(company=dash_details,login_details=log_details, employee=payroll,Action='CREATED')
-                history.save()
-                messages.info(request,'employee created')
-                return redirect('employee_list')
-        if log_details.user_type == 'Staff':
-            company_details = StaffDetails.objects.get(login_details=log_details)
-            title=request.POST['title']
-            fname=request.POST['fname']
-            lname=request.POST['lname']
-            alias=request.POST['alias']
-            joindate=request.POST['joindate']
-            salarydate=request.POST['salary']
-            saltype=request.POST['saltype']
-            if (saltype == 'Fixed'):
-                salary=request.POST['fsalary']
-            else:
-                salary=request.POST['vsalary']
-            image=request.FILES.get('file')
-            amountperhr=request.POST['amnthr']
-            workhr=request.POST['hours'] 
-            empnum=request.POST['empnum']
-            if payroll_employee.objects.filter(emp_number=empnum,company=company_details.company):
-                messages.info(request,'employee number all ready exists')
-                return redirect('payroll_employee_create')
-            designation = request.POST['designation']
-            location=request.POST['location']
-            gender=request.POST['gender']
-            dob=request.POST['dob']
-            blood=request.POST['blood']
-            fmname=request.POST['fm_name']
-            sname=request.POST['s_name']        
-            add1=request.POST['address']
-            add2=request.POST['address2']
-            address=add1+" "+add2
-            padd1=request.POST['paddress'] 
-            padd2=request.POST['paddress2'] 
-            paddress= padd1+padd2
-            phone=request.POST['phone']
-            ephone=request.POST['ephone']
-            result_set1 = payroll_employee.objects.filter(company=company_details.company,Phone=phone)
-            result_set2 = payroll_employee.objects.filter(company=company_details.company,emergency_phone=ephone)
-            if result_set1:
-                messages.error(request,'phone no already exists')
-                return redirect('payroll_employee_create')
-            if result_set2:
-                messages.error(request,'emerency phone no already exists')
-                return redirect('payroll_employee_create')
-            email=request.POST['email']
-            result_set = payroll_employee.objects.filter(company=company_details.company,email=email)
-            if result_set:
-                messages.error(request,'email already exists')
-                return redirect('payroll_employee_create')
-            isdts=request.POST['tds']
-            attach=request.FILES.get('attach')
-            if isdts == '1':
-                istdsval=request.POST['pora']
-                if istdsval == 'Percentage':
-                    tds=request.POST['pcnt']
-                elif istdsval == 'Amount':
-                    tds=request.POST['amnt']
-            else:
-                istdsval='No'
-                tds = 0
-            itn=request.POST['itn']
-            an=request.POST['an']
-            if payroll_employee.objects.filter(Aadhar=an,company=company_details.company):
-                    messages.error(request,'Aadhra number already exists')
-                    return redirect('payroll_employee_create')   
-            uan=request.POST['uan'] 
-            pfn=request.POST['pfn']
-            pran=request.POST['pran']
-            age=request.POST['age']
-            bank=request.POST['bank']
-            accno=request.POST['acc_no']       
-            ifsc=request.POST['ifsc']       
-            bname=request.POST['b_name']       
-            branch=request.POST['branch']
-            ttype=request.POST['ttype']
-            dash_details = StaffDetails.objects.get(login_details=log_details)
-            payroll= payroll_employee(title=title,first_name=fname,last_name=lname,alias=alias,image=image,joindate=joindate,salary_type=saltype,salary=salary,age=age,
-                         emp_number=empnum,designation=designation,location=location, gender=gender,dob=dob,blood=blood,parent=fmname,spouse_name=sname,workhr=workhr,
-                         amountperhr = amountperhr, address=address,permanent_address=paddress ,Phone=phone,emergency_phone=ephone, email=email,Income_tax_no=itn,Aadhar=an,
-                         UAN=uan,PFN=pfn,PRAN=pran,uploaded_file=attach,isTDS=istdsval,TDS_percentage=tds,salaryrange = salarydate,acc_no=accno,IFSC=ifsc,bank_name=bname,branch=branch,transaction_type=ttype,company=dash_details.company,login_details=log_details)
-            payroll.save()
-            history=employee_history(company=dash_details.company,login_details=log_details, employee=payroll,Action='CREATED')
-            history.save()
-            messages.info(request,'employee created')
-            return redirect('employee_list')
-    return redirect('payroll_employee_create')
+                <div class="row mt-4">
+                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN</label>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        {% for c in customer %}
+                        <input type="text" class="form-control bg-light text-dark" value="{{c.customer_gst_number}}" id="customer_gst_number" name="customer_gst_number" >       
+                        {% endfor %} 
+                    </div>
+                </div>
+
+            <div class="form-group row mt-4">
+                <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Place of Supply*</label>
+                <div class=" col-sm-12 col-md-3 col-lg-3">
+                    {% for c in customer %}
+                    <select id="customer_place_of_supply" value="{{c.customer_place_of_supply}}" name="customer_place_of_supply" class="form-control bg-light text-dark">
+                        <option value="value" selected></option>
+                        <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
+                        <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
+                        <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
+                        <option value="volvo">[AS]-Assam</option>
+                        <option value="[BR]-Bihar">[BR]-Bihar</option> 
+                        <option value="volvo">[CH]-	Chandhigarh</option>
+                        <option value="[CG]-Chattisgarh">[CG]-Chattisgarh</option>
+                        <option value="[DD]-Daman Diu">[DD]-Daman Diu</option>
+                        <option value="volvo">[DL]-	Delhi</option>
+                        <option value="[GA]-Goa">[GA]-Goa</option> 
+                        <option value="[GJ]-Gujarat">[GJ]-Gujarat</option>
+                        <option value="[HR]-Haryana">[HR]-Haryana</option> 
+                        <option value="[HP]-Himachal Pradesh">[HP]-Himachal Pradesh</option>
+                        <option value="[JK]-Jammu And Kashmir">[JK]-Jammu And Kashmir</option>
+                        <option value="[JH]-Jharkand">[JH]-Jharkand</option>
+                        <option value="[KA]-Karnataka">[KA]-Karnataka</option>
+                        <option value="[KL]-Kerala">[KL]-Kerala</option>
+                        <option value="[LA]-Ladakh">[LA]-Ladakh</option>
+                        <option value="[LD]-Lakshadweep">[LD]-Lakshadweep</option>
+                        <option value="[MP]-Madhyapradesh">[MP]-Madhyapradesh</option>
+                        <option value="[MH]-Maharashtra">[MH]-Maharashtra</option>
+                        <option value="[MN]-Manipur">[MN]-Manipur</option>  
+                        <option value="[ML]-Meghalaya">[ML]-Meghalaya</option>
+                        <option value="[MZ]-Mizoram">[MZ]-Mizoram</option>
+                        <option value="[NL]-Nagaland">[NL]-Nagaland</option> 
+                        <option value="[NL]-Nagaland">[NL]-Nagaland</option>
+                        <option value="[OD]-Odisha">[OD]-Odisha</option>
+                        <option value="[PY]-Puducherry">[PY]-Puducherry</option>
+                        <option value="[PB]-Punjab">[PB]-Punjab.</option>
+                        <option value="[RL]-Rajasthan">[RL]-Rajasthan</option>
+                        <option value="[SK]-Sikkim">[SK]-Sikkim</option>
+                        <option value="[TN]-Tamilnadu">[TN]-Tamilnadu</option>
+                        <option value="[TS]-Telenghana">[TS]-Telenghana</option>
+                        <option value="[TR]-Tripura">[TR]-Tripura</option>
+                        <option value="[UP]-Uttar Pradesh">[UP]-Uttar Pradesh</option>
+                        <option value="[UK]-Utharakhand">[UK]-Utharakhand</option>
+                        <option value="[WB]-West Bengal">[WB]-West Bengal</option>
+                        <option value="[OT]-Other Territory">[OT]-Other Territory</option>
+                    </select>
+                    {% endfor %} 
+                </div>
+            </div>
+
+
+            select customer only show that particular customer_email,customer_billing_address,customer_gst_type,customer_gst_number,customer_place_of_supply
+
+
+
+
+            <!-- <div class="card bg-black shadow p-3 rounded">
+                <h3 class="mb-4 mt-2" style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Sales Order</h3>
+                <form method="post" action="{% url 'add_salesorder' %}" enctype="multipart/form-data" class="mb-3">
+                    {% csrf_token %}
+            
+                    <div class="form-group row mt-4">
+                        <div for="select" class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer</label></div>
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            <select class="form-control bg-light text-dark" name="select" id="customerSelect">
+                                <option selected>Select Customer</option>
+                                {% for c in customer %}
+                                <option value="{{ c.id }}" data-email="{{ c.customer_email }}">{{ c.first_name }} {{ c.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-warning ml-1" role="button" data-toggle="modal" data-target="#customerModal" style="color: white; background-color: rgb(210, 132, 30);">+</a>
+                        </div>
+                    </div>
+            
+                    <div class="form-group row mt-4">
+                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            <input type="email" class="form-control bg-light text-dark" id="customer_email" name="customer_email" required>
+                            <span class="text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <script>
+                document.getElementById('customerSelect').addEventListener('change', function() {
+                    var selectedOption = this.options[this.selectedIndex];
+                    var customerEmail = selectedOption.dataset.email;
+                    document.getElementById('customer_email').value = customerEmail;
+                });
+            </script>
+            
+
+
+
+            <div class="form-group row mt-4">
+                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Billing Address</label></div>
+                <div class=" col-sm-12 col-md-3 col-lg-3">
+                    <input  type="text" class="form-control bg-light text-dark" id="customer_billing_address" name="customer_billing_address" required>     
+                    <div class="invalid-feedback">Please fill out this field.</div>   
+                </div>
+            </div>
+
+            <fieldset2 class="other details">
+                <div class="form-group row mt-4">
+                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
+                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                        <select class="form-control bg-light text-dark" id="GSTT" name="customer_gst_type" onclick="gstPan_function()">
+                            <option value="Select a Gst Treatment" selected>Select a Gst Treatment</option>
+                            <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
+                            <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">
+                                Registered Business-Composition Business that is registered under the Composition schemen in GST
+                            </option>
+                            <option value="Unregistered Business-not Registered under GST">Unregistered Business-not Registered under GST</option>
+                            <option value="Overseas- Persons with who you do import or exports of supplies outside india">Overseas- Persons with who you do import or exports of supplies outside india</option>
+                            <option value="Special Economic Zone">Special Economic Zone</option>
+                        </select><br>
+                    </div>
+                </div>
+                <fieldset3 id="gst" style="display: none;">
+                    <div class="row mt-4">
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN</label>
+                        <div class=" col-sm-12 col-md-3 col-lg-3">
+                            <input type="text" class="form-control bg-light text-dark" id="customer_gst_number" name="customer_gst_number" > 
+                            <span id="gstMessage"></span>       
+                        </div>
+                    </div>
+                </fieldset3>
+                <fieldset4 id="pan" style="display: none;">
+                    <div class=" row mt-4">
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > PAN</label>
+                        <div class=" col-sm-12 col-md-3 col-lg-3">
+                            <input type="text" class="form-control bg-light text-dark"  id="panInput"  name="pan_number">  
+                            <span id="panMessage"></span>    
+                        </div>
+                    </div>
+                </fieldset4> -->
+
+
+
+                select item only show that particulat hsn and price

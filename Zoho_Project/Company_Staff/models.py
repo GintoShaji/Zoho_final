@@ -824,7 +824,7 @@ class GodownComments(models.Model):
 class SaleOrder(models.Model):
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
     login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True, null=True)
     customer_email = models.EmailField()
     customer_billing_address = models.CharField(max_length=255)
     customer_gst_type = models.CharField(max_length=255)
@@ -866,7 +866,7 @@ class SaleOrder(models.Model):
         ('Draft', 'Draft'),
         ('Save', 'Save'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=Save)    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft')    
  
 
 class SalesOrderItems(models.Model):

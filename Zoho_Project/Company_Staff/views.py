@@ -15,6 +15,7 @@ from django.core.mail import EmailMessage
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from bs4 import BeautifulSoup
+from django.http import Http404
 import io,os
 import csv
 import math
@@ -61,6 +62,8 @@ from django.shortcuts import render, get_object_or_404
 from datetime import date as dt
 from django.db.models import Sum
 from django.utils.timezone import now
+
+
 # Create your views here.
 
 
@@ -13002,8 +13005,16 @@ def add_salesorder(request):
      
     if request.method=="POST":
         
+        if 'save_as_draft' in request.POST:
+            status = 'Draft'
+        elif 'save' in request.POST:
+            status = 'Save'
+        else:
+            return redirect('/') 
+        
+        
         select=request.POST["select"]
-        customer=Customer.objects.get(id=select)
+        customer = Customer.objects.get(id=select)
         
         customer_email=request.POST['customer_email']
         customer_billing_address=request.POST['customer_billing_address']
@@ -13022,9 +13033,8 @@ def add_salesorder(request):
         upi_number=request.POST['upi_number']
         bank_account_number=request.POST['bank_account_number']
         
-        
-        
-        sale=SaleOrder.objects.create(customer=customer,
+        sale=SaleOrder.objects.create(
+                                      customer=customer,
                                       login_details=log_details,
                                       company=comp_details,
                                       customer_email=customer_email,
@@ -13041,47 +13051,75 @@ def add_salesorder(request):
                                       
                                       cheque_number=cheque_number,
                                       upi_number=upi_number,
-                                      bank_account_number=bank_account_number)
+                                      bank_account_number=bank_account_number,
+                                      status=status)
         sale.save()
-        
-        
-        select=request.POST["select"]
-        item=Items.objects.get(id=select)
-        hsn=request.POST['hsn']
-        quantity=request.POST['quantity']
-        price=request.POST['price']
-        tax_rate=request.POST['tax_rate']
-        discount=request.POST['discount']
-        total=request.POST['total']
 
-        orderitem=SalesOrderItems.objects.create(
-                                                 item=item,
-                                                 hsn=hsn,
-                                                 quantity=quantity,
-                                                 price=price,
-                                                 tax_rate=tax_rate,
-                                                 discount=discount,
-                                                 total=total)
-        orderitem.save()
+        # itemname=request.POST["itemname"]
+        # item=Items.objects.get(id=itemname)
+        # hsn=request.POST['hsn']
+        # quantity=request.POST['quantity']
+        # price=request.POST['price']
+        # tax_rate=request.POST['tax_rate']
+        # discount=request.POST['discount']
+        # total=request.POST['total']
+
+        # orderitem=SalesOrderItems.objects.create(
+        #                                          item=item,
+        #                                          hsn=hsn,
+        #                                          quantity=quantity,
+        #                                          price=price,
+        #                                          tax_rate=tax_rate,
+        #                                          discount=discount,
+        #                                          total=total,
+        #                                          sales_order=sale )
+        # orderitem.save()
         
-        messages.success(request, 'Sales Order created successfully!')   
-    return render(request,'zohomodules/sales_order/salesorder_list.html',{ 
+     
+        item_name = request.POST["itemname"]
+        item = Items.objects.get(id=item_name)
+        hsn = request.POST['hsn']
+        quantity = float(request.POST['quantity'])
+        price = float(request.POST['price'])
+        tax_rate = float(request.POST['tax_rate'])
+        discount = float(request.POST['discount'])
+            
+        total = (quantity * price) - discount
+        sale = ...
+
+        order_item = SalesOrderItems.objects.create(
+                item=item,
+                hsn=hsn,
+                quantity=quantity,
+                price=price,
+                tax_rate=tax_rate,
+                discount=discount,
+                total=total,
+                sales_order=sale)
+        order_item.save()
+    
+     
+    messages.success(request, 'Sales Order created successfully!')   
+    return render(request,'zohomodules/sales_order/salesorder_list.html',{ 'total': total,
         'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
 
 
 
         # sales_data.description=request.POST['description']
-        # sales_data.terms_and_condition=request.POST['terms_and_condition']
         # sales_data.document=request.POST['document']
         # sales_data.sub_total=request.POST['sub_total']
-        # sales_data.cgst=request.POST['cgst']
-        # sales_data.sgst=request.POST['sgst']
         # sales_data.tax_amount_igst=request.POST['tax_amount_igst']
         # sales_data.shipping_charge=request.POST['shipping_charge']
         # sales_data.adjustment=request.POST['adjustment']
         # sales_data.grand_total=request.POST['grand_total']
         # sales_data.advanced_paid=request.POST['advanced_paid']
         # sales_data.balance=request.POST['balance']
+        
+        
+        # sales_data.terms_and_condition=request.POST['terms_and_condition']
+        # sales_data.cgst=request.POST['cgst']
+        # sales_data.sgst=request.POST['sgst']
+        
        
         
 def sort_customer_name(request):
