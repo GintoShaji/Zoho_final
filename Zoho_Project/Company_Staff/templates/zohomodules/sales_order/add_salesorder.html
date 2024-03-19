@@ -97,6 +97,9 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            <div class="col-md-4 ">
+                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#customerModal" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                            </div>
                         </div>
                 
                         <div class="form-group row mt-4">
@@ -177,24 +180,41 @@
                             </div>
                         </div>
 
-
-                       
-
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order No</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
                         <input  type="text" class="form-control bg-light text-dark" id="sales_order_number" name="sales_order_number" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
+                        <div class="invalid-feedback">Please fill out this field.</div> 
                     </div>
                 </div>
+
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Referance Number</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="text" class="form-control bg-light text-dark" id="reference_number" name="reference_number" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
+                        <input  type="text" class="form-control bg-light text-dark" id="reference_number" name="reference_number" readonly required>     
+                        <div class="invalid-feedback">Please fill out this field.</div> 
                     </div>
                 </div>
+
+                <script>
+                    // Function to generate the reference number
+                    function generateReferenceNumber() {
+                        let lastReferenceNumber = parseInt(localStorage.getItem('lastReferenceNumber')) || 0;
+                        // Increment the last reference number
+                        lastReferenceNumber++;
+                        // Save the new last reference number to localStorage
+                        localStorage.setItem('lastReferenceNumber', lastReferenceNumber);
+                        return lastReferenceNumber;
+                    }
+                
+                    // Set initial reference number when the page loads
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('reference_number').value = generateReferenceNumber();
+                    });
+                </script>
+                
+           
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order Date</label></div>
@@ -203,6 +223,15 @@
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
+
+                <script>
+                    // Get today's date
+                    var today = new Date();
+                    // Format the date as YYYY-MM-DD (required by the input type="date")
+                    var formattedDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+                    // Set the value of the input field to the formatted date
+                    document.getElementById('sales_order_date').value = formattedDate;
+                </script>
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Expected Shippment Date</label></div>
@@ -225,6 +254,7 @@
                         <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
                     </div>
                 </div>
+
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Payment Type</label></div>
@@ -258,6 +288,11 @@
                 </div>
 
 
+                
+
+                
+
+
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 ">
                         <div class="table-responsive">
@@ -275,50 +310,32 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <!-- <tbody>
-                                <tr>
-                                <td></td>
-                                <td>
-                                    <select class="form-control bg-light text-dark"  name="itemname" > 
-                                        <option selected>Select item</option>
-                                        {% for i in item %}
-                                        <option value="{{ i.id }}">{{i.item_name}}</option>
-                                        {% endfor %}   
-                                        </select> 
-                                </td>
-                                <td><input type="text"class="form-control border-1 bg-transparent text-white" name="hsn">
-                                </td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="quantity"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="price"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="tax_rate" onclick="sample1()"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="discount"  onclick="sample()"></td>
-                                <td><input type="text" class="form-control border-1 bg-transparent text-white" name="total"></td>
-                                <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
-                                </tr>
-                            </tbody> -->
-
-
+                            
                             <tbody>
                                 <tr>
                                     <td></td>
                                     <td>
-                                        <select class="form-control bg-light text-dark" name="itemname" onchange="updateItemDetails(this)">
-                                            <option selected>Select item</option>
-                                            {% for i in item %}
-                                                <option value="{{ i.id }}">{{ i.item_name }}</option>
-                                            {% endfor %}
-                                        </select>
+                                        <div class="d-flex align-items-center">
+                                            <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
+                                                <option selected>Select item</option>
+                                                {% for i in item %}
+                                                    <option value="{{ i.id }}">{{ i.item_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="ml-2">
+                                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white" id="hsnInput" name="hsn"></td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white" name="quantity"></td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white" id="priceInput"  name="price"></td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white" name="tax_rate" onclick="sample1()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white" name="discount" onclick="sample()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-transparent text-white" value="{{ total }}"  name="total"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" id="hsnInput" name="hsn"></td>
+                                    <td><input type="number" class="form-control border-1 bg-light text-dark" name="quantity" onchange="calculateTotal(this)"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" id="priceInput"  name="price" onchange="calculateTotal(this)"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" name="tax_rate" onclick="sample1()" onchange="calculateTotal(this)"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" name="discount" onclick="sample()" onchange="calculateTotal(this)"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ total }}"  name="total" readonly></td>
                                     <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
                                 </tr>
                             </tbody>
-
 
                             </table>
                         </div>
@@ -333,9 +350,23 @@
                 </div>
 
 
+            <script>
+                function calculateTotal(input) {
+                    var row = input.parentNode.parentNode; // Get the parent row of the input
+                    var quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
+                    var price = parseFloat(row.querySelector('input[name="price"]').value) || 0;
+                    var tax_rate = parseFloat(row.querySelector('input[name="tax_rate"]').value) || 0;
+                    var discount = parseFloat(row.querySelector('input[name="discount"]').value) || 0;
+                
+                    var total = (quantity * price) - discount;
+                    row.querySelector('input[name="total"]').value = total.toFixed(2);
+                }
+            </script>
+
+
                 <div class="row clearfix" style="margin-top:20px">
                     <div class="col-md-6 ml-4">
-                        <textarea class="form-control text-light" id="" name="Note" placeholder="Note"
+                        <textarea class="form-control text-light" id="" name="description" placeholder="Note"
                             style="height: 190px;"></textarea>
                         <input type="file" name="file" style="margin-top: 10px; width: 70%; background-color: white;">
                     </div>
@@ -347,7 +378,7 @@
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sub Total</label></div>
                         <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="" name="" value="0.00" required>
+                            <input type="text" class="form-control bg-light text-dark" id="" name="sub_total" value="0.00" required>
                             <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
@@ -355,7 +386,7 @@
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Tax Amount</label></div>
                         <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="" name="" value="0.00" required>
+                            <input type="text" class="form-control bg-light text-dark" id="" name="tax_amount_igst" value="0.00" required>
                             <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
@@ -363,7 +394,7 @@
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Shipping Charge</label></div>
                         <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="" name="" value="0.00" required>
+                            <input type="text" class="form-control bg-light text-dark" id="" name="shipping_charge" value="0.00" required>
                             <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
@@ -371,7 +402,7 @@
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Adjustment</label></div>
                         <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="" name="" value="0.00" required>
+                            <input type="text" class="form-control bg-light text-dark" id="" name="adjustment" value="0.00" required>
                             <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
@@ -379,7 +410,7 @@
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Grand Total</label></div>
                         <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="" name="" value="0.00" required>
+                            <input type="text" class="form-control bg-light text-dark" id="" name="grand_total" value="0.00" required>
                             <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
@@ -387,7 +418,7 @@
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Paid Off</label></div>
                         <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="" name="" value="0.00" required>
+                            <input type="text" class="form-control bg-light text-dark" id="" name="advanced_paid" value="0.00" required>
                             <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
@@ -395,21 +426,18 @@
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Balance</label></div>
                         <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="" name="" value="0.00" required>
+                            <input type="text" class="form-control bg-light text-dark" id="" name="balance" value="0.00" required>
                             <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
                 </div>
             
-                
-
 
                 <div class="row mt-5">
                     <div class="col-sm-12 col-md-2 col-lg-2 mt-3">
                         <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" name="save_as_draft">Draft</button>
                     </div>
                     <div class=" col-sm-12 col-md-2 col-lg-2 mt-3">
-                        <!-- <button type="reset" class="form-control  bg-warning text-dark" style="font-weight: bold;">Cancel</button> -->
                         <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" name="save">Save</button>
                     </div> 
                 </div>
@@ -1377,30 +1405,35 @@ function updateOutputFields() {
           $("#tbl").append(`<tr>
             <td></td>
             <td>
-                <select class="form-control bg-light text-dark"  name="select" onchange="updateItemDetails(this)" > 
-                    <option selected>Select item</option>
-                    {% for i in item %}
-                    <option value="{{ i.id }}">{{i.item_name}}</option>
-                    {% endfor %}   
-                    </select> 
+                <div class="d-flex align-items-center">
+                    <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
+                        <option selected>Select item</option>
+                        {% for i in item %}
+                            <option value="{{ i.id }}">{{ i.item_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="ml-2">
+                        <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                    </div>
+                </div>
             </td>
             <td>
-                <input type="text" name="hsn" class="form-control border-1 bg-transparent text-white" id="hsnInput"  value="" />
+                <input type="text" name="hsn" class="form-control border-1 bg-light text-dark" id="hsnInput"  value="" />
             </td>
             <td>
-                <input type="text" name="quantity" class="form-control border-1 bg-transparent text-white" value="" />
+                <input type="text" name="quantity" class="form-control border-1 bg-light text-dark" value="" />
             </td>
             <td>
-                <input type="text" name="price" class="form-control border-1 bg-transparent text-white" id="priceInput" value="" />
+                <input type="text" name="price" class="form-control border-1 bg-light text-dark" id="priceInput" value="" />
             </td>
             <td>
-                <input type="text"  onclick="sample1()" name="tax_rate" class="form-control border-1 bg-transparent text-white"  value="" />
+                <input type="text"  onclick="sample1()" name="tax_rate" class="form-control border-1 bg-light text-dark"  value="" />
             </td>
             <td>
-                <input type="text" onclick="sample()" name="discount" class="form-control border-1 bg-transparent text-white"  value="" />
+                <input type="text" onclick="sample()" name="discount" class="form-control border-1 bg-light text-dark"  value="" />
             </td>
             <td>
-                <input type="text" name="total" class="form-control border-1 bg-transparent text-white" value="" />
+                <input type="text" name="total" class="form-control border-1 bg-light text-dark" value="" />
             </td>
             
             <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>

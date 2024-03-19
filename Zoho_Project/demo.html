@@ -107,95 +107,47 @@
             </div>
 
 
-            select customer only show that particular customer_email,customer_billing_address,customer_gst_type,customer_gst_number,customer_place_of_supply
+           
 
-
-
-
-            <!-- <div class="card bg-black shadow p-3 rounded">
-                <h3 class="mb-4 mt-2" style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Sales Order</h3>
-                <form method="post" action="{% url 'add_salesorder' %}" enctype="multipart/form-data" class="mb-3">
-                    {% csrf_token %}
-            
-                    <div class="form-group row mt-4">
-                        <div for="select" class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <select class="form-control bg-light text-dark" name="select" id="customerSelect">
-                                <option selected>Select Customer</option>
-                                {% for c in customer %}
-                                <option value="{{ c.id }}" data-email="{{ c.customer_email }}">{{ c.first_name }} {{ c.last_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="btn btn-warning ml-1" role="button" data-toggle="modal" data-target="#customerModal" style="color: white; background-color: rgb(210, 132, 30);">+</a>
-                        </div>
-                    </div>
-            
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="email" class="form-control bg-light text-dark" id="customer_email" name="customer_email" required>
-                            <span class="text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            
-            <script>
-                document.getElementById('customerSelect').addEventListener('change', function() {
-                    var selectedOption = this.options[this.selectedIndex];
-                    var customerEmail = selectedOption.dataset.email;
-                    document.getElementById('customer_email').value = customerEmail;
-                });
-            </script>
-            
-
-
-
-            <div class="form-group row mt-4">
-                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Billing Address</label></div>
-                <div class=" col-sm-12 col-md-3 col-lg-3">
-                    <input  type="text" class="form-control bg-light text-dark" id="customer_billing_address" name="customer_billing_address" required>     
-                    <div class="invalid-feedback">Please fill out this field.</div>   
-                </div>
-            </div>
-
-            <fieldset2 class="other details">
-                <div class="form-group row mt-4">
-                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
-                    <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <select class="form-control bg-light text-dark" id="GSTT" name="customer_gst_type" onclick="gstPan_function()">
-                            <option value="Select a Gst Treatment" selected>Select a Gst Treatment</option>
-                            <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
-                            <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">
-                                Registered Business-Composition Business that is registered under the Composition schemen in GST
-                            </option>
-                            <option value="Unregistered Business-not Registered under GST">Unregistered Business-not Registered under GST</option>
-                            <option value="Overseas- Persons with who you do import or exports of supplies outside india">Overseas- Persons with who you do import or exports of supplies outside india</option>
-                            <option value="Special Economic Zone">Special Economic Zone</option>
-                        </select><br>
-                    </div>
-                </div>
-                <fieldset3 id="gst" style="display: none;">
-                    <div class="row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN</label>
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="customer_gst_number" name="customer_gst_number" > 
-                            <span id="gstMessage"></span>       
-                        </div>
-                    </div>
-                </fieldset3>
-                <fieldset4 id="pan" style="display: none;">
-                    <div class=" row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > PAN</label>
-                        <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark"  id="panInput"  name="pan_number">  
-                            <span id="panMessage"></span>    
-                        </div>
-                    </div>
-                </fieldset4> -->
-
-
-
-                select item only show that particulat hsn and price
+                itemname=request.POST["itemname"]
+                item=Items.objects.get(id=itemname)
+                hsn=request.POST['hsn']
+                quantity=request.POST['quantity']
+                price=request.POST['price']
+                tax_rate=request.POST['tax_rate']
+                discount=request.POST['discount']
+                total=request.POST['total']
+        
+                orderitem=SalesOrderItems.objects.create(
+                                                         item=item,
+                                                         hsn=hsn,
+                                                         quantity=quantity,
+                                                         price=price,
+                                                         tax_rate=tax_rate,
+                                                         discount=discount,
+                                                         total=total,
+                                                         sales_order=sale )
+                orderitem.save()
+                
+             
+                item_name = request.POST["itemname"]
+                item = Items.objects.get(id=item_name)
+                hsn = request.POST['hsn']
+                quantity = float(request.POST['quantity'])
+                price = float(request.POST['price'])
+                tax_rate = float(request.POST['tax_rate'])
+                discount = float(request.POST['discount'])
+                    
+                total = (quantity * price) - discount
+                sale = ...
+        
+                order_item = SalesOrderItems.objects.create(
+                        item=item,
+                        hsn=hsn,
+                        quantity=quantity,
+                        price=price,
+                        tax_rate=tax_rate,
+                        discount=discount,
+                        total=total,
+                        sales_order=sale)
+                order_item.save()
