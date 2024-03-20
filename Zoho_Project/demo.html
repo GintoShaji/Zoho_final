@@ -1,153 +1,50 @@
-<div class="card bg-black shadow p-3 rounded">
-    <h3  class="mb-4 mt-2  " style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Sales Order</h3>
-    <form  method="post" action="{% url 'add_salesorder' %}"  enctype="multipart/form-data" class="mb-3">
-        {% csrf_token %}
-
-        <div class="form-group row mt-4">
-            <div for="select" class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer</label></div>
-            <div class=" col-sm-12 col-md-3 col-lg-3">
-                <select class="form-control bg-light text-dark"  name="select" > 
-                <option selected>Select Customer</option>
-                {% for c in customer %}
-                <option value="{{ c.id }}">{{c.first_name}}{{c.last_name}}</option>
-                {% endfor %}   
-                </select> 
-            </div>
-            <div class="col-md-4 ">
-                <a href="#" class="btn btn-warning ml-1" role="button" data-toggle="modal" data-target="#customerModal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
-            </div>
-        </div>
-
-        
-        <div class="form-group row mt-4">
-            <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
-            <div class=" col-sm-12 col-md-3 col-lg-3">
-                {% for c in customer %}
-                <input  type="email" class="form-control bg-light text-dark" value="{{c.customer_email}}"  id="customer_email" name="customer_email" required> 
-                {% endfor %} 
-                <span class=" text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
-            </div>
-        </div>
-
-        <div class="form-group row mt-4">
-            <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Billing Address</label></div>
-            <div class=" col-sm-12 col-md-3 col-lg-3">
-                {% for c in customer %}
-                <input  type="text" class="form-control bg-light text-dark" value="{{c.customer_billing_address}}" id="customer_billing_address" name="customer_billing_address" required>
-                {% endfor %}    
-                <div class="invalid-feedback">Please fill out this field.</div>   
-            </div>
-        </div>
-
-            <div class="form-group row mt-4">
-                <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
-                <div class=" col-sm-12 col-md-3 col-lg-3">
-                {% for c in customer %}
-                <input type="text" class="form-control bg-light text-dark" value="{{c.customer_gst_type}}" id="customer_gst_type" name="customer_gst_type" >
-                {% endfor %}     
+<tbody>
+    <tr>
+        <td></td>
+        <td>
+            <div class="d-flex align-items-center">
+                <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
+                    <option selected>Select item</option>
+                    {% for i in item %}
+                        <option value="{{ i.id }}">{{ i.item_name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="ml-2">
+                    <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
                 </div>
             </div>
-    
-                <div class="row mt-4">
-                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN</label>
-                    <div class=" col-sm-12 col-md-3 col-lg-3">
-                        {% for c in customer %}
-                        <input type="text" class="form-control bg-light text-dark" value="{{c.customer_gst_number}}" id="customer_gst_number" name="customer_gst_number" >       
-                        {% endfor %} 
-                    </div>
-                </div>
+        </td>
+        <td><input type="text" class="form-control border-1 bg-light text-dark" id="hsnInput" name="hsn"></td>
+        <td><input type="number" class="form-control border-1 bg-light text-dark" name="quantity" onchange="calculateTotal(this); calculateSubtotal()" id="quantity1"></td>
+        <td><input type="text" class="form-control border-1 bg-light text-dark" id="priceInput"  name="price" onchange="calculateTotal(this); calculateSubtotal()" id="price1"></td>
+        <td><input type="text" class="form-control border-1 bg-light text-dark" id="taxRateInput" name="tax_rate" onclick="sample1()" onchange="calculateTotal(this)" id="taxRate1"></td>
+        <td><input type="text" class="form-control border-1 bg-light text-dark" name="discount" onclick="sample()" onchange="calculateTotal(this); calculateSubtotal()" id="discount1"></td>
+        <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ total }}"  name="total" readonly id="total1"></td>
+        <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
+    </tr>
+</tbody>
 
-            <div class="form-group row mt-4">
-                <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Place of Supply*</label>
-                <div class=" col-sm-12 col-md-3 col-lg-3">
-                    {% for c in customer %}
-                    <select id="customer_place_of_supply" value="{{c.customer_place_of_supply}}" name="customer_place_of_supply" class="form-control bg-light text-dark">
-                        <option value="value" selected></option>
-                        <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
-                        <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
-                        <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
-                        <option value="volvo">[AS]-Assam</option>
-                        <option value="[BR]-Bihar">[BR]-Bihar</option> 
-                        <option value="volvo">[CH]-	Chandhigarh</option>
-                        <option value="[CG]-Chattisgarh">[CG]-Chattisgarh</option>
-                        <option value="[DD]-Daman Diu">[DD]-Daman Diu</option>
-                        <option value="volvo">[DL]-	Delhi</option>
-                        <option value="[GA]-Goa">[GA]-Goa</option> 
-                        <option value="[GJ]-Gujarat">[GJ]-Gujarat</option>
-                        <option value="[HR]-Haryana">[HR]-Haryana</option> 
-                        <option value="[HP]-Himachal Pradesh">[HP]-Himachal Pradesh</option>
-                        <option value="[JK]-Jammu And Kashmir">[JK]-Jammu And Kashmir</option>
-                        <option value="[JH]-Jharkand">[JH]-Jharkand</option>
-                        <option value="[KA]-Karnataka">[KA]-Karnataka</option>
-                        <option value="[KL]-Kerala">[KL]-Kerala</option>
-                        <option value="[LA]-Ladakh">[LA]-Ladakh</option>
-                        <option value="[LD]-Lakshadweep">[LD]-Lakshadweep</option>
-                        <option value="[MP]-Madhyapradesh">[MP]-Madhyapradesh</option>
-                        <option value="[MH]-Maharashtra">[MH]-Maharashtra</option>
-                        <option value="[MN]-Manipur">[MN]-Manipur</option>  
-                        <option value="[ML]-Meghalaya">[ML]-Meghalaya</option>
-                        <option value="[MZ]-Mizoram">[MZ]-Mizoram</option>
-                        <option value="[NL]-Nagaland">[NL]-Nagaland</option> 
-                        <option value="[NL]-Nagaland">[NL]-Nagaland</option>
-                        <option value="[OD]-Odisha">[OD]-Odisha</option>
-                        <option value="[PY]-Puducherry">[PY]-Puducherry</option>
-                        <option value="[PB]-Punjab">[PB]-Punjab.</option>
-                        <option value="[RL]-Rajasthan">[RL]-Rajasthan</option>
-                        <option value="[SK]-Sikkim">[SK]-Sikkim</option>
-                        <option value="[TN]-Tamilnadu">[TN]-Tamilnadu</option>
-                        <option value="[TS]-Telenghana">[TS]-Telenghana</option>
-                        <option value="[TR]-Tripura">[TR]-Tripura</option>
-                        <option value="[UP]-Uttar Pradesh">[UP]-Uttar Pradesh</option>
-                        <option value="[UK]-Utharakhand">[UK]-Utharakhand</option>
-                        <option value="[WB]-West Bengal">[WB]-West Bengal</option>
-                        <option value="[OT]-Other Territory">[OT]-Other Territory</option>
-                    </select>
-                    {% endfor %} 
-                </div>
-            </div>
-
-
-           
-
-                itemname=request.POST["itemname"]
-                item=Items.objects.get(id=itemname)
-                hsn=request.POST['hsn']
-                quantity=request.POST['quantity']
-                price=request.POST['price']
-                tax_rate=request.POST['tax_rate']
-                discount=request.POST['discount']
-                total=request.POST['total']
+<script>
+    // Function to calculate and update the subtotal
+    function calculateSubtotal() {
+        var rows = document.querySelectorAll('tbody tr');
         
-                orderitem=SalesOrderItems.objects.create(
-                                                         item=item,
-                                                         hsn=hsn,
-                                                         quantity=quantity,
-                                                         price=price,
-                                                         tax_rate=tax_rate,
-                                                         discount=discount,
-                                                         total=total,
-                                                         sales_order=sale )
-                orderitem.save()
-                
-             
-                item_name = request.POST["itemname"]
-                item = Items.objects.get(id=item_name)
-                hsn = request.POST['hsn']
-                quantity = float(request.POST['quantity'])
-                price = float(request.POST['price'])
-                tax_rate = float(request.POST['tax_rate'])
-                discount = float(request.POST['discount'])
-                    
-                total = (quantity * price) - discount
-                sale = ...
-        
-                order_item = SalesOrderItems.objects.create(
-                        item=item,
-                        hsn=hsn,
-                        quantity=quantity,
-                        price=price,
-                        tax_rate=tax_rate,
-                        discount=discount,
-                        total=total,
-                        sales_order=sale)
-                order_item.save()
+        rows.forEach(function(row) {
+            var quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
+            var price = parseFloat(row.querySelector('input[name="price"]').value) || 0;
+            var discount = parseFloat(row.querySelector('input[name="discount"]').value) || 0;
+            
+            var subtotal = (quantity * price) - discount;
+            row.querySelector('input[name="total"]').value = subtotal.toFixed(2);
+        });
+
+        // Calculate total of all subtotals and update the Sub Total input field
+        var subTotal = 0;
+        rows.forEach(function(row) {
+            subTotal += parseFloat(row.querySelector('input[name="total"]').value) || 0;
+        });
+        document.getElementById('subTotal').value = subTotal.toFixed(2);
+    }
+</script>
+
+

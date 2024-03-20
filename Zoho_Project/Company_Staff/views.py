@@ -12989,84 +12989,103 @@ def salesorder_list(request):
 #             log_id = request.session['login_id']
 #         else:
 #             return redirect('/')
-#         log_details= LoginDetails.objects.get(id=log_id)
-#         if log_details.user_type=='Staff':
+#         log_details = LoginDetails.objects.get(id=log_id)
+#         if log_details.user_type == 'Staff':
 #             dash_details = StaffDetails.objects.get(login_details=log_details)
-#             comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
-#         else:    
+#             comp_details = CompanyDetails.objects.get(id=dash_details.company.id)
+#         else:
 #             dash_details = CompanyDetails.objects.get(login_details=log_details)
-#             comp_details=CompanyDetails.objects.get(login_details=log_details)
-   
-#         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
-#         data=Customer.objects.filter(company=comp_details)
+#             comp_details = CompanyDetails.objects.get(login_details=log_details)
+
+#         allmodules = ZohoModules.objects.get(company=comp_details, status='New')
+#         data = Customer.objects.filter(company=comp_details)
 
 #     else:
 #         return redirect('/')
-     
-#     if request.method=="POST":
-        
+
+#     if request.method == "POST":
+
 #         if 'save_as_draft' in request.POST:
 #             status = 'Draft'
 #         elif 'save' in request.POST:
 #             status = 'Save'
 #         else:
-#             return redirect('/') 
-        
-        
-#         select=request.POST["select"]
+#             return redirect('/')
+
+#         select = request.POST["select"]
 #         customer = Customer.objects.get(id=select)
+
+#         customer_email = request.POST['customer_email']
+#         customer_billing_address = request.POST['customer_billing_address']
+#         customer_gst_type = request.POST['customer_gst_type']
+#         customer_gst_number = request.POST['customer_gst_number']
+#         customer_place_of_supply = request.POST['customer_place_of_supply']
+
+#         sales_order_date = request.POST['sales_order_date']
+#         payment_terms = Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
+#         expiration_date = request.POST['expiration_date']
+#         reference_number = request.POST['reference_number']
+#         sales_order_number = request.POST['sales_order_number']
+#         payment_method = request.POST['payment_method']
+
+#         cheque_number = request.POST.get('cheque_number', '')
+#         upi_number = request.POST.get('upi_number', '')
+#         bank_account_number = request.POST.get('bank_account_number', '')
         
-#         customer_email=request.POST['customer_email']
-#         customer_billing_address=request.POST['customer_billing_address']
-#         customer_gst_type=request.POST['customer_gst_type']
-#         customer_gst_number=request.POST['customer_gst_number']
-#         customer_place_of_supply=request.POST['customer_place_of_supply']
-    
-#         sales_order_date=request.POST['sales_order_date']
-#         payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
-#         expiration_date=request.POST['expiration_date']
-#         reference_number=request.POST['reference_number']
-#         sales_order_number=request.POST['sales_order_number']
-#         payment_method=request.POST['payment_method']
+#         description=request.POST['description']
+#         document = request.FILES['file']
+#         sub_total=request.POST['sub_total']
+#         tax_amount_igst=request.POST['tax_amount_igst']
+#         shipping_charge=request.POST['shipping_charge']
+#         adjustment=request.POST['adjustment']
+#         grand_total=request.POST['grand_total']
+#         advanced_paid=request.POST['advanced_paid']
+#         balance=request.POST['balance']
+
+#         sale = SaleOrder.objects.create(
+#             customer=customer,
+#             login_details=log_details,
+#             company=comp_details,
+#             customer_email=customer_email,
+#             customer_billing_address=customer_billing_address,
+#             customer_gst_type=customer_gst_type,
+#             customer_gst_number=customer_gst_number,
+#             customer_place_of_supply=customer_place_of_supply,
+#             sales_order_date=sales_order_date,
+#             payment_terms=payment_terms,
+#             expiration_date=expiration_date,
+#             reference_number=reference_number,
+#             sales_order_number=sales_order_number,
+#             payment_method=payment_method,
+#             cheque_number=cheque_number,
+#             upi_number=upi_number,
+#             bank_account_number=bank_account_number,
+#             status=status,
+            
+#             description=description,
+#             document=document,
+#             sub_total=sub_total,
+#             tax_amount_igst=tax_amount_igst,
+#             shipping_charge=shipping_charge,
+#             adjustment=adjustment,
+#             grand_total=grand_total,
+#             advanced_paid=advanced_paid,
+#             balance=balance
+#             )
         
-#         cheque_number=request.POST['cheque_number']
-#         upi_number=request.POST['upi_number']
-#         bank_account_number=request.POST['bank_account_number']
-        
-#         sale=SaleOrder.objects.create(
-#                                       customer=customer,
-#                                       login_details=log_details,
-#                                       company=comp_details,
-#                                       customer_email=customer_email,
-#                                       customer_billing_address=customer_billing_address,
-#                                       customer_gst_type=customer_gst_type,
-#                                       customer_gst_number=customer_gst_number,
-#                                       customer_place_of_supply=customer_place_of_supply,
-#                                       sales_order_date=sales_order_date,
-#                                       payment_terms=payment_terms,
-#                                       expiration_date=expiration_date,
-#                                       reference_number=reference_number,
-#                                       sales_order_number=sales_order_number,
-#                                       payment_method=payment_method,
-                                      
-#                                       cheque_number=cheque_number,
-#                                       upi_number=upi_number,
-#                                       bank_account_number=bank_account_number,
-#                                       status=status)
-#         sale.save()
-        
-#         item_name = request.POST["itemname"]
-#         item = Items.objects.get(id=item_name)
-#         hsn = request.POST['hsn']
 #         quantity = float(request.POST['quantity'])
 #         price = float(request.POST['price'])
 #         tax_rate = float(request.POST['tax_rate'])
 #         discount = float(request.POST['discount'])
-#         total = float(request.POST['total'])  # Retrieve total from the form data
-        
-#         sale = ...
+#         total = (quantity * price) - discount
 
+#         item_name = request.POST["itemname"]
+#         item = Items.objects.get(id=item_name)
+#         hsn = request.POST['hsn']
+        
 #         order_item = SalesOrderItems.objects.create(
+#             login_details=log_details,
+#             company=comp_details,
 #             item=item,
 #             hsn=hsn,
 #             quantity=quantity,
@@ -13076,14 +13095,21 @@ def salesorder_list(request):
 #             total=total,
 #             sales_order=sale)
 #         order_item.save()
-    
-     
-#     messages.success(request, 'Sales Order created successfully!')   
-#     return render(request,'zohomodules/sales_order/salesorder_list.html',{ 'total': total,
-#         'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
+
+#         messages.success(request, 'Sales Order created successfully!')
+#         return render(request, 'zohomodules/sales_order/salesorder_list.html', {'total': total,
+#         'details': dash_details,'allmodules': allmodules,'data': data,'log_details': log_details})
+#     else:
+#         return redirect('/')
 
 
-
+        # sales_data.terms_and_condition=request.POST['terms_and_condition']
+        # sales_data.cgst=request.POST['cgst']
+        # sales_data.sgst=request.POST['sgst']
+        
+        
+        
+        
 def add_salesorder(request):
     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
@@ -13134,7 +13160,7 @@ def add_salesorder(request):
         bank_account_number = request.POST.get('bank_account_number', '')
         
         description=request.POST['description']
-        document=request.POST['file']
+        document = request.FILES['file']
         sub_total=request.POST['sub_total']
         tax_amount_igst=request.POST['tax_amount_igst']
         shipping_charge=request.POST['shipping_charge']
@@ -13142,6 +13168,13 @@ def add_salesorder(request):
         grand_total=request.POST['grand_total']
         advanced_paid=request.POST['advanced_paid']
         balance=request.POST['balance']
+
+        place_of_supply = request.POST['customer_place_of_supply']
+        company_state = comp_details.state 
+        
+        item_name = request.POST["itemname"]
+        item = Items.objects.get(id=item_name)
+        default_tax_rate = item.intrastate_tax if place_of_supply == company_state else item.interstate_tax
 
         sale = SaleOrder.objects.create(
             customer=customer,
@@ -13176,12 +13209,9 @@ def add_salesorder(request):
         
         quantity = float(request.POST['quantity'])
         price = float(request.POST['price'])
-        tax_rate = float(request.POST['tax_rate'])
         discount = float(request.POST['discount'])
         total = (quantity * price) - discount
 
-        item_name = request.POST["itemname"]
-        item = Items.objects.get(id=item_name)
         hsn = request.POST['hsn']
         
         order_item = SalesOrderItems.objects.create(
@@ -13191,7 +13221,7 @@ def add_salesorder(request):
             hsn=hsn,
             quantity=quantity,
             price=price,
-            tax_rate=tax_rate,
+            tax_rate=default_tax_rate,
             discount=discount,
             total=total,
             sales_order=sale)
@@ -13203,12 +13233,8 @@ def add_salesorder(request):
     else:
         return redirect('/')
 
-
         
         
-        # sales_data.terms_and_condition=request.POST['terms_and_condition']
-        # sales_data.cgst=request.POST['cgst']
-        # sales_data.sgst=request.POST['sgst']
         
        
         
