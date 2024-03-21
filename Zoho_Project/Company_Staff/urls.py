@@ -349,6 +349,15 @@ urlpatterns = [
     path('sort_sales_order',views.sort_sales_order,name='sort_sales_order'),
     path('view_salesorder_save',views.view_salesorder_save,name='view_salesorder_save'),
     path('view_salesorder_draft',views.view_salesorder_draft,name='view_salesorder_draft'),
+    path('view_salesorder_details/<int:pk>',views.view_salesorder_details,name='view_salesorder_details'),
+    path('all_salesorder',views.all_salesorder,name='all_salesorder'),
+    path('viewsort_customer_name',views.viewsort_customer_name,name='viewsort_customer_name'),
+    path('viewsort_sales_order',views.viewsort_sales_order,name='viewsort_sales_order'),
+    path('filter_salesorder_save',views.filter_salesorder_save,name='filter_salesorder_save'),
+    path('filter_salesorder_draft',views.filter_salesorder_draft,name='filter_salesorder_draft'),
+    
+    
+    
     
     
     

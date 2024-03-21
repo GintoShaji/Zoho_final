@@ -13234,10 +13234,7 @@ def add_salesorder(request):
         return redirect('/')
 
         
-        
-        
-       
-        
+                
 def sort_customer_name(request):
      if 'login_id' in request.session:
         if request.session.has_key('login_id'):
@@ -13322,8 +13319,151 @@ def view_salesorder_draft(request):
         return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale':sale,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
      else:
         return redirect('/') 
+    
+    
+def view_salesorder_details(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+              
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
    
+        sale=SaleOrder.objects.get(id=pk)
+
+        # Getting all vendor to disply on the left side of vendor_detailsnew page
+        vendor_objs=Customer.objects.filter(company=comp_details)
+        sales_objs=SaleOrder.objects.all()
+
+        # vendor_comments=Customer_comments_table.objects.filter(customer=sale)
+        # vendor_history=CustomerHistory.objects.filter(customer=sale)
+    
+    content = {
+                'details': dash_details,
+                'allmodules': allmodules,
+                'log_details':log_details,
+                'sale':sale,
+                'sales_objs':sales_objs,
+                'vendor_objs':vendor_objs,
+                # 'vendor_comments':vendor_comments,
+                # 'vendor_history':vendor_history,
+        }
+    return render(request,'zohomodules/sales_order/salesorder_details.html',content)   
+
+
+def all_salesorder(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details) 
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+  
+        sales_objs=SaleOrder.objects.all()
+        return render(request,'zohomodules/sales_order/salesorder_details.html',{'sales_objs':sales_objs,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+            return redirect('/')  
+ 
+ 
+def viewsort_customer_name(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details) 
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+  
+        sales_objs = SaleOrder.objects.all().order_by('customer__first_name')
+        return render(request,'zohomodules/sales_order/salesorder_details.html',{'sales_objs':sales_objs,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+            return redirect('/')  
         
+        
+def viewsort_sales_order(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details) 
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+  
+        sales_objs=SaleOrder.objects.all().order_by('sales_order_number')
+        return render(request,'zohomodules/sales_order/salesorder_details.html',{'sales_objs':sales_objs,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+            return redirect('/')  
+        
+                    
+def filter_salesorder_save(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id'] 
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+  
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+        
+        sales_objs=SaleOrder.objects.filter(status='Save').order_by('-id')
+        return render(request,'zohomodules/sales_order/salesorder_details.html',{'sales_objs':sales_objs,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+        return redirect('/')
+    
+    
+def filter_salesorder_draft(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id'] 
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+  
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+        
+        sales_objs=SaleOrder.objects.filter(status='Draft').order_by('-id')
+        return render(request,'zohomodules/sales_order/salesorder_details.html',{'sales_objs':sales_objs,'allmodules':allmodules, 'dash_details':dash_details,'log_details':log_details})
+     else:
+        return redirect('/')
 
         
         

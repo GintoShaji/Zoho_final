@@ -1473,46 +1473,65 @@ function updateOutputFields() {
 
  
  
-    $('document').ready(function () {
+      $('document').ready(function () {
         $('.add_another').click(function () {
-          $("#tbl").append(`<tr>
-            <td></td>
-            <td>
-                <div class="d-flex align-items-center">
-                    <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
-                        <option selected>Select item</option>
-                        {% for i in item %}
-                            <option value="{{ i.id }}">{{ i.item_name }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="ml-2">
-                        <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+            $("#tbl").append(`<tr>
+                <td></td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateDetails(this)" style="width: 110px;">
+                            <option selected>Select item</option>
+                            {% for i in item %}
+                                <option value="{{ i.id }}" data-price="{{ i.selling_price }}" data-hsn="{{ i.hsn_code }}">{{ i.item_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="ml-2">
+                            <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                        </div>
                     </div>
-                </div>
-            </td>
-            <td>
-                <input type="text" name="hsn" class="form-control border-1 bg-light text-dark" id="hsnInput"  value="" />
-            </td>
-            <td>
-                <input type="text" name="quantity" class="form-control border-1 bg-light text-dark" value="" />
-            </td>
-            <td>
-                <input type="text" name="price" class="form-control border-1 bg-light text-dark" id="priceInput" value="" />
-            </td>
-            <td>
-                <input type="text"  onclick="sample1()" name="tax_rate" class="form-control border-1 bg-light text-dark"  value="" />
-            </td>
-            <td>
-                <input type="text" onclick="sample()" name="discount" class="form-control border-1 bg-light text-dark"  value="" />
-            </td>
-            <td>
-                <input type="text" name="total" class="form-control border-1 bg-light text-dark" value="" />
-            </td>
-            
-            <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
-        </tr>`);
+                </td>
+                <td>
+                    <input type="text" name="hsn" class="form-control border-1 bg-light text-dark" id="hsnInput"  value="" />
+                </td>
+                <td>
+                    <input type="number" name="quantity" class="form-control border-1 bg-light text-dark" onchange="calculateTotal(this); calculateSubtotal()" value="" />
+                </td>
+                <td>
+                    <input type="text" name="price" class="form-control border-1 bg-light text-dark"  id="priceInput" onchange="calculateTotal(this); calculateSubtotal()" value="" />
+                </td>
+                <td>
+                    <input type="text"  onclick="sample1()" name="tax_rate" class="form-control border-1 bg-light text-dark" onchange="calculateTotal(this)"  value="" />
+                </td>
+                <td>
+                    <input type="text" onclick="sample()" name="discount" class="form-control border-1 bg-light text-dark" onchange="calculateTotal(this); calculateSubtotal()"  value="" />
+                </td>
+                <td>
+                    <input type="text" name="total" class="form-control border-1 bg-light text-dark"  value="{{ total }}"  name="total" readonly value="" />
+                </td>
+                <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
+            </tr>`);
         });
-      })
+    });
+    
+    function updateDetails(selectElement) {
+        var selectedItem = selectElement.options[selectElement.selectedIndex];
+        var priceInput = $(selectElement).closest('tr').find('input[name="price"]');
+        var hsnInput = $(selectElement).closest('tr').find('input[name="hsn"]');
+        
+        // Update price input field
+        var price = selectedItem.getAttribute('data-price');
+        priceInput.val(price);
+        
+        // Update HSN input field
+        var hsn = selectedItem.getAttribute('data-hsn');
+        hsnInput.val(hsn);
+    }
+
+
+
+
+
+      
 
       function fieldset5_function()
       {

@@ -157,7 +157,7 @@
              
               <tbody>
                 {% for i in sale %}
-                <tr id="over" class="clickable-row" data-href="">
+                <tr id="over" class="clickable-row" data-href="{% url 'view_salesorder_details' i.id %}">
                   <td style="text-align: center;">{{forloop.counter}}</td>
                   <td>{{i.sales_order_date}}</td>
                   <td>{{i.sales_order_number}}</td>
