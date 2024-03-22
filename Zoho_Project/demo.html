@@ -1,95 +1,142 @@
-<tbody>
-    <tr>
-        <td></td>
-        <td>
-            <div class="d-flex align-items-center">
-                <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
-                    <option selected>Select item</option>
-                    {% for i in item %}
-                        <option value="{{ i.id }}">{{ i.item_name }}</option>
-                    {% endfor %}
-                </select>
-                <div class="ml-2">
-                    <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
-                </div>
-            </div>
-        </td>
-        <td><input type="text" class="form-control border-1 bg-light text-dark" id="hsnInput" name="hsn"></td>
-        <td><input type="number" class="form-control border-1 bg-light text-dark" name="quantity" onchange="calculateTotal(this); calculateSubtotal()" id="quantity1"></td>
-        <td><input type="text" class="form-control border-1 bg-light text-dark" id="priceInput"  name="price" onchange="calculateTotal(this); calculateSubtotal()" id="price1"></td>
-        <td><input type="text" class="form-control border-1 bg-light text-dark" id="taxRateInput" name="tax_rate" onclick="sample1()" onchange="calculateTotal(this)" id="taxRate1"></td>
-        <td><input type="text" class="form-control border-1 bg-light text-dark" name="discount" onclick="sample()" onchange="calculateTotal(this); calculateSubtotal()" id="discount1"></td>
-        <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ total }}"  name="total" readonly id="total1"></td>
-        <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
-    </tr>
-</tbody>
+<div class="row clearfix" style="margin-top:20px">
+    <div class="col-md-6 ml-4">
+        <textarea class="form-control text-light" id="" name="description" placeholder="Note"
+            style="height: 190px;"></textarea>
+        <input type="file" name="file" style="margin-top: 10px; width: 70%; background-color: white;">
+    </div>
+</div>
+
+<br>
+<div class="grey-container">
+    <div class="form-group row mt-4">
+        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sub Total</label></div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <input type="text" class="form-control bg-light text-dark" id="subTotal" name="sub_total"  readonly required>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+    </div>
+
+
+    <script>
+        // Function to calculate and update the subtotal
+        function calculateSubtotal() {
+            var rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(function(row) {
+                var quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
+                var price = parseFloat(row.querySelector('input[name="price"]').value) || 0;
+                var discount = parseFloat(row.querySelector('input[name="discount"]').value) || 0;
+                
+                var subtotal = (quantity * price) - discount;
+                row.querySelector('input[name="total"]').value = subtotal.toFixed(2);
+            });
+    
+            // Calculate total of all subtotals and update the Sub Total input field
+            var subTotal = 0;
+            rows.forEach(function(row) {
+                subTotal += parseFloat(row.querySelector('input[name="total"]').value) || 0;
+            });
+            document.getElementById('subTotal').value = subTotal.toFixed(2);
+        }
+    </script>
+
+
+    
+    <div class="form-group row mt-4">
+        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Tax Amount</label></div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <input type="text" class="form-control bg-light text-dark" id="taxAmount" name="tax_amount_igst" value="0.00" required>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+    </div>
+    
+    <div class="form-group row mt-4">
+        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Shipping Charge</label></div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <input type="text" class="form-control bg-light text-dark" id="shippingCharge" name="shipping_charge" value="0.00" required>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+    </div>
+    
+    <div class="form-group row mt-4">
+        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Adjustment</label></div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <input type="number" step="0.01" class="form-control bg-light text-dark" id="adjustment" name="adjustment" value="0.00" required>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+    </div> 
+    
+    <div class="form-group row mt-4">
+        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Grand Total</label></div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <input type="text" class="form-control bg-light text-dark" id="grandTotal" name="grand_total" value="0.00" required readonly>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+    </div>
+    
+    <script>
+        // Get references to the input fields
+        const subTotalInput = document.getElementById('subTotal');
+        const taxAmountInput = document.getElementById('taxAmount');
+        const shippingChargeInput = document.getElementById('shippingCharge');
+        const adjustmentInput = document.getElementById('adjustment');
+        const grandTotalInput = document.getElementById('grandTotal');
+    
+        // Function to calculate the grand total
+        function calculateGrandTotal() {
+            const subtotal = parseFloat(subTotalInput.value) || 0;
+            const taxAmount = parseFloat(taxAmountInput.value) || 0;
+            const shippingCharge = parseFloat(shippingChargeInput.value) || 0;
+            const adjustment = parseFloat(adjustmentInput.value) || 0;
+    
+            // Calculate the grand total
+            const grandTotal = subtotal + taxAmount + shippingCharge + adjustment;
+    
+            // Update the value of the grand total input field
+            grandTotalInput.value = grandTotal.toFixed(2);
+        }
+    
+        // Call the calculateGrandTotal function when any of the input fields change
+        subTotalInput.addEventListener('input', calculateGrandTotal);
+        taxAmountInput.addEventListener('input', calculateGrandTotal);
+        shippingChargeInput.addEventListener('input', calculateGrandTotal);
+        adjustmentInput.addEventListener('input', calculateGrandTotal);
+    
+        // Call the calculateGrandTotal function initially to set the initial value
+        calculateGrandTotal();
+    </script>
+
+
+
+    <div class="form-group row mt-4">
+        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Paid</label></div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <input type="text" class="form-control bg-light text-dark" id="advancedPaid" oninput="calculateBalance()" name="advanced_paid" value="0.00" required>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+    </div>
+
+    <div class="form-group row mt-4">
+        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Balance</label></div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <input type="text" class="form-control bg-light text-dark" id="balance" name="balance" value="0.00" required>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+    </div>
+</div>
 
 <script>
-    // Function to calculate and update the subtotal
-    function calculateSubtotal() {
-        var rows = document.querySelectorAll('tbody tr');
-        
-        rows.forEach(function(row) {
-            var quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
-            var price = parseFloat(row.querySelector('input[name="price"]').value) || 0;
-            var discount = parseFloat(row.querySelector('input[name="discount"]').value) || 0;
-            
-            var subtotal = (quantity * price) - discount;
-            row.querySelector('input[name="total"]').value = subtotal.toFixed(2);
-        });
-
-        // Calculate total of all subtotals and update the Sub Total input field
-        var subTotal = 0;
-        rows.forEach(function(row) {
-            subTotal += parseFloat(row.querySelector('input[name="total"]').value) || 0;
-        });
-        document.getElementById('subTotal').value = subTotal.toFixed(2);
+    // Define the calculateBalance function
+    function calculateBalance() {
+        var grandTotal = parseFloat(document.getElementById("grandTotal").value);
+        var advancedPaid = parseFloat(document.getElementById("advancedPaid").value);
+        var balance = grandTotal - advancedPaid;
+        document.getElementById("balance").value = balance.toFixed(2); // Displaying balance with 2 decimal places
     }
+
+    // Add an event listener to the advancedPaid input field
+    document.getElementById("advancedPaid").addEventListener("input", calculateBalance);
 </script>
 
-
-
-$('document').ready(function () {
-    $('.add_another').click(function () {
-      $("#tbl").append(`<tr>
-        <td></td>
-
-        <td>
-            <div class="d-flex align-items-center">
-                <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
-                    <option selected>Select item</option>
-                    {% for i in item %}
-                        <option value="{{ i.id }}">{{ i.item_name }}</option>
-                    {% endfor %}
-                </select>
-                <div class="ml-2">
-                    <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
-                </div>
-            </div>
-        </td>
-
-        <td>
-            <input type="text" name="hsn" class="form-control border-1 bg-light text-dark" id="hsnInput"  value="" />
-        </td>
-        <td>
-            <input type="number" name="quantity" class="form-control border-1 bg-light text-dark" onchange="calculateTotal(this); calculateSubtotal()" value="" />
-        </td>
-        <td>
-            <input type="text" name="price" class="form-control border-1 bg-light text-dark"  id="priceInput" onchange="calculateTotal(this); calculateSubtotal()" value="" />
-        </td>
-        <td>
-            <input type="text"  onclick="sample1()" name="tax_rate" class="form-control border-1 bg-light text-dark" onchange="calculateTotal(this)"  value="" />
-        </td>
-        <td>
-            <input type="text" onclick="sample()" name="discount" class="form-control border-1 bg-light text-dark" onchange="calculateTotal(this); calculateSubtotal()"  value="" />
-        </td>
-        <td>
-            <input type="text" name="total" class="form-control border-1 bg-light text-dark"  value="{{ total }}"  name="total" readonly value="" />
-        </td>
-        
-        <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
-    </tr>`);
-    });
-  })
 
 

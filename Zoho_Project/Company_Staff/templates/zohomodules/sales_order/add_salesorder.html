@@ -270,22 +270,26 @@
                           </select>
                     </div>
                 
+                    
                     <div class="col-md-1"></div>
                     <div class="col-sm-12 col-md-3 col-lg-3" style="display:none;"  id="chequediv">
                         <label class="col-form-label text-light" >Cheque No</label>
                         <input type="text" class="form-control bg-light" name="cheque_number"  id="cheque_id" placeholder="Enter Cheque No" style="color: black;">
                     </div>
+                    
 
                     <div class="col-sm-12 col-md-3 col-lg-3 "  style="display:none; " id="upidiv">
                         <label class="col-form-label text-light" >UPI ID</label>
                         <input type="text" class="form-control bg-light" name="upi_number"  id="upi_id" placeholder="Enter UPI ID" style="color: black;">
                     </div>
+                    
                    
                     <div class="col-sm-12 col-md-3 col-lg-3"  style="display:none;" id="bnkdiv">
                         <label class="col-form-label text-light" >Bank Account</label>
                         <input type="text" class="form-control bg-light" name="bank_account_number" id="bnk_id"  style="background-color: #43596c;" readonly style="color: black;">
                     </div>
                 </div>
+                
 
 
                 
@@ -365,155 +369,163 @@
             </script>
 
 
-                <div class="row clearfix" style="margin-top:20px">
-                    <div class="col-md-6 ml-4">
-                        <textarea class="form-control text-light" id="" name="description" placeholder="Note"
-                            style="height: 190px;"></textarea>
-                        <input type="file" name="file" style="margin-top: 10px; width: 70%; background-color: white;">
-                    </div>
-                </div>
-
-                <br>
-                <div class="grey-container">
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sub Total</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="subTotal" name="sub_total"  readonly required>
-                            <div class="invalid-feedback">Please fill out this field.</div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row clearfix" style="margin-top:20px">
+                            <div class="col-md-6 ml-4">
+                                <textarea class="form-control text-light" id="" name="description" placeholder="Note" style="height: 190px; width: 180%;"></textarea>
+                                <input type="file" name="file" style="margin-top: 10px; width: 180%; background-color: white;">
+                            </div>
                         </div>
                     </div>
-  
-
-                    <script>
-                        // Function to calculate and update the subtotal
-                        function calculateSubtotal() {
-                            var rows = document.querySelectorAll('tbody tr');
+                    <div class="col-md-6">
+                        <div class="grey-container">
+                            <div class="form-group row mt-4">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sub Total</label></div>
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <input type="text" class="form-control bg-light text-dark" id="subTotal" name="sub_total"  readonly required>
+                                    <div class="invalid-feedback">Please fill out this field.</div>
+                                </div>
+                            </div>
+                        
+                        
+                            <script>
+                                // Function to calculate and update the subtotal
+                                function calculateSubtotal() {
+                                    var rows = document.querySelectorAll('tbody tr');
+                                    
+                                    rows.forEach(function(row) {
+                                        var quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
+                                        var price = parseFloat(row.querySelector('input[name="price"]').value) || 0;
+                                        var discount = parseFloat(row.querySelector('input[name="discount"]').value) || 0;
+                                        
+                                        var subtotal = (quantity * price) - discount;
+                                        row.querySelector('input[name="total"]').value = subtotal.toFixed(2);
+                                    });
                             
-                            rows.forEach(function(row) {
-                                var quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
-                                var price = parseFloat(row.querySelector('input[name="price"]').value) || 0;
-                                var discount = parseFloat(row.querySelector('input[name="discount"]').value) || 0;
-                                
-                                var subtotal = (quantity * price) - discount;
-                                row.querySelector('input[name="total"]').value = subtotal.toFixed(2);
-                            });
-                    
-                            // Calculate total of all subtotals and update the Sub Total input field
-                            var subTotal = 0;
-                            rows.forEach(function(row) {
-                                subTotal += parseFloat(row.querySelector('input[name="total"]').value) || 0;
-                            });
-                            document.getElementById('subTotal').value = subTotal.toFixed(2);
-                        }
-                    </script>
+                                    // Calculate total of all subtotals and update the Sub Total input field
+                                    var subTotal = 0;
+                                    rows.forEach(function(row) {
+                                        subTotal += parseFloat(row.querySelector('input[name="total"]').value) || 0;
+                                    });
+                                    document.getElementById('subTotal').value = subTotal.toFixed(2);
+                                }
+                            </script>
+                        
+                        
+                            
+                            <div class="form-group row mt-4">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Tax Amount</label></div>
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <input type="text" class="form-control bg-light text-dark" id="taxAmount" name="tax_amount_igst" value="0.00" required>
+                                    <div class="invalid-feedback">Please fill out this field.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mt-4">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Shipping Charge</label></div>
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <input type="text" class="form-control bg-light text-dark" id="shippingCharge" name="shipping_charge" value="0.00" required>
+                                    <div class="invalid-feedback">Please fill out this field.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mt-4">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Adjustment</label></div>
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <input type="number" step="0.01" style="width:350%;" class="form-control bg-light text-dark" id="adjustment" name="adjustment" value="0.00" required>
+                                    <div class="invalid-feedback">Please fill out this field.</div>
+                                </div>
+                            </div> 
+                            
+                            <div class="form-group row mt-4">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Grand Total</label></div>
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <input type="text" class="form-control bg-light text-dark" id="grandTotal" name="grand_total" value="0.00" required readonly>
+                                    <div class="invalid-feedback">Please fill out this field.</div>
+                                </div>
+                            </div>
+                            
+                            <script>
+                                // Get references to the input fields
+                                const subTotalInput = document.getElementById('subTotal');
+                                const taxAmountInput = document.getElementById('taxAmount');
+                                const shippingChargeInput = document.getElementById('shippingCharge');
+                                const adjustmentInput = document.getElementById('adjustment');
+                                const grandTotalInput = document.getElementById('grandTotal');
+                            
+                                // Function to calculate the grand total
+                                function calculateGrandTotal() {
+                                    const subtotal = parseFloat(subTotalInput.value) || 0;
+                                    const taxAmount = parseFloat(taxAmountInput.value) || 0;
+                                    const shippingCharge = parseFloat(shippingChargeInput.value) || 0;
+                                    const adjustment = parseFloat(adjustmentInput.value) || 0;
+                            
+                                    // Calculate the grand total
+                                    const grandTotal = subtotal + taxAmount + shippingCharge + adjustment;
+                            
+                                    // Update the value of the grand total input field
+                                    grandTotalInput.value = grandTotal.toFixed(2);
+                                }
+                            
+                                // Call the calculateGrandTotal function when any of the input fields change
+                                subTotalInput.addEventListener('input', calculateGrandTotal);
+                                taxAmountInput.addEventListener('input', calculateGrandTotal);
+                                shippingChargeInput.addEventListener('input', calculateGrandTotal);
+                                adjustmentInput.addEventListener('input', calculateGrandTotal);
+                            
+                                // Call the calculateGrandTotal function initially to set the initial value
+                                calculateGrandTotal();
+                            </script>
+                        
+                        
+                        
+                            <div class="form-group row mt-4">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Paid</label></div>
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <input type="text" class="form-control bg-light text-dark" id="advancedPaid" oninput="calculateBalance()" name="advanced_paid" value="0.00" required>
+                                    <div class="invalid-feedback">Please fill out this field.</div>
+                                </div>
+                            </div>
+                        
+                            <div class="form-group row mt-4">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Balance</label></div>
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <input type="text" class="form-control bg-light text-dark" id="balance" name="balance" value="0.00" required>
+                                    <div class="invalid-feedback">Please fill out this field.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            // Define the calculateBalance function
+                            function calculateBalance() {
+                                var grandTotal = parseFloat(document.getElementById("grandTotal").value);
+                                var advancedPaid = parseFloat(document.getElementById("advancedPaid").value);
+                                var balance = grandTotal - advancedPaid;
+                                document.getElementById("balance").value = balance.toFixed(2); // Displaying balance with 2 decimal places
+                            }
+                        
+                            // Add an event listener to the advancedPaid input field
+                            document.getElementById("advancedPaid").addEventListener("input", calculateBalance);
+                        </script>
 
 
-                    
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Tax Amount</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="taxAmount" name="tax_amount_igst" value="0.00" required>
-                            <div class="invalid-feedback">Please fill out this field.</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Shipping Charge</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="shippingCharge" name="shipping_charge" value="0.00" required>
-                            <div class="invalid-feedback">Please fill out this field.</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Adjustment</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="number" step="0.01" class="form-control bg-light text-dark" id="adjustment" name="adjustment" value="0.00" required>
-                            <div class="invalid-feedback">Please fill out this field.</div>
-                        </div>
-                    </div> 
-                    
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Grand Total</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="grandTotal" name="grand_total" value="0.00" required readonly>
-                            <div class="invalid-feedback">Please fill out this field.</div>
-                        </div>
-                    </div>
-                    
-                    <script>
-                        // Get references to the input fields
-                        const subTotalInput = document.getElementById('subTotal');
-                        const taxAmountInput = document.getElementById('taxAmount');
-                        const shippingChargeInput = document.getElementById('shippingCharge');
-                        const adjustmentInput = document.getElementById('adjustment');
-                        const grandTotalInput = document.getElementById('grandTotal');
-                    
-                        // Function to calculate the grand total
-                        function calculateGrandTotal() {
-                            const subtotal = parseFloat(subTotalInput.value) || 0;
-                            const taxAmount = parseFloat(taxAmountInput.value) || 0;
-                            const shippingCharge = parseFloat(shippingChargeInput.value) || 0;
-                            const adjustment = parseFloat(adjustmentInput.value) || 0;
-                    
-                            // Calculate the grand total
-                            const grandTotal = subtotal + taxAmount + shippingCharge + adjustment;
-                    
-                            // Update the value of the grand total input field
-                            grandTotalInput.value = grandTotal.toFixed(2);
-                        }
-                    
-                        // Call the calculateGrandTotal function when any of the input fields change
-                        subTotalInput.addEventListener('input', calculateGrandTotal);
-                        taxAmountInput.addEventListener('input', calculateGrandTotal);
-                        shippingChargeInput.addEventListener('input', calculateGrandTotal);
-                        adjustmentInput.addEventListener('input', calculateGrandTotal);
-                    
-                        // Call the calculateGrandTotal function initially to set the initial value
-                        calculateGrandTotal();
-                    </script>
-
-
-                
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Paid</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="advancedPaid" oninput="calculateBalance()" name="advanced_paid" value="0.00" required>
-                            <div class="invalid-feedback">Please fill out this field.</div>
-                        </div>
-                    </div>
-                
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Balance</label></div>
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <input type="text" class="form-control bg-light text-dark" id="balance" name="balance" value="0.00" required>
-                            <div class="invalid-feedback">Please fill out this field.</div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <script>
-                    // Define the calculateBalance function
-                    function calculateBalance() {
-                        var grandTotal = parseFloat(document.getElementById("grandTotal").value);
-                        var advancedPaid = parseFloat(document.getElementById("advancedPaid").value);
-                        var balance = grandTotal - advancedPaid;
-                        document.getElementById("balance").value = balance.toFixed(2); // Displaying balance with 2 decimal places
-                    }
-                
-                    // Add an event listener to the advancedPaid input field
-                    document.getElementById("advancedPaid").addEventListener("input", calculateBalance);
-                </script>
+            <div class="row mt-5">
+                <div class="col-sm-12 col-md-2 col-lg-2 mt-3">
+                    <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" name="save_as_draft">Draft</button>
+                </div>
+                <div class=" col-sm-12 col-md-2 col-lg-2 mt-3">
+                    <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" name="save">Save</button>
+                </div> 
+            </div>
             
-
-                <div class="row mt-5">
-                    <div class="col-sm-12 col-md-2 col-lg-2 mt-3">
-                        <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" name="save_as_draft">Draft</button>
-                    </div>
-                    <div class=" col-sm-12 col-md-2 col-lg-2 mt-3">
-                        <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" name="save">Save</button>
-                    </div> 
-                </div>
             </form>
       
                

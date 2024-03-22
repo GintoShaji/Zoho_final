@@ -13226,6 +13226,16 @@ def add_salesorder(request):
             total=total,
             sales_order=sale)
         order_item.save()
+        
+        sales_history_obj=SalesOrderHistory()
+        sales_history_obj.company=comp_details
+        sales_history_obj.login_details=log_details
+        sales_history_obj.sales_order=sale
+        sales_history_obj.date=sales_order_date
+        sales_history_obj.current_date=date.today()
+        sales_history_obj.action='Completed'
+        sales_history_obj.save()
+        
 
         messages.success(request, 'Sales Order created successfully!')
         return render(request, 'zohomodules/sales_order/salesorder_list.html', {'total': total,
@@ -13342,19 +13352,19 @@ def view_salesorder_details(request,pk):
         # Getting all vendor to disply on the left side of vendor_detailsnew page
         vendor_objs=Customer.objects.filter(company=comp_details)
         sales_objs=SaleOrder.objects.all()
+        items = SalesOrderItems.objects.filter(sales_order=sale)
+        sales_history=SalesOrderHistory.objects.filter(sales_order=sale)
 
-        # vendor_comments=Customer_comments_table.objects.filter(customer=sale)
-        # vendor_history=CustomerHistory.objects.filter(customer=sale)
     
     content = {
                 'details': dash_details,
                 'allmodules': allmodules,
                 'log_details':log_details,
                 'sale':sale,
+                'items':items,
                 'sales_objs':sales_objs,
                 'vendor_objs':vendor_objs,
-                # 'vendor_comments':vendor_comments,
-                # 'vendor_history':vendor_history,
+                'sales_history':sales_history,
         }
     return render(request,'zohomodules/sales_order/salesorder_details.html',content)   
 

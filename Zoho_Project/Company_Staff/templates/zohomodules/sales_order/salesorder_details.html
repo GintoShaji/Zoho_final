@@ -171,7 +171,7 @@
                   <table class="table  text-white mt-3" id="myTable">
                     <tbody>
                       {% for s in sales_objs %}
-                      <tr class="clickable-row" data-href="">
+                      <tr class="clickable-row" data-href="{% url 'view_salesorder_details' s.id %}">
                         <td>
                           <div class="row" style="height: 50px;">
                             <div class="col-md-6">
@@ -250,8 +250,8 @@
                           <button class="btn btn-outline-warning btn-sm" title="Delete"><i
                               class="fas fa-trash-alt"></i></button>
                         </a>
-                        <a class="btn btn-outline-warning btn-sm" href=""
-                          id="sts">{{vendor_obj.customer_status}}</a>
+                        <a class="btn btn-outline-warning btn-sm" href="{% url 'filter_salesorder_save' %}"
+                          id="sts">{{sales_objs.status}}</a>
                         <a class="btn btn-outline-warning btn-sm" href="" data-toggle="modal" data-target="#commentModal2"
                           data-toggle="tooltip" title="history">
                           <i class="fa-solid fa-clock-rotate-left"></i>
@@ -294,15 +294,15 @@
                     <div id="overview">
                       <div class="overview-head">
                         <div class="">
-                          <p class="bold">{{vendor_obj.company_name}}</p>
+                          <h2 class="bold">#{{sale.sales_order_number}}</h2>
                         </div>
 
                         <div class="">
-                           <h4 class="bold">Customer Details</h4>
+                           <h4 class="bold">Order Details</h4>
                         </div>
 
                         <div class="">
-                          <p class="bold"><span> Status : {{vendor_obj.customer_status}}</span> </p>
+                          <p class="bold"><span>Date:</span>{{sale.sales_order_date}}</p>
                         </div>
 
                       </div>
@@ -318,14 +318,18 @@
                                   </p>   
                             </div>
 
+                            <div class="col-5 ">
+                              <h5 class="">Company Details</h5>
+                            </div>
 
+                            <br>
                             <div class="row mt-2">
                                 <div class="col-5 ">
-                                  <p class="bold">Customer Name:</p>
+                                  <p class="bold">Company:</p>
                                 </div>
                                 <div class="col-7">
                                   <p class="bold" style="max-width: 15rem;word-wrap: break-word;">
-                                    {{vendor_obj.title}} &nbsp;{{vendor_obj.first_name}} &nbsp;{{vendor_obj.last_name}}
+                                    {{sale.company.company_name}}
 
                                   </p>
                                 </div>
@@ -333,95 +337,214 @@
                          
                             <div class="row mt-1">
                               <div class="col-5 ">
-                                <p >Customer Email:</p>
+                                <p >Company Email:</p>
                               </div>
                               <div class="col-7">
                                 <p class="bold" style="max-width: 15rem;word-wrap: break-word;">
-                                  {{vendor_obj.customer_email}}
+                                  {{sale.login_details.email}}
                                 </p>
                               </div>
                             </div>
 
                             <div class="row mt-1">
                                 <div class="col-5">
-                                  <p for="">Company Name:</p>
+                                  <p for="">Mobile:</p>
                                 </div>
                                 <div class="col-7">
-                                  <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{vendor_obj.company_name}}</p>
+                                  <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{sale.company.contact}}</p>
                                 </div>
-                              </div>
-                              <div class="row mt-1">
-                                <div class="col-5">
-                                  <p for="">Place of Supply:</p>
-                                </div>
-                                <div class="col-7">
-                                  <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{vendor_obj.place_of_supply}}</p>
-                                </div>
-                              </div>
-
+                              </div> 
 
                               <div class="row mt-1">
                                 <div class="col-5">
-                                  <p for="">Opening Balance Type:</p>
+                                  <p for="">Address:</p>
                                 </div>
                                 <div class="col-7">
-                                  <p class="bold" style="max-width: 15rem;word-wrap: break-word;">{{vendor_obj.opening_balance_type}}</p>
+                                  <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{sale.company.address}}</p>
+                                </div>
+                              </div> 
+
+
+                              
+
+                              <div class="col-5 ">
+                                <h5 class="">Bill Details</h5>
+                              </div>
+  
+                              <br>
+                              <div class="row mt-2">
+                                  <div class="col-5 ">
+                                    <p class="bold">Sales Order No:</p>
+                                  </div>
+                                  <div class="col-7">
+                                    <p class="bold" style="max-width: 15rem;word-wrap: break-word;">
+                                      {{sale.sales_order_number}} &nbsp;
+  
+                                    </p>
+                                  </div>
+                                </div>
+                           
+                              <div class="row mt-1">
+                                <div class="col-5 ">
+                                  <p >Customer Name:</p>
+                                </div>
+                                <div class="col-7">
+                                  <p class="bold" style="max-width: 15rem;word-wrap: break-word;">
+                                    {{sale.customer.first_name}} {{sale.customer.last_name}}
+                                  </p>
                                 </div>
                               </div>
   
-                              <div class="row mt-2">
-                                <div class="col-5">
-                                  <p for="">Opening Balance:</p>
+                              <div class="row mt-1">
+                                  <div class="col-5">
+                                    <p for="">Sales Order Date:</p>
+                                  </div>
+                                  <div class="col-7">
+                                    <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                      {{sale.sales_order_date}}
+                                    </p>
+                                  </div>
+                                </div> 
+  
+                                <div class="row mt-1">
+                                  <div class="col-5">
+                                    <p for="">Shipment Date:</p>
+                                  </div>
+                                  <div class="col-7">
+                                    <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                      {{sale.expiration_date}}
+                                    </p>
+                                  </div>
+                                </div> 
+
+                                <div class="row mt-1">
+                                  <div class="col-5">
+                                    <p for="">Address:</p>
+                                  </div>
+                                  <div class="col-7">
+                                    <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                      {{sale.customer_billing_address}}
+                                    </p>
+                                  </div>
+                                </div> 
+  
+                                <div class="row mt-1">
+                                  <div class="col-5">
+                                    <p for="">Payment Method:</p>
+                                  </div>
+                                  <div class="col-7">
+                                    <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                      {{sale.payment_method}}
+                                    </p>
+                                  </div>
                                 </div>
-                                <div class="col-7">
-                                  <p class="bold" style="max-width: 15rem;word-wrap: break-word;">{{vendor_obj.opening_balance}}</p>
+
+
+                                <div class="col-5 ">
+                                  <h5 class="bold">Item Details</h5>
                                 </div>
-                              </div>
-
-                              <div class="row mt-2">
-                                <div class="col-5">
-                                  <p for="">Payment Terms :</p>
+                               
+                                
+                                <br>
+                                {% for i in items %}
+                                <div class="row mt-2">
+                                    <div class="col-5 ">
+                                      <p class="bold">Name:</p>
+                                    </div>
+                                    <div class="col-7">
+                                      <p class="bold" style="max-width: 15rem;word-wrap: break-word;">
+                                        {{ i.item.item_name }} &nbsp;
+                                      </p>
+                                    </div>
+                                  </div>
+                                 
+                                <div class="row mt-1">
+                                  <div class="col-5 ">
+                                    <p >HSN:</p>
+                                  </div>
+                                  <div class="col-7">
+                                    <p class="bold" style="max-width: 15rem;word-wrap: break-word;">
+                                      {{ i.hsn }}
+                                    </p>
+                                  </div>
                                 </div>
-                                <div class="col-7">
-                                  <p class="bold" style="max-width: 15rem;word-wrap: break-word;">{{vendor_obj.company_payment_terms.term_name}}</p>
-                                </div>
-                              </div>
+    
+                                <div class="row mt-1">
+                                    <div class="col-5">
+                                      <p for="">Price:</p>
+                                    </div>
+                                    <div class="col-7">
+                                      <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                        {{ i.price }}
+                                      </p>
+                                    </div>
+                                  </div> 
+    
+                                  <div class="row mt-1">
+                                    <div class="col-5">
+                                      <p for="">Quantity:</p>
+                                    </div>
+                                    <div class="col-7">
+                                      <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                        {{ i.quantity }}
+                                      </p>
+                                    </div>
+                                  </div> 
+  
+                                  <div class="row mt-1">
+                                    <div class="col-5">
+                                      <p for="">Tax amount:</p>
+                                    </div>
+                                    <div class="col-7">
+                                      <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                        {{ i.tax_rate }}
+                                      </p>
+                                    </div>
+                                  </div> 
+    
+                                  <div class="row mt-1">
+                                    <div class="col-5">
+                                      <p for="">Discount:</p>
+                                    </div>
+                                    <div class="col-7">
+                                      <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                        {{ i.discount }}
+                                      </p>
+                                    </div>
+                                  </div>
 
-                              <div class="row mt-2">
-                                <div class="col-5">
-                                  <p for="">Tax Preference:</p>
-                                </div>
-                                <div class="col-7">
-                                  <p class="bold" style="max-width: 15rem;word-wrap: break-word;">{{vendor_obj.tax_preference}}</p>
-                                </div>
-                              </div>
+                                  <div class="row mt-1">
+                                    <div class="col-5">
+                                      <p for="">Total:</p>
+                                    </div>
+                                    <div class="col-7">
+                                      <p class="bold " style="max-width: 15rem;word-wrap: break-word;">
+                                        {{ i.total }}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {% endfor %}
 
 
 
-
-
-
-                          
-
-                         
-                          
+                              
 
 
                         </div>
                         <div class="p-info col-lg-6 col-sm-12 col-md-6 mr-2">
                           <div class="card " style="background-color:#383838 ; color:white; padding-left: 1rem; padding-top: 1rem;">
                             <div class="h3 mt-4 " style="margin-right: 1vh; color:white">
-                              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Customer Information
+                              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bill Details
                               <hr style="color: orange;">
                             </div>
 
                             
                           <div class="row mt-2">
                             <div class="col-5">
-                              <p for="">Customer Type:</p>
+                              <p for="">Bill Status :</p>
                             </div>
                             <div class="col-7">
-                              <p class="bold">{{vendor_obj.customer_type}}</p>
+                              <p class="bold">{{sale.status}}</p>
                             </div>
                           </div>
 
@@ -429,10 +552,10 @@
 
                             <div class="row mt-2">
                                 <div class="col-5">
-                                  <p for="">Work Phone :</p>
+                                  <p for="">Sub Total :</p>
                                 </div>
                                 <div class="col-6">
-                                  <p class="bold">{{vendor_obj.customer_phone}}</p>
+                                  <p class="bold">{{sale.sub_total}}</p>
                                 </div>
                               </div>
 
@@ -440,17 +563,26 @@
 
                            <div class="row mt-2">
                             <div class="col-5">
-                              <p for="">Mobile Phone :</p>
+                              <p for="">Tax Amount :</p>
                             </div>
                             <div class="col-6">
-                              <p class="bold">{{vendor_obj.customer_mobile}}</p>
+                              <p class="bold">{{sale.tax_amount_igst}}</p>
                             </div>
                           </div>
 
 
                             <div class="row mt-2">
                                 <div class="col-5">
-                                  <p for="">Currency :</p>
+                                  <p for="">CGST :</p>
+                                </div>
+                                <div class="col-6">
+                                  <p class="bold"></p>
+                                </div>
+                              </div>
+
+                            <div class="row mt-2">
+                                <div class="col-5">
+                                  <p for="">SGST :</p>
                                 </div>
                                 <div class="col-6">
                                   <p class="bold">{{vendor_obj.currency}}</p>
@@ -458,8 +590,7 @@
                               </div>
   
 
-
-                              <div class="h3 mt-4 text-white">More info
+                              <div class="h3 mt-4 text-white">
                                 <hr style="color: orange;">
                               </div>
 
@@ -467,28 +598,12 @@
 
                             <div class="row mt-2">
                               <div class="col-5">
-                                <p >GST Treatment :</p>
+                                <p >Grand Total :</p>
                               </div>
                               <div class="col-6">
-                                <p class="bold">{{vendor_obj.GST_treatement}}</p>
+                                <p class="bold">{{sale.grand_total}}</p>
                               </div>
                             </div>
-
-                            <div class="row mt-2">
-                              <div class="col-5">
-                                <p >GST Number :</p>
-                              </div>
-                              <div class="col-6">
-                                <p class="bold">{{vendor_obj.GST_number}}</p>
-                              </div>
-                            </div>
-
-                            <div class="row mt-2">
-                              <div class="col-5">
-                                <p>PAN Number:</p>
-                              </div>
-                              <div class="col-6">
-                                <p class="bold">{{vendor_obj.PAN_number}}</p>
 
                               </div>
                             </div>
@@ -667,12 +782,12 @@
                             </tr>
                           </thead>
                           <tbody>
-                            {% for i in vendor_history %}
+                            {% for s in sales_history %}
                             <tr class="table-row">
                               <td>{{forloop.counter}}</td>
-                              <td>{{i.date}}</td>
-                              <td>{{i.action}}</td>
-                              <td>{{i.login_details.first_name}} {{i.login_details.Last_name}}</td>
+                              <td>{{s.date}}</td>
+                              <td>{{s.action}}</td>
+                              <td>{{s.login_details.first_name}} {{s.login_details.last_name}}</td>
                             </tr>
                             {% endfor %}
                           </tbody>
