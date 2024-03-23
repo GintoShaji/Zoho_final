@@ -143,7 +143,7 @@
 
                     <div class="dropdown-menu m-1">
                       <a class="dropdown-item" href="{% url 'all_salesorder' %}">All</a>
-                      <a class="dropdown-item" href="{% url 'viewsort_customer_name' %}">Customer Name</a>
+                      <a class="dropdown-item" href="{% url 'viewsort_customer_name' %}">customer name</a>
                       <a class="dropdown-item" href="{% url 'viewsort_sales_order' %}">Sales Order No</a>
                     </div>
                     <a class="btn text-center btn-outline-warning btn-sm" id="filterbutton" data-bs-toggle="dropdown"
@@ -199,7 +199,7 @@
                 <div class="row ">
                   <div class="col-md-7">
                     <a class="text-white" style="font-size: 1.5rem;;">
-                      <h3 class="text-white">{{vendor_obj.first_name}} {{vendor_obj.last_name}}</h3>
+                      <h3 class="text-white">  </h3>
                     </a>
                   </div>
                 </div>
@@ -246,12 +246,15 @@
                         </a>
                         {% endif %}
     
+                        
                         <a href="" class="text-dark">
                           <button class="btn btn-outline-warning btn-sm" title="Delete"><i
                               class="fas fa-trash-alt"></i></button>
                         </a>
-                        <a class="btn btn-outline-warning btn-sm" href="{% url 'filter_salesorder_save' %}"
-                          id="sts">{{sales_objs.status}}</a>
+                        
+                        <a class="btn btn-outline-warning btn-sm" href=""
+                          id="sts">{{sale.status}}</a>
+                        
                         <a class="btn btn-outline-warning btn-sm" href="" data-toggle="modal" data-target="#commentModal2"
                           data-toggle="tooltip" title="history">
                           <i class="fa-solid fa-clock-rotate-left"></i>
@@ -629,24 +632,22 @@
                       <fieldset8 class="p-2">
                         <div class="row text-dark ">
                           <div class="col-md-8">
-                            <h6 class="text-uppercase py-2">{{vendor_obj.title}} {{vendor_obj.first_name}} {{vendor_obj.last_name}}
+                            <h6 class="text-uppercase py-2">{{sale.customer.title}} {{sale.customer.first_name}} {{sale.customer.last_name}}
                             </h6>
-                            {% if vendor_obj.customer_phone %}
-                            <p>Phone : {{vendor_obj.customer_phone}}</p>
+                            {% if sale.customer.customer_phone %}
+                            <p>Phone : {{sale.customer.customer_phone}}</p>
                             {% endif %}
-                            {% if vendor_obj.customer_email %}
-                            <p>Email : {{vendor_obj.customer_email}}</p>
+                            {% if sale.customer.customer_email %}
+                            <p>Email : {{sale.customer.customer_email}}</p>
                             {% endif %}
 
-                            <p>Address : {{vendor_obj.billing_address}}</p>
-                            <p>GSTIN : {{vendor_obj.GST_number}}</p>
+                            <p>Address : {{sale.customer.billing_address}}</p>
+                            <p>GSTIN : {{sale.customer.GST_number}}</p>
 
-
-                            <!-- <p>No Credit Limit Set</p> -->
                           </div>
-                          <div class="col-md-4">
+                          <!-- <div class="col-md-4">
                             <h6 class="T-Balance">Balance: {{vendor_obj.current_balance}}</h6>
-                          </div>
+                          </div> -->
 
                           <hr>
                         </div>
@@ -658,26 +659,23 @@
                             <thead style="border: 1px solid black; background-color: #383838; color: white;">
                               <tr style="border: 1px solid black;">
 
-                                <th>Transactions</th>
+                               <th>Transactions</th>
                                <th>Type</th>
                                <th>Number</th>
                                <th>Date</th>
                                <th>Total</th>
                                <th>Balance</th>
 
-
-
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
-                                <td style="border: 1px solid black;">{{forloop.counter}}</td>
-
-                                <td style="border: 1px solid black;">Opening Balance</td>
-                                <td style="border: 1px solid black;"></td>
+                                <td style="border: 1px solid black;">1</td>
+                                <td style="border: 1px solid black;">{{sale.payment_method}}</td>
+                                <td style="border: 1px solid black;">{{sale.customer.customer_mobile}}</td>
                                 <td style="border: 1px solid black;">{% now 'd-m-y' %}</td>
-                                <td style="border: 1px solid black;">{{vendor_obj.opening_balance}}</td>
-                                <td style="border: 1px solid black;"><span class="T-Balance">{{vendor_obj.opening_balance}}</span></td>
+                                <td style="border: 1px solid black;">{{sale.grand_total}}</td>
+                                <td style="border: 1px solid black;"><span class="T-Balance">{{sale.balance}}</span></td>
 
                               </tr>
                             </tbody>

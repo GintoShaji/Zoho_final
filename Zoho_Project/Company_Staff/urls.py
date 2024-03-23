@@ -355,6 +355,8 @@ urlpatterns = [
     path('viewsort_sales_order',views.viewsort_sales_order,name='viewsort_sales_order'),
     path('filter_salesorder_save',views.filter_salesorder_save,name='filter_salesorder_save'),
     path('filter_salesorder_draft',views.filter_salesorder_draft,name='filter_salesorder_draft'),
+    # path('delete_salesorder/<int:pk>',views.delete_salesorder,name='delete_salesorder'),
+    # path('salesorder_status/<int:pk>',views.salesorder_status,name='salesorder_status'),
     
     
     
