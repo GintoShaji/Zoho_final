@@ -358,6 +358,8 @@ urlpatterns = [
     # path('delete_salesorder/<int:pk>',views.delete_salesorder,name='delete_salesorder'),
     # path('salesorder_status/<int:pk>',views.salesorder_status,name='salesorder_status'),
     
+    path('edit_salesorder_page/<int:pk>',views.edit_salesorder_page,name='edit_salesorder_page'),
+    path('Edit_Salesorder/<int:pk>',views.Edit_Salesorder,name='Edit_Salesorder'),
     
     
     

@@ -13373,6 +13373,105 @@ def filter_salesorder_draft(request):
         
         
         
+def edit_salesorder_page(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+              
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
+        sale=SaleOrder.objects.get(id=pk)
+        
+        customer_objs=Customer.objects.filter(company=comp_details)
+        sales_objs=SaleOrder.objects.all()
+        items = SalesOrderItems.objects.filter(sales_order=sale)
+        sales_history=SalesOrderHistory.objects.filter(sales_order=sale)
+
+    content = {
+                'details': dash_details,
+                'allmodules': allmodules,
+                'log_details':log_details,
+                'sale':sale,
+                'items':items,
+                'customer_objs':customer_objs,
+                'sales_objs':sales_objs,
+                'sales_history':sales_history,
+        }
+    return render(request,'zohomodules/sales_order/edit_salesorder.html',content)  
+
+
+def Edit_Salesorder(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+              
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+        
+        
+        if request.method=="POST":
+            sales_data=SaleOrder.objects.get(id=pk)
+            sales_data.login_details=log_details
+            sales_data.company=comp_details
+            
+            select=request.POST["select"]
+            customer=Customer.objects.get(id=select)
+            sales_data.customer=customer
+            
+            sales_data.customer_email = request.POST['customer_email']
+            sales_data.customer_billing_address = request.POST['customer_billing_address']
+            sales_data.customer_gst_type = request.POST['customer_gst_type']
+            sales_data.customer_gst_number = request.POST['customer_gst_number']
+            sales_data.customer_place_of_supply = request.POST['customer_place_of_supply']
+
+            sales_data.sales_order_date = request.POST['sales_order_date']
+            sales_data.payment_terms = Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
+            sales_data.expiration_date = request.POST['expiration_date']
+            sales_data.reference_number = request.POST['reference_number']
+            sales_data.sales_order_number = request.POST['sales_order_number']
+            sales_data.payment_method = request.POST['payment_method']
+
+            sales_data.cheque_number = request.POST.get('cheque_number', '')
+            sales_data.upi_number = request.POST.get('upi_number', '')
+            sales_data.bank_account_number = request.POST.get('bank_account_number', '')
+        
+            sales_data.description=request.POST['description']
+            sales_data.document = request.FILES['file']
+            sales_data.sub_total=request.POST['sub_total']
+            sales_data.tax_amount_igst=request.POST['tax_amount_igst']
+            sales_data.shipping_charge=request.POST['shipping_charge']
+            sales_data.adjustment=request.POST['adjustment']
+            sales_data.grand_total=request.POST['grand_total']
+            sales_data.advanced_paid=request.POST['advanced_paid']
+            sales_data.balance=request.POST['balance']
+            
+            
+            item_name = request.POST["itemname"]
+            item = Items.objects.get(id=item_name)
+            sales_data.item=item
+            
+            sales_data.save()
+   
+
+        return redirect('view_salesorder_details',pk)
+        
         
         
         
