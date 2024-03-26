@@ -13474,6 +13474,65 @@ def Edit_Salesorder(request,pk):
         
         
         
+def salesorder_shareemail(request,pk):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+    
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+    
+    
+        sales_obj=SaleOrder.objects.get(id=pk)
+
+        context = {'sales_obj':sales_obj,'details':dash_details}
+        if request.method == 'POST':
+            try:
+                emails_string = request.POST['email_ids']
+
+                        # Split the string by commas and remove any leading or trailing whitespace
+                emails_list = [email.strip() for email in emails_string.split(',')]
+                email_message = request.POST['email_message']
+                                                                                          
+                template_path = 'zohomodules/sales_order/salesordermailoverview.html'
+                template = get_template(template_path)
+
+                html  = template.render(context)
+                result = BytesIO()
+                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
+                pdf = result.getvalue()
+                subject = f"Transaction Details"
+                email = f"Hi,\nPlease find the attached transaction details {sales_obj.customer.first_name} {sales_obj.customer.last_name}.\n"
+                email_from = settings.EMAIL_HOST_USER
+
+        
+                msg = EmailMultiAlternatives(subject, email, email_from, emails_list)
+                msg.attach(f'{sales_obj.customer.first_name}_{sales_obj.customer.last_name}_Transactions.pdf', pdf, "application/pdf")
+                
+                # Send the email
+                msg.send()
+
+                messages.success(request, 'Transaction has been shared via email successfully..!')
+                return redirect('view_salesorder_details',pk)
+
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                messages.error(request, 'An error occurred while sending the email. Please try again later.')
+                return redirect('view_salesorder_details',pk)
+        
+        
         
         
         
