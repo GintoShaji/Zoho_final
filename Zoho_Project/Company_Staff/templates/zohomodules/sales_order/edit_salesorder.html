@@ -77,7 +77,7 @@
   
                 <div class="card bg-black shadow p-3 rounded">
                     <h3 class="mb-4 mt-2" style="font-size: 1.40rem;color: rgb(230, 171, 45);">Edit Sales Order</h3>
-                    <form method="post" action="{% url 'Edit_Salesorder' sale.id %}" enctype="multipart/form-data" class="mb-3">
+                    <form method="post" action="{% url 'edit_salesorder' sale.id %}" enctype="multipart/form-data" class="mb-3">
                         {% csrf_token %}
                 
 
@@ -106,7 +106,7 @@
                         <div class="form-group row mt-4">
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">Customer Email</label>
                             <div class="col-sm-12 col-md-3 col-lg-3">
-                                <input type="email" class="form-control bg-light text-dark" value="{{sale.customer_email}}" id="customer_email" name="customer_email" required> 
+                                <input type="email" class="form-control bg-light text-dark" value="{{ sale.customer_email }}" id="customer_email" name="customer_email" required> 
                                 <span class="text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                                 <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
                                 
                                 <div class=" col-sm-12 col-md-3 col-lg-3">
-                                    <select name="gst" id="GSTT" class="form-control bg-light text-dark" onclick="gstPan_function()">
+                                    <select name="customer_gst_type" id="GSTT" class="form-control bg-light text-dark" onclick="gstPan_function()">
                                         <option value="{{sale.customer_gst_type}}" selected>{{sale.customer_gst_type}}</option>
         
                                         <option value="Select a Gst Treatment">Select a Gst Treatment</option>
@@ -144,7 +144,7 @@
                                 <div class="row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN/UIN*</label>
                                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                                        <input type="text" class="form-control bg-light text-dark" value="{{sale.customer_gst_number}}" name="gst_number" id="gstInput" value="{{customer_obj.GST_number}}"> 
+                                        <input type="text" class="form-control bg-light text-dark" value="{{sale.customer_gst_number}}" name="customer_gst_number" id="gstInput" value="{{customer_obj.GST_number}}"> 
                                         <span id="gstMessage"></span>       
                                     </div>
                                 </div>
@@ -225,6 +225,7 @@
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
+      
 
 
                 <div class="form-group row mt-4">
@@ -238,12 +239,12 @@
                 <div class="form-group row mt-4">
                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                    <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">  
-                        <option value="{{sale.payment_terms.id}}" selected>{{sale.payment_terms.payment_terms}}</option>
-                        {% for pay_terms in comp_payment_terms %}
-                            <option value="{{pay_terms.id}}" >{{pay_terms.payment_terms}}</option>
-                        {% endfor %}     
-                    </select>
+                        <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">  
+                            <option value="{{ sale.payment_terms.id }}" selected>{{ sale.payment_terms.term_name  }}</option>
+                            {% for pay_terms in comp_payment_terms %}
+                                <option value="{{ pay_terms.id }}">{{ pay_terms.term_name }}</option>
+                            {% endfor %}     
+                        </select>
                     </div>
                     <div class="col-md-4 ">
                         <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
@@ -312,14 +313,15 @@
                             
 
                             <tbody>
+                                {% for saleitem in sale_items %}
                                 <tr>
                                     <td></td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
-                                                <option value="{{ sale.item_name }}" selected>{{ sale.item_name }}</option>
+                                                <option value="{{ saleitem.item.item_name }}" selected>{{ saleitem.item.item_name }}</option>
                                                 {% for i in item %}
-                                                    <option value="{{ i.id }}">{{ i.item_name }}</option>
+                                                <option value="{{ i.id }}">{{ i.item_name }}</option>
                                                 {% endfor %}
                                             </select>
                                             <div class="ml-2">
@@ -327,14 +329,15 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ sale.hsn_code }} id="hsnInput" name="hsn"></td>
-                                    <td><input type="number" class="form-control border-1 bg-light text-dark" name="quantity" onchange="calculateTotal(this); calculateSubtotal()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ sale.price }} id="priceInput"  name="price" onchange="calculateTotal(this); calculateSubtotal()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" id="taxRateInput" name="tax_rate" onclick="sample1()" onchange="calculateTotal(this)"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" name="discount" onclick="sample()" onchange="calculateTotal(this); calculateSubtotal()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ total }}"  name="total" readonly></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.hsn }}"  id="hsnInput" name="hsn"></td>
+                                    <td><input type="number" class="form-control border-1 bg-light text-dark" value="{{ saleitem.quantity }}"  name="quantity" onchange="calculateTotal(this); calculateSubtotal()"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.price }}" id="priceInput"  name="price" onchange="calculateTotal(this); calculateSubtotal()"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.tax_rate }}" id="taxRateInput" name="tax_rate" onclick="sample1()" onchange="calculateTotal(this)"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.discount }}"  name="discount" onclick="sample()" onchange="calculateTotal(this); calculateSubtotal()"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.total }}"  name="total" readonly></td>
                                     <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
 
                             </table>
@@ -369,8 +372,8 @@
                     <div class="col-md-6">
                         <div class="row clearfix" style="margin-top:20px">
                             <div class="col-md-6 ml-4">
-                                <textarea class="form-control text-light" value="{{ sale.description }}" id="" name="description" placeholder="Note" style="height: 190px; width: 180%;"></textarea>
-                                <input type="file" name="file" style="margin-top: 10px; width: 180%; background-color: white;">
+                                <textarea class="form-control text-light" value="" id="{{ sale.description }}" name="description" placeholder="Note" style="height: 190px; width: 180%;"></textarea>
+                                <input type="file" name="file" id="{{ sale.file }}" style="margin-top: 10px; width: 180%; background-color: white;">
                             </div>
                         </div>
                     </div>
@@ -379,7 +382,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sub Total</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="subTotal" name="sub_total"  readonly required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.sub_total }}" id="subTotal" name="sub_total"  readonly required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -413,7 +416,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Tax Amount</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="taxAmount" name="tax_amount_igst" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.tax_amount_igst }}" id="taxAmount" name="tax_amount_igst" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -421,7 +424,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Shipping Charge</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="shippingCharge" name="shipping_charge" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.shipping_charge }}" id="shippingCharge" name="shipping_charge" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -429,7 +432,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Adjustment</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="number" step="0.01" style="width:350%;" class="form-control bg-light text-dark" id="adjustment" name="adjustment" value="0.00" required>
+                                    <input type="number" step="0.01" style="width:350%;" value="{{ sale.adjustment }}" class="form-control bg-light text-dark" id="adjustment" name="adjustment" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div> 
@@ -437,7 +440,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Grand Total</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="grandTotal" name="grand_total" value="0.00" required readonly>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.grand_total }}" id="grandTotal" name="grand_total" value="0.00" required readonly>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -479,7 +482,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Paid</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="advancedPaid" oninput="calculateBalance()" name="advanced_paid" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.advanced_paid }}" id="advancedPaid" oninput="calculateBalance()" name="advanced_paid" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -487,7 +490,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Balance</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="balance" name="balance" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.balance }}" id="balance" name="balance" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>

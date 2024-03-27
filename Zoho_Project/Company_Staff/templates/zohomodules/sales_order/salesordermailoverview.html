@@ -12,28 +12,27 @@
 <body>
   <div id="transactiondata" class="p-2">
 
-
     <fieldset8 class="p-2">
       <div class="row text-dark ">
         <div class="col-md-8">
-          <h6 class="text-uppercase py-2">{{vendor_obj.title}} {{vendor_obj.first_name}} {{vendor_obj.last_name}}
+          <h6 class="text-uppercase py-2">{{sale.customer.title}} {{sale.customer.first_name}} {{sale.customer.last_name}}
           </h6>
-         
-          {% if vendor_obj.customer_phone %}
-          <p>Phone : {{vendor_obj.customer_phone}}</p>
+        
+          {% if sale.customer.customer_phone %}
+          <p>Phone : {{sale.customer.customer_phone}}</p>
           {% endif %}
-          {% if vendor_obj.customer_email %}
-          <p>Email : {{vendor_obj.customer_email}}</p>
+          {% if sale.customer.customer_email %}
+          <p>Email : {{sale.customer.customer_email}}</p>
           {% endif %}
 
-          <p>Address : {{vendor_obj.billing_address}}</p>
-          <p>GSTIN : {{vendor_obj.GST_number}}</p>
+          <p>Address : {{sale.customer.billing_address}}</p>
+          <p>GSTIN : {{sale.customer.GST_number}}</p>
+
         </div>
         <div class="col-md-4">
           <h6 class="T-Balance" style=" color: #1e0a0a;
           font-weight: 800;">Balance: {{vendor_obj.current_balance}}</h6>
         </div>
-
 
         <hr>
       </div>
@@ -49,26 +48,22 @@
                 <th>Date</th>
                 <th>Total</th>
                 <th>Balance</th>
-
             </tr>
           </thead>
           <tbody>
             <tr style="border: 1px solid black; height: 40px;">
-                <td style="text-align: center;">{{forloop.counter}}</td>
+              <td style="text-align: center;">{{forloop.counter}}</td>
 
-              <td style="text-align: center;">Opening Balance</td>
-              <td></td>
+              <td style="text-align: center;">{{sale.payment_method}}</td>
+              <td style="text-align: center;"> {{sale.customer.customer_mobile}}</td>
               <td style="text-align: center;">{% now 'd-m-y' %}</td>
-              <td style="text-align: center;">{{ vendor_obj.opening_balance }}</td>
-              <td style="text-align: center;">{{ vendor_obj.opening_balance }}</td>
+              <td style="text-align: center;">{{sale.grand_total}}</td>
+              <td style="text-align: center;">{{sale.balance}}</td>
             </tr>
           </tbody>
         </table>
-        
-        
-        
+         
       </div>
-
     </fieldset8>
   </div>
  
