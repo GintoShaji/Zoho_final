@@ -13503,7 +13503,6 @@ def edit_salesorder(request, pk):
             else:
                 pass
                 
-            # Save sales order history entry for the edit action
             sales_history_obj = SalesOrderHistory.objects.create(
                 company=sale.company,
                 login_details=log_details,
@@ -13514,7 +13513,7 @@ def edit_salesorder(request, pk):
             )
             
             messages.success(request, 'Sales Order edited successfully!')
-            return redirect('view_salesorder_details',pk)  # Redirect to the sales order list page
+            return redirect('view_salesorder_details',pk) 
             
         else:
             context = {
@@ -13554,9 +13553,9 @@ def salesorder_shareemail(request,pk):
         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
     
     
-        sales_obj=SaleOrder.objects.get(id=pk)
+        sale=SaleOrder.objects.get(id=pk)
 
-        context = {'sales_obj':sales_obj,'details':dash_details}
+        context = {'sale':sale,'details':dash_details}
         if request.method == 'POST':
             try:
                 emails_string = request.POST['email_ids']
@@ -13573,12 +13572,12 @@ def salesorder_shareemail(request,pk):
                 pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
                 pdf = result.getvalue()
                 subject = f"Transaction Details"
-                email = f"Hi,\nPlease find the attached transaction details {sales_obj.customer.first_name} {sales_obj.customer.last_name}.\n"
+                email = f"Hi,\nPlease find the attached transaction details {sale.customer.first_name} {sale.customer.last_name}.\n"
                 email_from = settings.EMAIL_HOST_USER
 
         
                 msg = EmailMultiAlternatives(subject, email, email_from, emails_list)
-                msg.attach(f'{sales_obj.customer.first_name}_{sales_obj.customer.last_name}_Transactions.pdf', pdf, "application/pdf")
+                msg.attach(f'{sale.customer.first_name}_{sale.customer.last_name}_Transactions.pdf', pdf, "application/pdf")
                 
                 # Send the email
                 msg.send()
@@ -13590,6 +13589,49 @@ def salesorder_shareemail(request,pk):
                 print(f"Error sending email: {e}")
                 messages.error(request, 'An error occurred while sending the email. Please try again later.')
                 return redirect('view_salesorder_details',pk)
+            
+    
+def salesorder_add_comment(request,pk):
+   if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+ 
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
+        if request.method =='POST':
+            comment_data=request.POST['comments']
+            
+            sales_id= SaleOrder.objects.get(id=pk) 
+            sale=Salesorder_comments_table()
+            sale.comment=comment_data
+            sale.sales_order=sales_id
+            sale.company=comp_details
+            sale.login_details= LoginDetails.objects.get(id=log_id)
+
+            sale.save()
+            return redirect('view_salesorder_details',pk)
+   return redirect('view_salesorder_details',pk) 
+
+
+def salesorder_delete_comment(request, pk):
+    try:
+        sales_comment =Salesorder_comments_table.objects.get(id=pk)
+        sales_id=sales_comment.sales_order.id
+        sales_comment.delete()
+        return redirect('view_salesorder_details',sales_id)  
+    except Salesorder_comments_table.DoesNotExist:
+        return HttpResponseNotFound("comments not found.") 
+
+
         
         
         

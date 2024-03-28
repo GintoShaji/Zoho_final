@@ -895,6 +895,13 @@ class SalesOrderHistory(models.Model):
     date = models.DateField()
     current_date = models.DateField()
     action = models.CharField(max_length=255)
+    
+class Salesorder_comments_table(models.Model):
+    login_details=models.ForeignKey(LoginDetails,on_delete=models.CASCADE,null=True)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
+    sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
+    comment=models.TextField(max_length=500)  
 
 
 #---------------- Zoho Final sales order - Ginto Shaji - End--------------------

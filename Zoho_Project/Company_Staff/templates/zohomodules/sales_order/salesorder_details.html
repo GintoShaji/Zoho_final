@@ -709,7 +709,7 @@
                         <span aria-hidden="true" style="font-size: x-large;">&times;</span>
                       </button>
                     </div>
-                    <form action="" method="POST"
+                    <form action="{% url 'salesorder_add_comment' sale.id %}" method="POST"
                       enctype="multipart/form-data">
                       {% csrf_token %}
                       <div class="modal-body" style="background-color: #3b3b3b;">
@@ -725,14 +725,14 @@
                               </tr>
                             </thead>
                             <tbody>
-                              {% for c in vendor_comments %}
+                              {% for s in sales_comment %}
                               <tr class="table-row">
                                 <td style="text-align: center;">{{forloop.counter }}</td>
-                                <td style="text-align: center;">{{c.comment}}</td>
-                                <td style="text-align: center;">{{c.login_details.first_name}}
-                                  {{c.login_details.last_name}}</td>
+                                <td style="text-align: center;">{{s.comment}}</td>
+                                <td style="text-align: center;">{{s.first_name}}
+                                  {{s.last_name}}</td>
                                 <td style="text-align: center;">
-                                  <a class="text-danger" href="{% url 'customer_delete_comment' c.id %}"><i
+                                  <a class="text-danger" href="{% url 'salesorder_delete_comment' s.id %}"><i
                                       class="fa fa-trash" style="font-size:20px;"></i></a>
                                 </td>
                               </tr>
@@ -835,7 +835,7 @@
                     <button type="button" class="text-white btn" data-bs-dismiss="modal" aria-label=""><i class="fa fa-close text-white m-0"></i></button>
                   </div>
                   <div class="modal-body">
-                    <form action="" method="post" class="needs-validation" id="share_to_email_form">
+                    <form action="{% url 'salesorder_shareemail' sale.id %}" method="post" class="needs-validation" id="share_to_email_form">
                       {% csrf_token %}
                       <div class="form-group">
                           <label for="emailIds" style="color: white;">Email IDs</label>
