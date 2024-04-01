@@ -362,9 +362,12 @@ urlpatterns = [
     path('edit_salesorder/<int:pk>',views.edit_salesorder,name='edit_salesorder'),
     
     path('salesorder_shareemail/<int:pk>',views.salesorder_shareemail,name='salesorder_shareemail'),
-    path('salesorder_add_comment/<int:pk>',views.salesorder_add_comment,name='salesorder_add_comment'),
-    path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
     
+    
+    # path('salesorder_add_comment/<int:pk>',views.salesorder_add_comment,name='salesorder_add_comment'),
+    # path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
+    
+
     
     
     

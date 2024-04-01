@@ -13622,19 +13622,8 @@ def salesorder_add_comment(request,pk):
    return redirect('view_salesorder_details',pk) 
 
 
-# def salesorder_delete_comment(request, pk):
-#     try:
-#         sales_comment =Salesorder_comments_table.objects.get(id=pk)
-#         sales_id=sales_comment.sales_order.id
-#         sales_comment.delete()
-#         return redirect('view_salesorder_details',sales_id)  
-#     except Salesorder_comments_table.DoesNotExist:
-#         return HttpResponseNotFound("comments not found.") 
-    
-    
-def salesorder_delete_comment(request):
-    sales_comment =Salesorder_comments_table.objects.all()
-    return render(request,'zohomodules/sales_order/view_salesorder.html',{'sales_comment': sales_comment}) 
+
+
 
 
 
