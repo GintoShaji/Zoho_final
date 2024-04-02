@@ -13622,6 +13622,46 @@ def salesorder_add_comment(request,pk):
    return redirect('view_salesorder_details',pk) 
 
 
+def salesorder_delete_comment(request, pk):
+    sales_comment = Salesorder_comments_table.objects.get(id=pk)
+    sales_comment.delete()
+    return render(request, 'zohomodules/sales_order/salesorder_details.html', {'sales_comment': sales_comment}) 
+
+
+def add_salesorder_file(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)  
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
+        if request.method == 'POST':
+            data=request.FILES.getlist('file')
+            try:
+                for doc in data:
+                    sale=Salesorder_doc_upload_table()
+                    
+                    sale.document = doc
+                    sale.login_details = log_details
+                    sale.company = comp_details
+                    # sales_obj.customer = Customer.objects.get(id=pk)
+                    sale.sales_order=SaleOrder.objects.get(id=pk) 
+                    sale.save()
+                
+                messages.success(request,'File uploaded')
+                return redirect('view_salesorder_details',pk) 
+            except Salesorder_doc_upload_table.DoesNotExist:
+                return redirect('view_salesorder_details',pk) 
+
+
 
 
 

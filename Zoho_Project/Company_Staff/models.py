@@ -866,7 +866,10 @@ class SaleOrder(models.Model):
         ('Draft', 'Draft'),
         ('Save', 'Save'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft')    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft') 
+    
+    def getNumFieldName(self):
+        return 'sales_order_number'   
  
 
 class SalesOrderItems(models.Model):
@@ -901,7 +904,15 @@ class Salesorder_comments_table(models.Model):
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
     customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
     sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
-    comment=models.TextField(max_length=500)  
+    comment=models.TextField(max_length=500)
+    
+class Salesorder_doc_upload_table(models.Model):
+    login_details=models.ForeignKey(LoginDetails,on_delete=models.CASCADE,null=True)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
+    sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
+    title=models.TextField(max_length=200)
+    document=models.FileField(upload_to='doc/')  
 
 
 #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
