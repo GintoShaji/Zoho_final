@@ -365,6 +365,8 @@ urlpatterns = [
     path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
     
     path('add_salesorder_file/<int:pk>',views.add_salesorder_file,name='add_salesorder_file'),
+    path('show_comments/<int:pk>',views.show_comments,name='show_comments'),
+    
     
 
     

@@ -1,43 +1,34 @@
-def customer_add_comment(request,pk):
-   if 'login_id' in request.session:
-        if request.session.has_key('login_id'):
-            log_id = request.session['login_id']
-           
-        else:
-            return redirect('/')
-    
-        log_details= LoginDetails.objects.get(id=log_id)
-        if log_details.user_type=='Staff':
-            dash_details = StaffDetails.objects.get(login_details=log_details)
-            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+<script>
+    var itemDetails = {
+        {% for i in item %}
+            "{{ i.id }}": { "hsn": "{{ i.hsn_code }}", "price": "{{ i.selling_price }}","tax_rate": "{{ i.tax_rate }}" },
+        {% endfor %}
+    };
 
-        else:    
-            dash_details = CompanyDetails.objects.get(login_details=log_details)
-            comp_details=CompanyDetails.objects.get(login_details=log_details)
-
-            
-        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
-   
-        if request.method =='POST':
-            comment_data=request.POST['comments']
-       
-            vendor_id= Customer.objects.get(id=pk) 
-            vendor_obj=Customer_comments_table()
-            vendor_obj.comment=comment_data
-            vendor_obj.customer=vendor_id
-            vendor_obj.company=comp_details
-            vendor_obj.login_details= LoginDetails.objects.get(id=log_id)
-
-            vendor_obj.save()
-            return redirect('view_customer_details',pk)
-   return redirect('view_customer_details',pk) 
+    function updateItemDetails(selectElement) {
+        var selectedItemId = selectElement.value;
+        var itemDetail = itemDetails[selectedItemId];
+        if (itemDetail) {
+            document.getElementById('hsnInput').value = itemDetail.hsn;
+            document.getElementById('priceInput').value = itemDetail.price;
+            document.getElementById('taxRateInput').value = itemDetail.tax_rate;
+        } else {
+            document.getElementById('hsnInput').value = '';
+            document.getElementById('priceInput').value = '';
+            document.getElementById('taxRateInput').value = '';
+        }
+    }
+    function sample1() {
+        console.log("Sample function for tax rate calculation.");
+    }
+    function sample() {
+        console.log("Sample function for discount calculation.");
+    }
+    function deleteContact(buttonElement) {
+        console.log("Sample function for deleting contact.");
+    }
+</script>
 
 
-def customer_delete_comment(request, pk):
-    try:
-        vendor_comment =Customer_comments_table.objects.get(id=pk)
-        vendor_id=vendor_comment.customer.id
-        vendor_comment.delete()
-        return redirect('view_customer_details',vendor_id)  
-    except Customer_comments_table.DoesNotExist:
-        return HttpResponseNotFound("comments not found.")
+intrastate_tax=models.IntegerField(null=True,blank=True)
+interstate_tax=models.IntegerField(null=True,blank=True)

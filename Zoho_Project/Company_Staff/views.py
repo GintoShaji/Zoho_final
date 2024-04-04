@@ -13431,12 +13431,10 @@ def edit_salesorder(request, pk):
         log_id = request.session.get('login_id')
         if not log_id:
             return redirect('/')
-        
         try:
             log_details = LoginDetails.objects.get(id=log_id)
         except LoginDetails.DoesNotExist:
             return redirect('/')
-        
         try:
             if log_details.user_type == 'Staff':
                 dash_details = StaffDetails.objects.get(login_details=log_details)
@@ -13445,8 +13443,7 @@ def edit_salesorder(request, pk):
                 dash_details = CompanyDetails.objects.get(login_details=log_details)
                 comp_details = dash_details
         except (StaffDetails.DoesNotExist, CompanyDetails.DoesNotExist):
-            return redirect('/')
-              
+            return redirect('/')    
         try:
             allmodules = ZohoModules.objects.get(company=comp_details, status='New')
         except ZohoModules.DoesNotExist:
@@ -13459,17 +13456,29 @@ def edit_salesorder(request, pk):
         sales_history = SalesOrderHistory.objects.filter(sales_order=sale)
 
         if request.method == "POST":
-            # Process form data for editing the sales order
             sale.customer_email = request.POST.get('customer_email', '')
             sale.customer_billing_address = request.POST.get('customer_billing_address', '')
             sale.customer_gst_type = request.POST.get('customer_gst_type', '')
             sale.customer_gst_number = request.POST.get('customer_gst_number', '')
             sale.customer_place_of_supply = request.POST.get('customer_place_of_supply', '')
-            sale.sales_order_date = request.POST.get('sales_order_date', '')
-            
+            # sale.sales_order_date = request.POST.get('sales_order_date', '')
+            # sale.expiration_date = request.POST.get('expiration_date', '')
             sale.payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
             
-            sale.expiration_date = request.POST.get('expiration_date', '')
+            sales_order_date_str = request.POST.get('sales_order_date', '')
+            if sales_order_date_str:
+                try:
+                   sale.sales_order_date = datetime.strptime(sales_order_date_str, '%Y-%m-%d').date()
+                except ValueError:
+                   pass
+
+            expiration_date_str = request.POST.get('expiration_date', '')
+            if expiration_date_str:
+                try:
+                   sale.expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d').date()
+                except ValueError: 
+                   pass
+            
             sale.reference_number = request.POST.get('reference_number', '')
             sale.sales_order_number = request.POST.get('sales_order_number', '')
             sale.payment_method = request.POST.get('payment_method', '')
@@ -13484,6 +13493,15 @@ def edit_salesorder(request, pk):
             sale.grand_total = request.POST.get('grand_total', '')
             sale.advanced_paid = request.POST.get('advanced_paid', '')
             sale.balance = request.POST.get('balance', '')
+            
+            old=sale.document
+            new=request.FILES.get('file')
+        
+            if old!=None and new == None:
+               sale.document=old
+            else:
+               sale.document=new
+            
             sale.save()
 
             quantity = float(request.POST.get('quantity', 0))
@@ -13620,6 +13638,12 @@ def salesorder_add_comment(request,pk):
             sale.save()
             return redirect('view_salesorder_details',pk)
    return redirect('view_salesorder_details',pk) 
+
+
+def show_comments(request, pk):
+    sale_order = get_object_or_404(SaleOrder, pk=pk)
+    comments = Salesorder_comments_table.objects.filter(sales_order=sale_order)
+    return render(request, 'zohomodules/sales_order/salesorder_details.html', {'sale_order': sale_order, 'comments': comments})
 
 
 def salesorder_delete_comment(request, pk):

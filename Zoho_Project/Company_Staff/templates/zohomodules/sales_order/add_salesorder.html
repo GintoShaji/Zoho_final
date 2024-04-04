@@ -328,7 +328,7 @@
                                                 {% endfor %}
                                             </select>
                                             <div class="ml-2">
-                                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#addItemModal" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
                                             </div>
                                         </div>
                                     </td>
@@ -582,6 +582,46 @@
             </div> 
 
             <!------------------- Payments  Section End -------------->
+
+
+
+            <!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content" style="background: rgb(32, 35, 37);">
+        <div class="modal-header" style="background: rgb(32, 35, 37);">
+          <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Form for adding a new item -->
+          <form action="{% url 'create_item'%}" method="POST" id="addItemForm" style="padding-left: 20px;">
+            {% csrf_token %}
+           
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" form="addItemForm" class="btn btn-primary">Save Item</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
 
 
             
@@ -1129,7 +1169,8 @@
     </script>
 
 
-<script>
+
+<!-- <script>
         var itemDetails = {
             {% for i in item %}
                 "{{ i.id }}": { "hsn": "{{ i.hsn_code }}", "price": "{{ i.selling_price }}" },
@@ -1140,12 +1181,9 @@
             var selectedItemId = selectElement.value;
             var itemDetail = itemDetails[selectedItemId];
             if (itemDetail) {
-                // Update HSN field
                 document.getElementById('hsnInput').value = itemDetail.hsn;
-                // Update price field
                 document.getElementById('priceInput').value = itemDetail.price;
             } else {
-                // Clear fields if item not found
                 document.getElementById('hsnInput').value = '';
                 document.getElementById('priceInput').value = '';
             }
@@ -1159,7 +1197,55 @@
         function deleteContact(buttonElement) {
             console.log("Sample function for deleting contact.");
         }
+</script> -->
+
+
+<script>
+    var itemDetails = {
+        {% for i in item %}
+            "{{ i.id }}": { 
+                "hsn": "{{ i.hsn_code }}", 
+                "price": "{{ i.selling_price }}", 
+                "intrastate_tax": "{{ i.intrastate_tax }}", 
+                "interstate_tax": "{{ i.interstate_tax }}", 
+                "place_of_supply": "{{ i.place_of_supply }}" 
+            },
+        {% endfor %}
+    };
+
+    function updateItemDetails(selectElement, companyState) {
+        var selectedItemId = selectElement.value;
+        var itemDetail = itemDetails[selectedItemId];
+        if (itemDetail) {
+            document.getElementById('hsnInput').value = itemDetail.hsn;
+            document.getElementById('priceInput').value = itemDetail.price;
+            var taxRate = itemDetail.place_of_supply === companyState ? itemDetail.intrastate_tax : itemDetail.interstate_tax;
+            document.getElementById('taxRateInput').value = taxRate;
+        } else {
+            document.getElementById('hsnInput').value = '';
+            document.getElementById('priceInput').value = '';
+            document.getElementById('taxRateInput').value = '';
+        }
+    }
+
+    function sample1() {
+        console.log("Sample function for tax rate calculation.");
+    }
+
+    function sample() {
+        console.log("Sample function for discount calculation.");
+    }
+
+    function deleteContact(buttonElement) {
+        console.log("Sample function for deleting contact.");
+    }
 </script>
+
+
+
+
+
+
     
     
 
