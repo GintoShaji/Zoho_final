@@ -700,6 +700,7 @@
 
               <!---------------------------------------------print div content----------->
 
+              
               <div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="margin-top: 8vh;">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" style="background-color: #3b3b3b;">
@@ -717,20 +718,20 @@
                                     <table class="table text-white" style="margin:3px; background-color: #000000;">
                                         <thead>
                                             <tr>
-                                                <th style="text-align: center; font-size: large;">sl no.</th>
+                                                <th style="text-align: center; font-size: large;">Sl No.</th>
                                                 <th style="text-align: center; font-size: large;">Comments</th>
                                                 <th style="text-align: center; font-size: large;">By</th>
                                                 <th style="text-align: center; font-size: large;">Delete</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for sale in comments %}
+                                            {% for comment in comments %}
                                             <tr class="table-row">
                                                 <td style="text-align: center;">{{ forloop.counter }}</td>
-                                                <td style="text-align: center;">{{ sale.Comment }}</td>
-                                                <td style="text-align: center;"></td>
+                                                <td style="text-align: center;">{{ comment.comment }}</td>
+                                                <td style="text-align: center;">{{ comment.login_details.first_name }}</td> 
                                                 <td style="text-align: center;">
-                                                    <a class="text-danger" href="{% url 'salesorder_delete_comment' sale.id %}">
+                                                    <a class="text-danger" href="{% url 'salesorder_delete_comment' comment.id %}">
                                                         <i class="fa fa-trash" style="font-size:20px;"></i>
                                                     </a>
                                                 </td>
@@ -748,6 +749,7 @@
                     </div>
                 </div>
             </div>
+            
 
 
 

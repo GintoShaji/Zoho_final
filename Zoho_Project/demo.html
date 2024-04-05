@@ -1,34 +1,48 @@
-<script>
-    var itemDetails = {
-        {% for i in item %}
-            "{{ i.id }}": { "hsn": "{{ i.hsn_code }}", "price": "{{ i.selling_price }}","tax_rate": "{{ i.tax_rate }}" },
-        {% endfor %}
-    };
-
-    function updateItemDetails(selectElement) {
-        var selectedItemId = selectElement.value;
-        var itemDetail = itemDetails[selectedItemId];
-        if (itemDetail) {
-            document.getElementById('hsnInput').value = itemDetail.hsn;
-            document.getElementById('priceInput').value = itemDetail.price;
-            document.getElementById('taxRateInput').value = itemDetail.tax_rate;
-        } else {
-            document.getElementById('hsnInput').value = '';
-            document.getElementById('priceInput').value = '';
-            document.getElementById('taxRateInput').value = '';
-        }
-    }
-    function sample1() {
-        console.log("Sample function for tax rate calculation.");
-    }
-    function sample() {
-        console.log("Sample function for discount calculation.");
-    }
-    function deleteContact(buttonElement) {
-        console.log("Sample function for deleting contact.");
-    }
-</script>
-
-
-intrastate_tax=models.IntegerField(null=True,blank=True)
-interstate_tax=models.IntegerField(null=True,blank=True)
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="margin-top: 8vh;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="background-color: #3b3b3b;">
+            <div class="modal-header">
+                <h3 class="modal-title text-light" id="exampleModalLabel">Add Comments</h3>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                </button>
+            </div>
+            <form action="{% url 'salesorder_add_comment' sale.id %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body" style="background-color: #3b3b3b;">
+                    <textarea type="text" class="form-control text-light" name="comments"></textarea>
+                    <div class="container-fluid">
+                        <table class="table text-white" style="margin:3px; background-color: #000000;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; font-size: large;">sl no.</th>
+                                    <th style="text-align: center; font-size: large;">Comments</th>
+                                    <th style="text-align: center; font-size: large;">By</th>
+                                    <th style="text-align: center; font-size: large;">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in comments %}
+                                <tr class="table-row">
+                                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td style="text-align: center;">{{ sale.comment }}</td>
+                                    <td style="text-align: center;">{{sale.}}</td>
+                                    <td style="text-align: center;">
+                                        <a class="text-danger" href="{% url 'salesorder_delete_comment' sale.id %}">
+                                            <i class="fa fa-trash" style="font-size:20px;"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-warning">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

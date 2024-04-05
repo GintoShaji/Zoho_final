@@ -360,12 +360,12 @@ urlpatterns = [
     path('edit_salesorder_page/<int:pk>',views.edit_salesorder_page,name='edit_salesorder_page'),
     path('edit_salesorder/<int:pk>',views.edit_salesorder,name='edit_salesorder'),
     path('salesorder_shareemail/<int:pk>',views.salesorder_shareemail,name='salesorder_shareemail'),
+    path('add_salesorder_file/<int:pk>',views.add_salesorder_file,name='add_salesorder_file'),
     
     path('salesorder_add_comment/<int:pk>',views.salesorder_add_comment,name='salesorder_add_comment'),
-    path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
-    
-    path('add_salesorder_file/<int:pk>',views.add_salesorder_file,name='add_salesorder_file'),
-    path('show_comments/<int:pk>',views.show_comments,name='show_comments'),
+    # path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
+    # path('show_comments/<int:pk>',views.show_comments,name='show_comments'),
+    path('show_comments_and_delete/<int:pk>',views.show_comments_and_delete,name='show_comments_and_delete'),
     
     
 

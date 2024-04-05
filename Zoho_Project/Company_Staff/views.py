@@ -13609,47 +13609,93 @@ def salesorder_shareemail(request,pk):
                 return redirect('view_salesorder_details',pk)
             
     
-def salesorder_add_comment(request,pk):
-   if 'login_id' in request.session:
-        if request.session.has_key('login_id'):
-            log_id = request.session['login_id']
-        else:
-            return redirect('/')
-        log_details= LoginDetails.objects.get(id=log_id)
-        if log_details.user_type=='Staff':
-            dash_details = StaffDetails.objects.get(login_details=log_details)
-            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
-        else:    
-            dash_details = CompanyDetails.objects.get(login_details=log_details)
-            comp_details=CompanyDetails.objects.get(login_details=log_details)
+# def salesorder_add_comment(request,pk):
+#    if 'login_id' in request.session:
+#         if request.session.has_key('login_id'):
+#             log_id = request.session['login_id']
+#         else:
+#             return redirect('/')
+#         log_details= LoginDetails.objects.get(id=log_id)
+#         if log_details.user_type=='Staff':
+#             dash_details = StaffDetails.objects.get(login_details=log_details)
+#             comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+#         else:    
+#             dash_details = CompanyDetails.objects.get(login_details=log_details)
+#             comp_details=CompanyDetails.objects.get(login_details=log_details)
  
-        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+#         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
    
-        if request.method =='POST':
-            comment_data=request.POST['comments']
+#         if request.method =='POST':
+#             comment_data=request.POST['comments']
             
-            sales_id= SaleOrder.objects.get(id=pk) 
-            sale=Salesorder_comments_table()
-            sale.comment=comment_data
-            sale.sales_order=sales_id
-            sale.company=comp_details
-            sale.login_details= LoginDetails.objects.get(id=log_id)
+#             sales_id= SaleOrder.objects.get(id=pk) 
+#             sale=Salesorder_comments_table()
+#             sale.comment=comment_data
+#             sale.sales_order=sales_id
+#             sale.company=comp_details
+#             sale.login_details= LoginDetails.objects.get(id=log_id)
 
-            sale.save()
-            return redirect('view_salesorder_details',pk)
-   return redirect('view_salesorder_details',pk) 
+#             sale.save()
+#             return redirect('view_salesorder_details',pk)
+#    return redirect('view_salesorder_details',pk) 
 
 
-def show_comments(request, pk):
+# def show_comments(request, pk):
+#     sale_order = get_object_or_404(SaleOrder, pk=pk)
+#     comments = Salesorder_comments_table.objects.filter(sales_order=sale_order)
+#     return render(request, 'zohomodules/sales_order/salesorder_details.html', {'sale_order': sale_order, 'comments': comments})
+
+
+def salesorder_add_comment(request, pk):
+    if 'login_id' in request.session:  # Checking if 'login_id' exists in session
+        log_id = request.session.get('login_id')  # Retrieve 'login_id' from session
+        if log_id is not None:
+            log_details = get_object_or_404(LoginDetails, id=log_id)
+            if log_details.user_type == 'Staff':
+                dash_details = get_object_or_404(StaffDetails, login_details=log_details)
+                comp_details = get_object_or_404(CompanyDetails, id=dash_details.company.id)
+            else:
+                dash_details = get_object_or_404(CompanyDetails, login_details=log_details)
+                comp_details = get_object_or_404(CompanyDetails, login_details=log_details)
+    
+            if request.method == 'POST':
+                comment_data = request.POST.get('comments', '')  
+                
+                sales_id = get_object_or_404(SaleOrder, id=pk)  
+                sale = Salesorder_comments_table(comment=comment_data,
+                                                  sales_order=sales_id,
+                                                  company=comp_details,
+                                                  login_details=log_details)
+                sale.save() 
+                
+                return redirect('view_salesorder_details', pk=pk)  
+                
+    return redirect('view_salesorder_details', pk=pk)  
+
+
+# def show_comments(request, pk):
+#     sale_order = get_object_or_404(SaleOrder, pk=pk)
+#     comments = Salesorder_comments_table.objects.filter(sales_order=sale_order)
+#     return render(request, 'zohomodules/sales_order/salesorder_details.html', {'sale_order': sale_order, 'comments': comments})
+
+# def salesorder_delete_comment(request, pk):
+#     sales_comment = Salesorder_comments_table.objects.get(id=pk)
+#     sales_comment.delete()
+#     return render(request, 'zohomodules/sales_order/salesorder_details.html', {'sales_comment': sales_comment}) 
+
+
+def show_comments_and_delete(request, pk):
+    if request.method == 'POST':
+        sales_comment = Salesorder_comments_table.objects.get(id=pk)
+        sales_comment.delete()
+        return redirect('view_salesorder_details') 
+
     sale_order = get_object_or_404(SaleOrder, pk=pk)
     comments = Salesorder_comments_table.objects.filter(sales_order=sale_order)
     return render(request, 'zohomodules/sales_order/salesorder_details.html', {'sale_order': sale_order, 'comments': comments})
 
 
-def salesorder_delete_comment(request, pk):
-    sales_comment = Salesorder_comments_table.objects.get(id=pk)
-    sales_comment.delete()
-    return render(request, 'zohomodules/sales_order/salesorder_details.html', {'sales_comment': sales_comment}) 
+
 
 
 def add_salesorder_file(request,pk):

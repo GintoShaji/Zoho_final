@@ -315,13 +315,13 @@
                                 </tr>
                             </thead>
                             
-
+                             
                             <tbody>
                                 <tr>
                                     <td></td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
+                                            <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this, '{{ customer_place_of_supply }}', '{{ company_state }}')" style="width: 110px;">
                                                 <option selected>Select item</option>
                                                 {% for i in item %}
                                                     <option value="{{ i.id }}">{{ i.item_name }}</option>
@@ -341,6 +341,10 @@
                                     <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
                                 </tr>
                             </tbody>
+                            
+                           
+                            
+                            
 
                             </table>
                         </div>
@@ -1200,6 +1204,8 @@
 </script> -->
 
 
+
+
 <script>
     var itemDetails = {
         {% for i in item %}
@@ -1213,14 +1219,21 @@
         {% endfor %}
     };
 
-    function updateItemDetails(selectElement, companyState) {
+    function updateItemDetails(selectElement, customerPlaceOfSupply, companyState) {
         var selectedItemId = selectElement.value;
         var itemDetail = itemDetails[selectedItemId];
         if (itemDetail) {
             document.getElementById('hsnInput').value = itemDetail.hsn;
             document.getElementById('priceInput').value = itemDetail.price;
-            var taxRate = itemDetail.place_of_supply === companyState ? itemDetail.intrastate_tax : itemDetail.interstate_tax;
-            document.getElementById('taxRateInput').value = taxRate;
+            var defaultTaxRate;
+            if (customerPlaceOfSupply === companyState) {
+                // If customer's place of supply is the same as company state
+                defaultTaxRate = itemDetail.intrastate_tax;
+            } else {
+                // If customer's place of supply is different from company state
+                defaultTaxRate = itemDetail.interstate_tax;
+            }
+            document.getElementById('taxRateInput').value = defaultTaxRate;
         } else {
             document.getElementById('hsnInput').value = '';
             document.getElementById('priceInput').value = '';
@@ -1244,10 +1257,6 @@
 
 
 
-
-
-    
-    
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" ></script>
