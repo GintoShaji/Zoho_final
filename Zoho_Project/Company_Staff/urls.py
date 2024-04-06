@@ -351,21 +351,22 @@ urlpatterns = [
     path('view_salesorder_draft',views.view_salesorder_draft,name='view_salesorder_draft'),
     path('view_salesorder_details/<int:pk>',views.view_salesorder_details,name='view_salesorder_details'),
     path('all_salesorder',views.all_salesorder,name='all_salesorder'),
-    path('viewsort_customer_name',views.viewsort_customer_name,name='viewsort_customer_name'),
-    path('viewsort_sales_order',views.viewsort_sales_order,name='viewsort_sales_order'),
-    path('filter_salesorder_save',views.filter_salesorder_save,name='filter_salesorder_save'),
-    path('filter_salesorder_draft',views.filter_salesorder_draft,name='filter_salesorder_draft'),
     path('delete_salesorder/<int:pk>',views.delete_salesorder,name='delete_salesorder'),
     path('salesorder_status/<int:pk>',views.salesorder_status,name='salesorder_status'),
     path('edit_salesorder_page/<int:pk>',views.edit_salesorder_page,name='edit_salesorder_page'),
     path('edit_salesorder/<int:pk>',views.edit_salesorder,name='edit_salesorder'),
     path('salesorder_shareemail/<int:pk>',views.salesorder_shareemail,name='salesorder_shareemail'),
     path('add_salesorder_file/<int:pk>',views.add_salesorder_file,name='add_salesorder_file'),
-    
     path('salesorder_add_comment/<int:pk>',views.salesorder_add_comment,name='salesorder_add_comment'),
-    # path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
-    # path('show_comments/<int:pk>',views.show_comments,name='show_comments'),
-    path('show_comments_and_delete/<int:pk>',views.show_comments_and_delete,name='show_comments_and_delete'),
+    path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
+    
+    path('sort_salesorder/<int:selectId>/<int:pk>',views.sort_salesorder,name='sort_salesorder'),
+    path('salesorder_status_change/<int:statusId>/<int:pk>',views.salesorder_status_change,name='salesorder_status_change'),
+
+    
+    
+    
+
     
     
 

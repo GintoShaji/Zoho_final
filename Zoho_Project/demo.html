@@ -1,48 +1,46 @@
-<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="margin-top: 8vh;">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content" style="background-color: #3b3b3b;">
-            <div class="modal-header">
-                <h3 class="modal-title text-light" id="exampleModalLabel">Add Comments</h3>
-                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="font-size: x-large;">&times;</span>
-                </button>
-            </div>
-            <form action="{% url 'salesorder_add_comment' sale.id %}" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="modal-body" style="background-color: #3b3b3b;">
-                    <textarea type="text" class="form-control text-light" name="comments"></textarea>
-                    <div class="container-fluid">
-                        <table class="table text-white" style="margin:3px; background-color: #000000;">
-                            <thead>
-                                <tr>
-                                    <th style="text-align: center; font-size: large;">sl no.</th>
-                                    <th style="text-align: center; font-size: large;">Comments</th>
-                                    <th style="text-align: center; font-size: large;">By</th>
-                                    <th style="text-align: center; font-size: large;">Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for sale in comments %}
-                                <tr class="table-row">
-                                    <td style="text-align: center;">{{ forloop.counter }}</td>
-                                    <td style="text-align: center;">{{ sale.comment }}</td>
-                                    <td style="text-align: center;">{{sale.}}</td>
-                                    <td style="text-align: center;">
-                                        <a class="text-danger" href="{% url 'salesorder_delete_comment' sale.id %}">
-                                            <i class="fa fa-trash" style="font-size:20px;"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-outline-warning">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<div id="transactions">
+    <fieldset class="p-2">
+        <script>
+            function generateSalesOrderSlip(customerInfo, products) {
+                // Print customer information
+                console.log("Customer Information:");
+                for (const [key, value] of Object.entries(customerInfo)) {
+                    console.log(`${key}: ${value}`);
+                }
+                console.log("\n");
+                
+                // Print product details
+                console.log("Products Purchased:");
+                console.log("-------------------------------------------------------------------");
+                console.log("|   Product Name    |   Quantity   |   Unit Price   |   Total Price   |");
+                console.log("-------------------------------------------------------------------");
+                let totalAmount = 0;
+                products.forEach(product => {
+                    const totalPrice = product.quantity * product.unitPrice;
+                    totalAmount += totalPrice;
+                    console.log(`|   ${product.name.padEnd(15)} | ${product.quantity.toString().padEnd(12)} | $${product.unitPrice.toFixed(2).padEnd(13)} | $${totalPrice.toFixed(2).padEnd(13)} |`);
+                });
+                console.log("-------------------------------------------------------------------");
+                
+                // Print total amount due
+                console.log(`\nTotal Amount Due: $${totalAmount.toFixed(2)}`);
+            }
+
+            // Example usage
+            const customerInfo = {
+                "Name": "John Doe",
+                "Address": "123 Main Street",
+                "City": "Anytown",
+                "Email": "johndoe@example.com"
+            };
+            
+            const products = [
+                {"name": "Product A", "quantity": 2, "unitPrice": 10},
+                {"name": "Product B", "quantity": 1, "unitPrice": 20},
+                {"name": "Product C", "quantity": 3, "unitPrice": 15}
+            ];
+            
+            generateSalesOrderSlip(customerInfo, products);
+        </script>
+    </fieldset>
 </div>

@@ -142,9 +142,9 @@
 
 
                     <div class="dropdown-menu m-1">
-                      <a class="dropdown-item" href="{% url 'all_salesorder' %}">All</a>
-                      <a class="dropdown-item" href="{% url 'viewsort_customer_name' %}">customer name</a>
-                      <a class="dropdown-item" href="{% url 'viewsort_sales_order' %}">Sales Order No</a>
+                      <a class="dropdown-item" href="{% url 'sort_salesorder' 0 sale.id %}">All</a>
+                      <a class="dropdown-item" href="{% url 'sort_salesorder' 1 sale.id %}">customer name</a>
+                      <a class="dropdown-item" href="{% url 'sort_salesorder' 2 sale.id %}">Sales Order No</a>
                     </div>
                     <a class="btn text-center btn-outline-warning btn-sm" id="filterbutton" data-bs-toggle="dropdown"
                       aria-haspopup="true" aria-expanded="false" role="button">
@@ -152,9 +152,9 @@
                     </a>
 
                     <div class="dropdown-menu m-1 ">
-                      <a class="dropdown-item" href="{% url 'all_salesorder' %}">All</a>
-                      <a class="dropdown-item" href="{% url 'filter_salesorder_draft' %}">Draft</a>
-                      <a class="dropdown-item" href="{% url 'filter_salesorder_save' %}">Saved</a>
+                      <a class="dropdown-item" href="{% url 'salesorder_status_change' 0 sale.id  %}">All</a>
+                      <a class="dropdown-item" href="{% url 'salesorder_status_change' 1 sale.id  %}">Draft</a>
+                      <a class="dropdown-item" href="{% url 'salesorder_status_change' 2 sale.id  %}">Saved</a>
                     </div>
                     <a class="btn btn btn-outline-warning btn-sm " style="text-align: right;"
                       href="{% url 'salesorder' %}"><i class="fa fa-plus "></i>
@@ -217,10 +217,19 @@
                       <span>
                         <i class="fas fa-eye ml-1"></i> Overview</span>
                     </div>
+
                     <div onclick="fieldset8_function()" class="btn btn-warning mrl-2" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"><span><i class="fas fa-file-alt ml-1"></i>
                         Transactions</span> </div>
+
+                    <div onclick="fieldset9_function()" class="btn btn-warning mrl-2" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">
+                          <span><i class='fas fa-receipt'></i> Slip</span>
+                    </div>
+
                   </div>
 
+
+
+                  
                   <div class="col-md-6 col-lg-6 col-sm-12 icon-box">
 
                     <div id="overview-icons" class="">
@@ -597,8 +606,6 @@
                                 <hr style="color: orange;">
                               </div>
 
-
-
                             <div class="row mt-2">
                               <div class="col-5">
                                 <p >Grand Total :</p>
@@ -681,9 +688,14 @@
                             </tbody>
                           </table>
                         </div>
-
                       </fieldset8>
                     </div>
+
+
+                    
+
+
+
 
                   </div>
                 </div>
@@ -729,7 +741,9 @@
                                             <tr class="table-row">
                                                 <td style="text-align: center;">{{ forloop.counter }}</td>
                                                 <td style="text-align: center;">{{ comment.comment }}</td>
-                                                <td style="text-align: center;">{{ comment.login_details.first_name }}</td> 
+                                                <td style="text-align: center;">{{ comment.login_details.first_name }}
+                                                  {{ comment.login_details.last_name }}
+                                                </td> 
                                                 <td style="text-align: center;">
                                                     <a class="text-danger" href="{% url 'salesorder_delete_comment' comment.id %}">
                                                         <i class="fa fa-trash" style="font-size:20px;"></i>
@@ -772,18 +786,10 @@
                         <table class="table text-light  " style="margin:3px; background-color: #000000;">
                           <thead>
                             <tr>
-                              <th>
-                                sl
-                              </th>
-                              <th>
-                                Date
-                              </th>
-                              <th>
-                                Action
-                              </th>
-                              <th>
-                                By
-                              </th>
+                              <th>sl</th>
+                              <th>Date</th>
+                              <th>Action</th>
+                              <th>By</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -900,10 +906,6 @@
           </script>
 
 
-
-
-
-
             <!----------------------------------------------------------end--------------------------------->
 
 
@@ -955,6 +957,7 @@
     document.getElementById("transation-icons").style.display = "block";
     
   }
+
 
 </script>
 
