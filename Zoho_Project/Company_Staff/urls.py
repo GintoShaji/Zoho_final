@@ -359,9 +359,11 @@ urlpatterns = [
     path('add_salesorder_file/<int:pk>',views.add_salesorder_file,name='add_salesorder_file'),
     path('salesorder_add_comment/<int:pk>',views.salesorder_add_comment,name='salesorder_add_comment'),
     path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
-    
     path('sort_salesorder/<int:selectId>/<int:pk>',views.sort_salesorder,name='sort_salesorder'),
     path('salesorder_status_change/<int:statusId>/<int:pk>',views.salesorder_status_change,name='salesorder_status_change'),
+    
+    path('getselCustomerDetails/',views.getselCustomerDetails,name='getselCustomerDetails'),
+    
 
     
     
