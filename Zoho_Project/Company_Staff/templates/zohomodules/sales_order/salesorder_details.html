@@ -693,7 +693,7 @@
     <div class="col-md-6">
         <div class="d-sm-flex" style="float: right;">
           <a class="btn btn-outline-warning small_btn mt-2 ms-1" title="CONVERT" id="convert_btn" href="{% url 'salesorder_status' sale.id %}">
-            <i class="fa fa-exchange"></i>{{sale.status}}
+            <i class="fa fa-exchange"></i>
           </a>
           <a class="btn btn-outline-warning small_btn mt-2 ms-1" title="EDIT" id="edit_btn" href="{% url 'edit_salesorder_page' sale.id %}">
             <i class="fa fa-pencil"></i>
@@ -735,7 +735,7 @@
             <i class="fa fa-times-circle"></i>
           </a> -->
 
-  
+       </div>
         </div>
     </div><br>
     </div><br>
@@ -792,7 +792,7 @@
       function convertToPDF(sectionId) {
           const element = document.getElementById(sectionId);
   
-          html2pdf().from(element).save('invoice.pdf');
+          html2pdf().from(element).save('sales.pdf');
       }
   
       function toggleTemplate(templateId, buttonId) {
@@ -813,9 +813,9 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
   
         <div class="history_highlight pt-3 px-2 d-flex">
             <div class="col-12 d-flex justify-content-start align-items-center">
-                {% if sales_history %}{% if sales_history.action == 'Created' %}<p class=" m-0" style="font-size: 1.07rem; color:#4CAF50;  font-weight: 500;">Created by :</p>{% else %}<p class="text-danger m-0" style="font-size: 1.07rem; font-weight: 500;">Last Edited by :</p>{% endif %}{% endif %}
-                <span class="ml-2" style="font-size: 1.15rem; font-weight: 500;">{{s.login_details.first_name}} {{s.login_details.last_name}}</span>
-                <span class="ml-2">{{s.date| date:'d-m-Y'}}</span>
+                {% if history %}{% if history.action == 'Created' %}<p class=" m-0" style="font-size: 1.07rem; color:#4CAF50;  font-weight: 500;">Created by :</p>{% else %}<p class="text-danger m-0" style="font-size: 1.07rem; font-weight: 500;">Last Edited by :</p>{% endif %}{% endif %}
+                <span class="ml-2" style="font-size: 1.15rem; font-weight: 500;">{{history.login_details.first_name}} {{history.login_details.last_name}}</span>
+                <span class="ml-2" style="margin-left: 2%; font-size: 1.15rem">{{history.date| date:'d-m-Y'}}</span>
             </div>
         </div>
 
@@ -934,22 +934,22 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
                     {{sale.sub_total}}
                 </div>
                 
-                {%if sale.IGST != 0 %}
+                {%if sale.tax_amount_igst != 0 %}
                 <div class="d-flex justify-content-between mb-4 text-white">
                     <h6 class="text-white">IGST</h6>
-                    {{ sale.IGST }}
+                    {{ sale.tax_amount_igst }}
                 </div>
                 {%endif%}
-                {%if sale.CGST != 0 %}
+                {%if sale.cgst != 0 %}
                 <div class="d-flex justify-content-between mb-4 text-white">
                     <h6 class="text-white">CGST</h6>
-                    {{ sale.CGST }}
+                    {{ sale.cgst }}
                 </div>
                 {%endif%}
-                {%if sale.SGST != 0 %}
+                {%if sale.sgst != 0 %}
                 <div class="d-flex justify-content-between mb-4 text-white">
                     <h6 class="text-white">SGST</h6>
-                    {{ sale.SGST }}
+                    {{ sale.sgst }}
                 </div>
                 {%endif%}
                 <div class="d-flex justify-content-between mb-4 text-white">
@@ -1082,32 +1082,32 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
                                                         <td class="text-right" style="color: #000;">{{sale.sub_total}}</td>
                                                     </tr>
                                                     
-                                                    {% if sale.IGST != 0 %}
+                                                    {% if sale.tax_amount_igst != 0 %}
                                                     <tr >
                                                         <td style="color: #000;">IGST</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.IGST}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount_igst}}</td>
                                                     </tr>
                                                     {% endif %}
-                                                    {% if sale.CGST != 0 %}
+                                                    {% if sale.cgst != 0 %}
                                                     <tr>
                                                         <td style="color: #000;">CGST</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.CGST}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.cgst}}</td>
                                                         
                                                     </tr>
                                                     {% endif %}
-                                                    {% if sale.SGST != 0 %}
+                                                    {% if sale.sgst != 0 %}
                                                     <tr>
                                                         <td style="color: #000;">SGST</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.SGST}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.sgst}}</td>
                                                     </tr>
                                                     {% endif %}
                                                     <tr >
                                                         <td style="color: #000;">Tax Amount</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount_igst}}</td>
                                                     </tr>
                                                     {% if sale.shipping_charge != 0 %}
                                                     <tr >
@@ -1248,32 +1248,32 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
                                                           <td class="text-right" style="color: #000;">{{sale.sub_total}}</td>
                                                       </tr>
                                                       
-                                                      {% if sale.IGST != 0 %}
+                                                      {% if sale.tax_amount_igst != 0 %}
                                                       <tr >
                                                           <td style="color: #000;">IGST</td>
                                                           <td style="color: #000;">:</td>
-                                                          <td class="text-right" style="color: #000;">{{sale.IGST}}</td>
+                                                          <td class="text-right" style="color: #000;">{{sale.tax_amount_igst}}</td>
                                                       </tr>
                                                       {% endif %}
-                                                      {% if sale.CGST != 0 %}
+                                                      {% if sale.cgst != 0 %}
                                                       <tr>
                                                           <td style="color: #000;">CGST</td>
                                                           <td style="color: #000;">:</td>
-                                                          <td class="text-right" style="color: #000;">{{sale.CGST}}</td>
+                                                          <td class="text-right" style="color: #000;">{{sale.cgst}}</td>
                                                           
                                                       </tr>
                                                       {% endif %}
-                                                      {% if sale.SGST != 0 %}
+                                                      {% if sale.sgst != 0 %}
                                                       <tr>
                                                           <td style="color: #000;">SGST</td>
                                                           <td style="color: #000;">:</td>
-                                                          <td class="text-right" style="color: #000;">{{sale.SGST}}</td>
+                                                          <td class="text-right" style="color: #000;">{{sale.sgst}}</td>
                                                       </tr>
                                                       {% endif %}
                                                       <tr >
                                                         <td style="color: #000;">Tax Amount</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount_igst}}</td>
                                                     </tr>
                                                     {% if sale.shipping_charge != 0 %}
                                                     <tr >
@@ -1414,32 +1414,32 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
                                                         <td class="text-right" style="color: #000;">{{sale.sub_total}}</td>
                                                     </tr>
                                                     
-                                                    {% if sale.IGST != 0 %}
+                                                    {% if sale.tax_amount_igst != 0 %}
                                                     <tr >
                                                         <td style="color: #000;">IGST</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.IGST}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount_igst}}</td>
                                                     </tr>
                                                     {% endif %}
-                                                    {% if sale.CGST != 0 %}
+                                                    {% if sale.cgst != 0 %}
                                                     <tr>
                                                         <td style="color: #000;">CGST</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.CGST}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.cgst}}</td>
                                                         
                                                     </tr>
                                                     {% endif %}
-                                                    {% if sale.SGST != 0 %}
+                                                    {% if sale.sgst != 0 %}
                                                     <tr>
                                                         <td style="color: #000;">SGST</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.SGST}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.sgst}}</td>
                                                     </tr>
                                                     {% endif %}
                                                     <tr >
                                                         <td style="color: #000;">Tax Amount</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount}}</td>
+                                                        <td class="text-right" style="color: #000;">{{sale.tax_amount_igst}}</td>
                                                     </tr>
                                                     {% if sale.shipping_charge != 0 %}
                                                     <tr >
@@ -1580,24 +1580,24 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
                                 <span><span>&#8377; </span>{{sale.sub_total}}</span>
                             </div>
                            
-                            {% if sale.IGST == 0 %}
+                            {% if sale.tax_amount_igst == 0 %}
                             <div class="subtot-item d-flex justify-content-between">
                                 <span>CGST</span>
-                                <span><span>&#8377; </span>{{sale.CGST}}</span>
+                                <span><span>&#8377; </span>{{sale.cgst}}</span>
                             </div>
                             <div class="subtot-item d-flex justify-content-between">
                                 <span>SGST</span>
-                                <span><span>&#8377; </span>{{sale.SGST}}</span>
+                                <span><span>&#8377; </span>{{sale.sgst}}</span>
                             </div>
                             {% else %}
                             <div class="subtot-item d-flex justify-content-between">
                                 <span>IGST</span>
-                                <span><span>&#8377; </span>{{sale.IGST}}</span>
+                                <span><span>&#8377; </span>{{sale.tax_amount_igst}}</span>
                             </div>
                             {% endif %}
                             <div class="subtot-item d-flex justify-content-between">
                                 <span>Tax Amount</span>
-                                <span><span>&#8377; </span>{{sale.tax_amount}}</span>
+                                <span><span>&#8377; </span>{{sale.tax_amount_igst}}</span>
                             </div>
                             {% if sale.adjustment != 0 %}
                             <div class="subtot-item d-flex justify-content-between">
@@ -1617,9 +1617,9 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
                             <span>{{sale.payment_method}}</span>
                         </div>
                         <div class="createdby d-flex justify-content-between">
-                            {% if sales_history %}{% if sales_history.action == 'Created' %}<p class="text-dark m-0" style="font-size: 1.07rem; font-weight: 500;">Created by :</p>{% else %}<p class="text-dark m-0" style="font-size: 1.07rem; font-weight: 500;">Last Edited by :</p>{% endif %}{% endif %}
+                            {% if history %}{% if history.action == 'Created' %}<p class="text-dark m-0" style="font-size: 1.07rem; font-weight: 500;">Created by :</p>{% else %}<p class="text-dark m-0" style="font-size: 1.07rem; font-weight: 500;">Last Edited by :</p>{% endif %}{% endif %}
 
-                            <span>{{sales_history.login_details.first_name}} {{sales_history.login_details.last_name}}</span>
+                            <span>{{history.login_details.first_name}} {{history.login_details.last_name}}</span>
                         </div>
                         <div class="datetime d-flex justify-content-between">
                             <p class="">Printed On:</p>
@@ -2596,7 +2596,7 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
                       <tr style="background-color: black;height: 40px;">
                         <td class="text-white" style="color: rgb(0, 0, 0); background-color: black; padding-bottom: 10px;">{{forloop.counter}}</td>
                         <td class="text-white" style="color: rgb(0, 0, 0); background-color: black; padding-bottom: 10px;">{{ s.date }}</td>
-                        {% if s.action == 'Created' %}<td class="text-white" style="color: rgb(0, 0, 0); background-color: black; padding-bottom: 10px;">{{ i.action }}</td> {% else %}<td class="text-warning" style="color: rgb(0, 0, 0); background-color: black; padding-bottom: 10px;">{{s.action}}</td>{% endif %}           
+                        {% if s.action == 'Created' %}<td class="text-white" style="color: rgb(0, 0, 0); background-color: black; padding-bottom: 10px;">{{ s.action }}</td> {% else %}<td class="text-warning" style="color: rgb(0, 0, 0); background-color: black; padding-bottom: 10px;">{{s.action}}</td>{% endif %}           
                           <td class="text-white" style="color: rgb(0, 0, 0); background-color: black; padding-bottom: 10px;">{{ s.login_details.first_name }}&nbsp;{{ s.login_details.last_name }}</td>
                       </tr>
                   {% endfor %}
@@ -2718,7 +2718,7 @@ style="background-color: #c4c1c1fd;  height: auto; margin-left:1px; margin-right
               </div>
               <div class="col-md-6">
                 <input type="file" class="form-control text-white bg-black" name="file" id="filess">
-                <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
+                <input type="hidden" name="invoice_id" value="{{ sale.id }}">
 
               </div>
             </div>

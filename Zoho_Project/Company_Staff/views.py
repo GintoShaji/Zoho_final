@@ -13236,6 +13236,7 @@ def view_salesorder_details(request,pk):
         items = SalesOrderItems.objects.filter(sales_order=sale)
         sales_history=SalesOrderHistory.objects.filter(sales_order=sale)
         comments = Salesorder_comments_table.objects.filter(sales_order=sale)
+        hist =SalesOrderHistory.objects.filter( sales_order = sale).last()
 
     content = {
                 'details': dash_details,
@@ -13247,6 +13248,7 @@ def view_salesorder_details(request,pk):
                 'vendor_objs':vendor_objs,
                 'sales_history':sales_history,
                 'comments': comments,
+                'history':hist,
         }
     return render(request,'zohomodules/sales_order/salesorder_details.html',content)   
 
@@ -13681,53 +13683,79 @@ def add_salesorder_file(request,pk):
             except Salesorder_doc_upload_table.DoesNotExist:
                 return redirect('view_salesorder_details',pk) 
             
-def getselCustomerDetails(request):
+            
+def import_salesorder_excel(request):
     if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        log_details= LoginDetails.objects.get(id=log_id)
-        if log_details.user_type == 'Company':
-            cmp = CompanyDetails.objects.get(login_details = log_details)
+        log_id = request.session.get('login_id')
+        if not log_id:
+            return redirect('/')
+        try:
+            log_details = LoginDetails.objects.get(id=log_id)
+        except LoginDetails.DoesNotExist:
+            return redirect('/')
+        
+        if log_details.user_type == 'Staff':
+            try:
+                dash_details = StaffDetails.objects.get(login_details=log_details)
+                comp_details = CompanyDetails.objects.get(id=dash_details.company.id)
+            except (StaffDetails.DoesNotExist, CompanyDetails.DoesNotExist):
+                return redirect('/')
         else:
-            cmp = StaffDetails.objects.get(login_details = log_details).company
+            try:
+                dash_details = CompanyDetails.objects.get(login_details=log_details)
+                comp_details = dash_details
+            except CompanyDetails.DoesNotExist:
+                return redirect('/') 
+        try:
+            allmodules = ZohoModules.objects.get(company=comp_details, status='New')
+        except ZohoModules.DoesNotExist:
+            return redirect('/')
+
+        if request.method == 'POST':
+            if 'empfile' in request.FILES:
+                excel_file = request.FILES['empfile']
+                try:
+                    excel_data = load_workbook(excel_file)
+                    sheet = excel_data['Sheet1']
+                except Exception as e:
+                    messages.error(request, f'Failed to load Excel file: {e}')
+                    return redirect('salesorder_list')
+                
+                for row_number in range(2, sheet.max_row + 1):
+                    row_data = [sheet.cell(row=row_number, column=col_num).value for col_num in range(1, 30)]  
+                    
+                    customer_id = row_data[0]  
+                    try:
+                        customer = Customer.objects.get(id=customer_id)
+                    except Customer.DoesNotExist:
+                        messages.warning(request, f'Customer with ID {customer_id} does not exist')
+                        continue  
+                    
+                    Vendor_object = SaleOrder(
+                        customer=customer,company=comp_details,login_details=log_details,customer_email=row_data[1],customer_billing_address=row_data[2],
+                        customer_gst_type=row_data[3],customer_gst_number=row_data[4],customer_place_of_supply=row_data[5],sales_order_date=row_data[6],
+                        expiration_date=row_data[8],reference_number=row_data[9],sales_order_number=row_data[10],payment_method=row_data[11],cheque_number=row_data[12],
+                        upi_number=row_data[13],bank_account_number=row_data[14],description=row_data[15],terms_and_condition=row_data[17],
+                        document=row_data[18],sub_total=row_data[19],cgst=row_data[20],sgst=row_data[21],tax_amount_igst=row_data[22],
+                        shipping_charge=row_data[23],adjustment=row_data[24],grand_total=row_data[25],advanced_paid=row_data[26],balance=row_data[27],
+                        status=row_data[28]
+                    )
+                    Vendor_object.save()
+
+                messages.success(request, 'File imported successfully')
+                return redirect('salesorder_list')
+            
+            messages.error(request, 'File upload failed!')
+            return redirect('salesorder_list')
         
-        custId = request.POST['id']
-        cust = Customer.objects.get(id = custId)
+    messages.error(request, 'Authentication failed!')
+    return redirect('/')
+            
 
-        if cust:
-            context = {
-                'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None else True, 'gstNo':cust.GST_number,
-                'street':cust.billing_address, 'city':cust.billing_city, 'state':cust.billing_state, 'country':cust.billing_country, 'pincode':cust.billing_pincode
-            }
-            return JsonResponse(context)
-        else:
-            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
-    else:
-       return redirect('/')
-   
-   
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        
-        
-        
-        
-
+            
 
 
 #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
+
+
+

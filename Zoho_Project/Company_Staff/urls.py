@@ -361,28 +361,12 @@ urlpatterns = [
     path('salesorder_delete_comment/<int:pk>',views.salesorder_delete_comment,name='salesorder_delete_comment'),
     path('sort_salesorder/<int:selectId>/<int:pk>',views.sort_salesorder,name='sort_salesorder'),
     path('salesorder_status_change/<int:statusId>/<int:pk>',views.salesorder_status_change,name='salesorder_status_change'),
-    
-    path('getselCustomerDetails/',views.getselCustomerDetails,name='getselCustomerDetails'),
-    
-
-    
-    
-    
-
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
+    path('import_salesorder_excel',views.import_salesorder_excel,name='import_salesorder_excel'),
     
     
     #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
+    
+    
         
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

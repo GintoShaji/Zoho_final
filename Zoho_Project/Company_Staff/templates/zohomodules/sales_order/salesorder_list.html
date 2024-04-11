@@ -175,57 +175,42 @@
           </div>
         </div>
        
-        <div class="row" hidden>
+        <!-- <div class="row" hidden>
           <table id="employeemodeltable">
             <thead>
-              <th>Customer Type(Business/Individual)</th>
-              <th>Title</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Company Name</th>
-             <th>Email</th>
-             <th>Phone(7digit)</th>
-             <th>Mobile</th>
-             <th>Skype</th>
-             <th>Designation</th>
-             <th>Department</th>
-              <th>Website</th>
+              <th>Customer</th>
+              <th>Customer Email</th>
+              <th>Customer Billing Address</th>
               <th>GST TREATMENT</th>
-              <th>Source of supply([KL]-Kerala)</th>
-              <th>Tax Preference(Taxable/Tax Exempt)</th>
-              <th>Currency (Indian Rupee)</th>
-              <th>opening balance type(Debit/Credit)</th>
-              <th>opening balance</th>
-              <th>payment term(NET 30)</th>
-              <th>Price List</th>
-              <th>Portal language</th>
-              <th>Facebook</th>
-              <th>Twitter</th>
-              <th>billing attention</th>
-              <th>billing address</th>
-              <th>billing city</th>
-              <th>billing state</th>
-              <th>billing country</th>
-              <th>billing pin code</th>
-              <th>billing phone</th>
-              <th>billing fax</th>
-              <th>shipping attention</th>
-              <th>shipping address</th>
-              <th>shipping city</th>
-              <th>shipping state</th>
-              <th>shipping country</th>
-              <th>shipping pin code</th>
-              <th>shipping phone</th>
-              <th>shipping fax</th>
-              <th>Remarks</th>
+              <th>Customer gst Number</th>
+             <th>Customer Place of supply([KL]-Kerala)</th>
+             <th>sales_order_date</th>
+             <th>payment term(NET 30)</th>
+             <th>expiration date</th>
+             <th>reference number</th>
+             <th>sales order number</th>
+              <th>payment method</th>
+              <th>cheque number</th>
+              <th> upi number</th>
+              <th>bank account number</th>
+              <th>terms and condition</th>
+              <th>document</th>
+              <th>sub total</th>
+              <th>cgst</th>
+              <th>sgst</th>
+              <th>tax amount igst</th>
+              <th>shipping charge</th>
+              <th>adjustment</th>
+              <th>grand total</th>
+              <th>advanced paid</th>
+              <th>balance</th>
              
             </thead>
             <tbody>
-              
              
             </tbody>
           </table>
-        </div>
+        </div> -->
 
 
       </div>
@@ -245,7 +230,7 @@
             </div>
             <div class="modal-body" style="background: rgb(32, 35, 37);">
               <div class="card">
-                <form action="{% url 'import_customer_excel' %}" method="post" class="needs-validation" enctype="multipart/form-data"  id="excelForm">
+                <form action="{% url 'import_salesorder_excel' %}" method="post" class="needs-validation" enctype="multipart/form-data"  id="excelForm">
                   {% csrf_token %}
                   <div class="form-group mt-3" style="margin-left: 2vh;">
                     <label for="file" style="font-size: medium;">Choose Excel File for Salesorder - </label> <br><br>
@@ -347,7 +332,7 @@
       const ws1 = XLSX.utils.table_to_sheet(table1);
       const wb1 = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
-      XLSX.writeFile(wb1, 'customer list.xlsx');
+      XLSX.writeFile(wb1, 'salesorder list.xlsx');
     }
   </script>
 
