@@ -363,6 +363,19 @@ urlpatterns = [
     path('salesorder_status_change/<int:statusId>/<int:pk>',views.salesorder_status_change,name='salesorder_status_change'),
     path('import_salesorder_excel',views.import_salesorder_excel,name='import_salesorder_excel'),
     
+    path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
+    path('getselBankAccountNumber',views.getselBankAccountNumber,name='getselBankAccountNumber'),
+    path('newselPaymentTerm',views.newselPaymentTerm,name='newselPaymentTerm'),
+    path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
+    
+    path('createsalesCustomer',views.createsalesCustomer,name='createsalesCustomer'),
+    path('getsalesCustomers',views.getsalesCustomers,name='getsalesCustomers'),
+    
+    
+    
+    
+    
+   
     
     #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
     
