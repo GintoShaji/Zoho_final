@@ -13016,9 +13016,12 @@ def add_salesorder(request):
         else:
             return redirect('/')
 
-        select = request.POST["select"]
-        customer = Customer.objects.get(id=select)
-
+        # select = request.POST["select"]
+        # customer = Customer.objects.get(id=select)
+        
+        customer_id = request.POST['customerId']
+        customer = Customer.objects.get(id=customer_id)
+        
         customer_email = request.POST['customer_email']
         customer_billing_address = request.POST['customer_billing_address']
         customer_gst_type = request.POST['customer_gst_type']
@@ -13026,7 +13029,12 @@ def add_salesorder(request):
         customer_place_of_supply = request.POST['customer_place_of_supply']
 
         sales_order_date = request.POST['sales_order_date']
-        payment_terms = Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
+        # payment_terms = Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
+        
+        payment_terms = None  
+        payment_terms_id = request.POST['payment_terms']
+        payment_terms = Company_Payment_Term.objects.get(id=payment_terms_id)
+       
         expiration_date = request.POST['expiration_date']
         reference_number = request.POST['reference_number']
         sales_order_number = request.POST['sales_order_number']
@@ -13037,9 +13045,13 @@ def add_salesorder(request):
         bank_account_number = request.POST.get('bank_account_number', '')
         
         description=request.POST['description']
-        document = request.FILES['file']
+        # document = request.FILES['file']
+        if len(request.FILES) != 0:
+                document=request.FILES.get('file')
+                
         sub_total=request.POST['sub_total']
-        tax_amount_igst=request.POST['tax_amount_igst']
+        tax_amount=request.POST['tax_amount']
+        igst=request.POST['igst']
         cgst=request.POST['cgst']
         sgst=request.POST['sgst']
         shipping_charge=request.POST['shipping_charge']
@@ -13047,13 +13059,14 @@ def add_salesorder(request):
         grand_total=request.POST['grand_total']
         advanced_paid=request.POST['advanced_paid']
         balance=request.POST['balance']
+        
 
         place_of_supply = request.POST['customer_place_of_supply']
         company_state = comp_details.state 
         
-        item_name = request.POST["itemname"]
-        item = Items.objects.get(id=item_name)
-        default_tax_rate = item.intrastate_tax if place_of_supply == company_state else item.interstate_tax
+        # item_name = request.POST["itemname"]
+        # item = Items.objects.get(id=item_name)
+        # default_tax_rate = item.intrastate_tax if place_of_supply == company_state else item.interstate_tax
 
         sale = SaleOrder.objects.create(
             customer=customer,
@@ -13078,9 +13091,10 @@ def add_salesorder(request):
             description=description,
             document=document,
             sub_total=sub_total,
+            igst=igst,
             cgst=cgst,
             sgst=sgst,
-            tax_amount_igst=tax_amount_igst,
+            tax_amount=tax_amount,
             shipping_charge=shipping_charge,
             adjustment=adjustment,
             grand_total=grand_total,
@@ -13088,25 +13102,26 @@ def add_salesorder(request):
             balance=balance
             )
         
-        quantity = float(request.POST['quantity'])
-        price = float(request.POST['price'])
-        discount = float(request.POST['discount'])
-        total = (quantity * price) - discount
+        # quantity = float(request.POST['quantity'])
+        # price = float(request.POST['price'])
+        # discount = float(request.POST['discount'])
+        # total = (quantity * price) - discount
 
-        hsn = request.POST['hsn']
+        # hsn = request.POST['hsn']
         
-        order_item = SalesOrderItems.objects.create(
-            login_details=log_details,
-            company=comp_details,
-            item=item,
-            hsn=hsn,
-            quantity=quantity,
-            price=price,
-            tax_rate=default_tax_rate,
-            discount=discount,
-            total=total,
-            sales_order=sale)
-        order_item.save()
+        # order_item = SalesOrderItems.objects.create(
+        #     login_details=log_details,
+        #     company=comp_details,
+        #     item=item,
+        #     hsn=hsn,
+        #     quantity=quantity,
+        #     price=price,
+        #     tax_rate=default_tax_rate,
+        #     discount=discount,
+        #     total=total,
+        #     sales_order=sale)
+        # order_item.save()
+        
         
         sales_history_obj=SalesOrderHistory()
         sales_history_obj.company=comp_details
@@ -13117,9 +13132,8 @@ def add_salesorder(request):
         sales_history_obj.action='Created'
         sales_history_obj.save()
         
-
         messages.success(request, 'Sales Order created successfully!')
-        return render(request, 'zohomodules/sales_order/salesorder_list.html', {'total': total,
+        return render(request, 'zohomodules/sales_order/salesorder_list.html', {
         'details': dash_details,'allmodules': allmodules,'data': data,'log_details': log_details})
     else:
         return redirect('/')
@@ -13763,7 +13777,8 @@ def getselCustomerDetails(request):
         
         custId = request.POST['id']
         cust = Customer.objects.get(id = custId)
-
+        
+      
         if cust:
             context = {
                 'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None else True, 'gstNo':cust.GST_number,

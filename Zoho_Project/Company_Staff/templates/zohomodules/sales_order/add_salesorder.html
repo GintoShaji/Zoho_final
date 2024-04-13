@@ -263,11 +263,11 @@
                     <div class="d-flex">
                         <div class="w-100">
                             <div class="p-0 border-0 bg-none position-relative drop-box">
-                                <input required type="text" id="customer" value="" name="select" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
+                                <input required type="text" id="customer" value="" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
                                 <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                     <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('','')">Select Customer</li>
                                     {% for cust in customer %}
-                                    <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails(`{{cust.id}}`,this.innerHTML)">{{ cust.title }} {{ cust.first_name }} {{ cust.last_name }}</li>
+                                    <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails(`{{cust.id}}`,this.innerHTML)"> {{ cust.title }} {{ cust.first_name }} {{ cust.last_name }}</li>
                                     {% endfor %}
                                 </ul>
                                 
@@ -394,7 +394,7 @@
                       <label for="" class="col-md-3 labels">Payment Terms</label>
                       <div class="col-md-9">
                         <div class="d-flex">
-                          <select class="form-control bg-black text-white" name="payment_term" id="paymentTerm" required>
+                          <select class="form-control bg-black text-white" name="payment_terms" id="paymentTerm" required>
                               <option value="" selected> Select Payment Term</option>
                               {% for term in comp_payment_terms %}
                                   <option value="{{term.id}}" text="{{term.days}}">{{term.term_name}}</option>
@@ -414,36 +414,8 @@
                       <div class="col-md-9">
                         <input type="Date" id="" class="form-control bg-black text-white" name="expiration_date">
                       </div>
-                    </div>
+                    </div>+
                   </div>
-  
-                  <!-- <div class="col-md-6 mt-2">
-                    <div class="row">
-                      <label for="" class="col-md-3 labels">Repeat Every</label>
-                      <div class="col-md-9">
-                        <div class="d-flex">
-                          <select class="form-control bg-black text-white" name="repeat_every" id="repeatEvery" required>
-                            <option value="" selected> Select Repeat Duration</option>
-                            {% for r in repeat %}
-                                <option value="{{r.id}}">{{r.repeat_every}}</option>
-                            {% endfor %}
-                        </select>
-                        <a class="btn btn-outline-warning ms-1" role="button" data-target="#newRepeatEvery" data-toggle="modal" id="addRepeatEvery">+</a>
-                      </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
-
-                <!-- <div class="row">
-                  <div class="col-md-6 mt-2">
-                    <div class="row">
-                      <label for="" class="col-md-3 labels">Order No.</label>
-                      <div class="col-md-9">
-                        <input class="form-control bg-black text-white" type="text" name="order_number" id="orderNum">
-                      </div>
-                    </div>
-                  </div> -->
   
                   <div class="col-md-6 mt-2">
                     <div class="row">
@@ -527,7 +499,7 @@
                 </div>
               </div> -->
 
-              
+
 
               <div class="row mt-4">
                 <div class="col-12 table-responsive">
@@ -606,7 +578,7 @@
                             <td >
                                 <input type="number" name='discount[]'  placeholder='Enter Discount' id="disc1" value=0 class="form-control bg-black text-white disc" step='any' min=0  />
                             </td>
-
+            
                             <td><input type="number" name='total[]' id="total1" class="form-control bg-black text-white total" value=0 readonly /></td>
                             <td style="display: none;"><input type="hidden" id="taxamount1" class="form-control itemTaxAmount" /></td>
                             <td>
@@ -620,6 +592,16 @@
                   </table>
                 </div>
               </div>
+            
+            
+
+
+
+
+
+
+
+
 
 
 
@@ -662,7 +644,7 @@
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Tax Amount</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" value=0.00 readonly class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='tax_amount' id="tax_amount" value=0.00 readonly class="form-control bg-black text-white"/></div>
                         </div>
                         
                         <div class="row container-fluid p-2 m-0">
