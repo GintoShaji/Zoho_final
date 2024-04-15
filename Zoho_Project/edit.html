@@ -72,19 +72,20 @@
                 {% if log_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                 {% if log_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                  <li class="breadcrumb-item"><a href="{% url 'salesorder_list' %}" class="text-warning-emphasis">salesorder List</a></li>
-                 <li class="breadcrumb-item" aria-current="page">add salesorder</li>
+                 <li class="breadcrumb-item" aria-current="page">Edit salesorder</li>
         </nav>
   
                 <div class="card bg-black shadow p-3 rounded">
-                    <h3 class="mb-4 mt-2" style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Sales Order</h3>
-                    <form method="post" action="{% url 'add_salesorder' %}" enctype="multipart/form-data" class="mb-3">
+                    <h3 class="mb-4 mt-2" style="font-size: 1.40rem;color: rgb(230, 171, 45);">Edit Sales Order</h3>
+                    <form method="post" action="{% url 'edit_salesorder' sale.id %}" enctype="multipart/form-data" class="mb-3">
                         {% csrf_token %}
                 
+
                         <div class="form-group row mt-4">
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">Customer</label>
                             <div class="col-sm-12 col-md-3 col-lg-3">
                                 <select class="form-control bg-light text-dark" id="customerSelect" name="select">
-                                    <option value="" selected>Select Customer</option>
+                                    <option value="{{sale.customer.first_name}} {{sale.customer.last_name}}" selected>{{sale.customer.first_name}} {{sale.customer.last_name}}</option>
                                     {% for c in customer %}
                                         <option value="{{ c.id }}" 
                                                 data-email="{{ c.customer_email }}" 
@@ -98,14 +99,14 @@
                                 </select>
                             </div>
                             <div class="col-md-4 ">
-                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newCustomer" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#customerModal" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
                             </div>
                         </div>
                 
                         <div class="form-group row mt-4">
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">Customer Email</label>
                             <div class="col-sm-12 col-md-3 col-lg-3">
-                                <input type="email" class="form-control bg-light text-dark" id="customer_email" name="customer_email" required> 
+                                <input type="email" class="form-control bg-light text-dark" value="{{ sale.customer_email }}" id="customer_email" name="customer_email" required> 
                                 <span class="text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
                             </div>
                         </div>
@@ -113,31 +114,50 @@
                         <div class="form-group row mt-4">
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">Billing Address</label>
                             <div class="col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark" id="billing_address" name="customer_billing_address" required>
+                                <input type="text" class="form-control bg-light text-dark" value="{{sale.customer_billing_address}}" id="billing_address" name="customer_billing_address" required>
                                 <div class="invalid-feedback">Please fill out this field.</div>   
                             </div>
                         </div>
                         
-                
-                        <div class="form-group row mt-4">
-                            <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">GST Treatment*</label>
-                            <div class="col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark" id="customer_gst_type" name="customer_gst_type">
+                        <br>
+                        <fieldset2 class="other details">
+                            <div class="form-group row mt-2">
+                                <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > GST Treatment*</label>
+                                
+                                <div class=" col-sm-12 col-md-3 col-lg-3">
+                                    <select name="customer_gst_type" id="GSTT" class="form-control bg-light text-dark" onclick="gstPan_function()">
+                                        <option value="{{sale.customer_gst_type}}" selected>{{sale.customer_gst_type}}</option>
+        
+                                        <option value="Select a Gst Treatment">Select a Gst Treatment</option>
+                                        <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
+                                        <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">
+                                            Registered Business-Composition Business that is registered under the Composition schemen in GST
+                                        </option>
+                                        <option value="Unregistered Business-not Registered under GST">Unregistered Business-not Registered under GST</option>
+                                        <option value="Overseas- Persons with who you do import or exports of supplies outside india">Overseas- Persons with who you do import or exports of supplies outside india</option>
+                                        <option value="Special Economic Zone">Special Economic Zone</option>
+                                    </select><br>
+                                </div>
                             </div>
-                        </div>
+        
+                            <fieldset3 id="gst" >
+                                <div class="row mt-4">
+                                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN/UIN*</label>
+                                    <div class=" col-sm-12 col-md-3 col-lg-3">
+                                        <input type="text" class="form-control bg-light text-dark" value="{{sale.customer_gst_number}}" name="customer_gst_number" id="gstInput" value="{{customer_obj.GST_number}}"> 
+                                        <span id="gstMessage"></span>       
+                                    </div>
+                                </div>
+                            </fieldset3>
                 
-                        <div class="form-group row mt-4">
-                            <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">GSTIN</label>
-                            <div class="col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark" id="customer_gst_number" name="customer_gst_number">
-                            </div>
-                        </div>
+                        
                 
                         <div class="form-group row mt-4">
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">Place of Supply*</label>
                             <div class="col-sm-12 col-md-3 col-lg-3">
-                                <select id="customer_place_of_supply" name="customer_place_of_supply" class="form-control bg-light text-dark">
-                                    <option value="" selected></option>
+                                <select id="customer_place_of_supply" name="customer_place_of_supply"  class="form-control bg-light text-dark">
+                                    <option value="{{sale.customer_place_of_supply}}" selected>{{sale.customer_place_of_supply}}</option>
+
                                     <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                                     <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                                     <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
@@ -183,64 +203,32 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order No</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="text" class="form-control bg-light text-dark" id="sales_order_number" name="sales_order_number" required>     
+                        <input  type="text" class="form-control bg-light text-dark" value="{{sale.sales_order_number}}" id="sales_order_number" name="sales_order_number" required>     
                         <div class="invalid-feedback">Please fill out this field.</div> 
                     </div>
                 </div>
-
-
-                
-
 
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Referance Number</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="text" class="form-control bg-light text-dark" id="reference_number" name="reference_number" readonly required>     
+                        <input  type="text" class="form-control bg-light text-dark" value="{{sale.reference_number}}" id="" name="reference_number" readonly required>     
                         <div class="invalid-feedback">Please fill out this field.</div> 
                     </div>
                 </div>
 
-                <script>
-                    // Function to generate the reference number
-                    function generateReferenceNumber() {
-                        let lastReferenceNumber = parseInt(localStorage.getItem('lastReferenceNumber')) || 0;
-                        // Increment the last reference number
-                        lastReferenceNumber++;
-                        // Save the new last reference number to localStorage
-                        localStorage.setItem('lastReferenceNumber', lastReferenceNumber);
-                        return lastReferenceNumber;
-                    }
-                
-                    // Set initial reference number when the page loads
-                    document.addEventListener('DOMContentLoaded', function () {
-                        document.getElementById('reference_number').value = generateReferenceNumber();
-                    });
-                </script>
-                
-           
-
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sales Order Date</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="Date" class="form-control bg-light text-dark" id="sales_order_date" name="sales_order_date" required>     
+                        <input  type="text" class="form-control bg-light text-dark" value="{{sale.sales_order_date}}" id="" name="sales_order_date" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
-
-                <script>
-                    // Get today's date
-                    var today = new Date();
-                    // Format the date as YYYY-MM-DD (required by the input type="date")
-                    var formattedDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
-                    // Set the value of the input field to the formatted date
-                    document.getElementById('sales_order_date').value = formattedDate;
-                </script>
-
+    
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Expected Shippment Date</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="Date" class="form-control bg-light text-dark" id="expiration_date" name="expiration_date" required>     
+                        <input  type="text" class="form-control bg-light text-dark" value="{{sale.expiration_date}}" id="" name="expiration_date" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -248,10 +236,11 @@
                 <div class="form-group row mt-4">
                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <select id="paytearm_select" name="payment_terms" class="form-control bg-light text-dark">
+                        <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">  
+                            <option value="{{ sale.payment_terms.id }}" selected>{{ sale.payment_terms.term_name  }}</option>
                             {% for pay_terms in comp_payment_terms %}
-                            <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
-                        {% endfor %} 
+                                <option value="{{ pay_terms.id }}">{{ pay_terms.term_name }}</option>
+                            {% endfor %}     
                         </select>
                     </div>
                     <div class="col-md-4 ">
@@ -263,8 +252,8 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Payment Type</label></div>
                     <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <select class="form-control my-select bg-light" id="pay_method" name="payment_method"  required style="color: black;">
-                            <option value="" selected hidden>Choose Payment</option>
+                        <select class="form-control my-select bg-light"   id="pay_method" name="payment_method"  required style="color: black;">
+                            <option value="{{sale.payment_method}}" selected hidden>{{sale.payment_method}}</option>
                             <option value="cash">Cash</option>
                             <option value="cheque">Cheque</option>
                             <option value="upi">UPI</option>
@@ -278,13 +267,13 @@
                     <div class="col-md-1"></div>
                     <div class="col-sm-12 col-md-3 col-lg-3" style="display:none;"  id="chequediv">
                         <label class="col-form-label text-light" >Cheque No</label>
-                        <input type="text" class="form-control bg-light" name="cheque_number"  id="cheque_id" placeholder="Enter Cheque No" style="color: black;">
+                        <input type="text" class="form-control bg-light" value="{{sale.cheque_number}}" name="cheque_number"  id="cheque_id" placeholder="Enter Cheque No" style="color: black;">
                     </div>
                     
 
                     <div class="col-sm-12 col-md-3 col-lg-3 "  style="display:none; " id="upidiv">
                         <label class="col-form-label text-light" >UPI ID</label>
-                        <input type="text" class="form-control bg-light" name="upi_number"  id="upi_id" placeholder="Enter UPI ID" style="color: black;">
+                        <input type="text" class="form-control bg-light" value="{{sale.upi_number}}" name="upi_number"  id="upi_id" placeholder="Enter UPI ID" style="color: black;">
                     </div>
                     
                    
@@ -319,34 +308,35 @@
                                 </tr>
                             </thead>
                             
-                             
+
                             <tbody>
+                                {% for saleitem in sale_items %}
                                 <tr>
                                     <td></td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this, '{{ customer_place_of_supply }}', '{{ company_state }}')" style="width: 110px;">
-                                                <option selected>Select item</option>
+                                            <select class="form-control bg-light text-dark mr-2" name="itemname" onchange="updateItemDetails(this)" style="width: 110px;">
+                                                <option value="{{ saleitem.item.item_name }}" selected>{{ saleitem.item.item_name }}</option>
                                                 {% for i in item %}
-                                                    <option value="{{ i.id }}">{{ i.item_name }}</option>
+                                                <option value="{{ i.id }}">{{ i.item_name }}</option>
                                                 {% endfor %}
                                             </select>
                                             <div class="ml-2">
-                                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newItem" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                                                <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
                                             </div>
                                         </div>
                                     </td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" id="hsnInput" name="hsn"></td>
-                                    <td><input type="number" class="form-control border-1 bg-light text-dark" name="quantity" onchange="calculateTotal(this); calculateSubtotal()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" id="priceInput"  name="price" onchange="calculateTotal(this); calculateSubtotal()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" id="taxRateInput" name="tax_rate" onclick="sample1()" onchange="calculateTotal(this)"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" name="discount" onclick="sample()" onchange="calculateTotal(this); calculateSubtotal()"></td>
-                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ total }}"  name="total" readonly></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.hsn }}"  id="hsnInput" name="hsn"></td>
+                                    <td><input type="number" class="form-control border-1 bg-light text-dark" value="{{ saleitem.quantity }}"  name="quantity" onchange="calculateTotal(this); calculateSubtotal()"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.price }}" id="priceInput"  name="price" onchange="calculateTotal(this); calculateSubtotal()"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.tax_rate }}" id="taxRateInput" name="tax_rate" onclick="sample1()" onchange="calculateTotal(this)"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.discount }}"  name="discount" onclick="sample()" onchange="calculateTotal(this); calculateSubtotal()"></td>
+                                    <td><input type="text" class="form-control border-1 bg-light text-dark" value="{{ saleitem.total }}"  name="total" readonly></td>
                                     <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
-                            
-                           
+
                             </table>
                         </div>
                     
@@ -379,8 +369,14 @@
                     <div class="col-md-6">
                         <div class="row clearfix" style="margin-top:20px">
                             <div class="col-md-6 ml-4">
-                                <textarea class="form-control text-light" id="" name="description" placeholder="Note" style="height: 190px; width: 180%;"></textarea>
-                                <input type="file" name="file" style="margin-top: 10px; width: 180%; background-color: white;">
+                                <textarea class="form-control text-light" value="" id="" name="description" placeholder="Note" style="height: 190px; width: 180%;">{{ sale.description }}</textarea>
+                                <!-- <input type="file" name="file" id=""  value="" style="margin-top: 10px; width: 180%; background-color: white;"> -->
+
+                                <br>
+                                <label for="file">Choose a new file:</label><br>
+                                <input type="text" id="document" name="document" value="{{ sale.document }}" style="margin-top: 10px; width: 180%; background-color: white;"><br>
+                                <input type="file" name="file" id="file" style="margin-top: 10px; width: 180%; background-color: white;"><br>
+
                             </div>
                         </div>
                     </div>
@@ -389,7 +385,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Sub Total</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="subTotal" name="sub_total"  readonly required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.sub_total }}" id="subTotal" name="sub_total"  readonly required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -417,28 +413,13 @@
                                     document.getElementById('subTotal').value = subTotal.toFixed(2);
                                 }
                             </script>
-
-
-                            <div class="form-group row mt-4">
-                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>CGST</label></div>
-                                <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="" name="cgst" value="0.00" required>
-                                    <div class="invalid-feedback">Please fill out this field.</div>
-                                </div>
-                            </div>
-
-                            <div class="form-group row mt-4">
-                                <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>SGST</label></div>
-                                <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="" name="sgst" value="0.00" required>
-                                    <div class="invalid-feedback">Please fill out this field.</div>
-                                </div>
-                            </div>
                         
+                        
+                            
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Tax Amount</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="taxAmount" name="tax_amount_igst" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.tax_amount_igst }}" id="taxAmount" name="tax_amount_igst" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -446,7 +427,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Shipping Charge</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="shippingCharge" name="shipping_charge" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.shipping_charge }}" id="shippingCharge" name="shipping_charge" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -454,7 +435,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Adjustment</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="number" step="0.01" style="width:350%;" class="form-control bg-light text-dark" id="adjustment" name="adjustment" value="0.00" required>
+                                    <input type="number" step="0.01" style="width:350%;" value="{{ sale.adjustment }}" class="form-control bg-light text-dark" id="adjustment" name="adjustment" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div> 
@@ -462,7 +443,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Grand Total</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="grandTotal" name="grand_total" value="0.00" required readonly>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.grand_total }}" id="grandTotal" name="grand_total" value="0.00" required readonly>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -504,7 +485,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Paid</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="advancedPaid" oninput="calculateBalance()" name="advanced_paid" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.advanced_paid }}" id="advancedPaid" oninput="calculateBalance()" name="advanced_paid" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -512,7 +493,7 @@
                             <div class="form-group row mt-4">
                                 <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Balance</label></div>
                                 <div class="col-sm-12 col-md-3 col-lg-3">
-                                    <input type="text" class="form-control bg-light text-dark" id="balance" name="balance" value="0.00" required>
+                                    <input type="text" class="form-control bg-light text-dark" value="{{ sale.balance }}" id="balance" name="balance" value="0.00" required>
                                     <div class="invalid-feedback">Please fill out this field.</div>
                                 </div>
                             </div>
@@ -544,15 +525,12 @@
                 <div class=" col-sm-12 col-md-2 col-lg-2 mt-3">
                     <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" name="save">Save</button>
                 </div> 
-                <div class="col-sm-12 col-md-2 col-lg-2 mt-3">
-                    <button type="button" class="btn btn-outline-danger form-control bg-warning text-dark" style="font-weight: bold;" name="cancel" onclick="window.location.reload();">Cancel</button>
-                </div>
             </div>
             
             </form>
       
                
-<!--------------- Payments Seciton Start ----------------->
+            <!--------------- Payments Seciton Start ----------------->
 
             <div class="modal fade" id="newpayment">
                 <div class="modal-dialog modal-md">
@@ -601,7 +579,496 @@
                 </div>  
             </div> 
 
-<!------------------- Payments  Section End -------------->
+            <!------------------- Payments  Section End -------------->
+
+
+            
+        
+        <!-- Modal for Employee Form -->
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="customerModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-xl" role="document" >
+        <div class="modal-content bg-dark" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerModalLabel"></h5>
+                <button type="button" class="btn btn-warning  float-right" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Your entire form code goes here -->
+                <div class="header pb-5">
+                    <h2 style="text-align: center;color:white;" id="customerModalLabel">New Customer</h2>
+                    <hr class="text-warning font-weight-bold">
+                  
+                </div>
+                <div class="container pl-5" style="color:white;">
+                <form method="POST" action="" enctype="multipart/form-data" id="myForms">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="data   col-md-6 ">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Title</label>
+                                </div>
+                                <div class=" col-6">
+                                    <select class="form-control text-dark bg-light" name="title" id="title" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Mr">Mr</option>
+                                        <option value="Mrs">Mrs</option>
+                                        <option value="Miss">Miss</option>
+                                        <option value="Ms">Ms</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">First Name</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="fname" id="fname" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Last Name</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="lname" id="lname" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Alias</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="alias" id="alias">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Date of joining</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="date" class="form-control text-dark bg-light" name="joindate2" id="joindate2" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="sdate">Salary Date</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <select class="form-control text-dark bg-light" name="salary" id="sdate" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1-10">1-10</option>
+                                        <option value="11-15">11-15</option>
+                                        <option value="16-31">16-31</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Define salary details</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="saltype" id="sal" onchange="salFunction()" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Fixed">Fixed</option>
+                                        <option value="Temporary">Temporary</option>
+                                        <option value="Variable">Time Based</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="fixed" style="display: none;">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Salary Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="fsalary" id="fsalary" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="variable" style="display: none;">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Amount per Hour</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="amnthr" id="amnthr" value="0">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Total working Hours</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="hours" id="hours" onkeyup="calculateAmount()" value="0">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Salary Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="vsalary" id="vsalary" value="0" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div class="image col-6 col-lg-6 col-md-6 col-sm-5">
+                            <div class="row">
+                                <div class="col-5 col-lg-5 col-md-10 col-sm-5 text-center">
+                                    <label for="">Upload Image</label>
+                                </div>
+                                <div class="col-6 col-lg-7 col-md-10 col-sm-5">
+                                    <br><br><br><br>
+                                    <label for="image-input">
+                                        <img class="img-fluid" src="" alt="profile image" id="img"
+                                            style="background-color: rgba(156, 156, 156, 0.267); border-radius: 30px;">
+                                    </label>
+                                    <input id="image-input" type="file" name="file" class="form-control" accept="image/*" onchange="loadFile(event)" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="gen-info row pt-5">
+                       
+                            <h4 class="text-center py-2 text-light">General information</h4>
+                            <hr class="text-warning font-weight-bold">
+                            <div class="left col-lg-6 col-sm-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Employee Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="empnum" id="empnum" onkeyup="empValidation(document.getElementById('empnum'))" required >
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Designation</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="designation" required  id="designation">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Location</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="location" required id="location">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Gender</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="gender" id="dropId3" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female" >Female</option>
+                                        <option value="Transgender" >Transgender</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Date of Birth</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" class="form-control text-dark bg-light"  id="dob" name="dob" onchange="calculateAge()" required >
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Age</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type=""  class="form-control text-dark bg-light"  id="age" name="age" readonly>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Blood Group</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" id="blood" name="blood" required>
+                                        <!-- <option value="A+">A+</option>
+                                        <option value="B+">B+</option> -->
+                                     
+                                        {% for i in blood %}
+                                        <option value="{{i.Blood_group}}" >{{i.Blood_group}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <a class="btn-outline-warning"  data-toggle="modal" data-target="#commentModal" data-toggle="tooltip" title="comment">
+                                        Add Blood group
+                                       </a>
+                                </div>
+                                
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Father's Name/Mother's Name</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="fm_name" id="fm_name">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Spouse's Name</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="s_name" id="s_name">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Contact Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control text-dark bg-light" name="phone" id="phone" required 
+                                        onkeyup="phoneValidate(document.getElementById('phone'),document.getElementById('pherror'))">
+                                    <div id="pherror" class="text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Emergency Contact Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control text-dark bg-light" name="ephone" id="ephone"
+                                        onkeyup="phoneValidate(document.getElementById('ephone'),document.getElementById('epherror'))">
+                                    <div id="epherror" class="text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Email</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="email"  class="form-control text-dark bg-light" name="email2" id="email2"
+                                        required onkeyup="emailvalidate()">
+                                    <div id="error" class="text-danger"></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-lg-5 col-sm-5">
+
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Permanent Address</label>
+                                </div>
+                                <div class="col-6">
+                                    <textarea class="form-control text-dark bg-light mb-2 pt-0" name="paddress" id="padrs1" onkeyup="clearaddreass(this.id)" required value=""></textarea>
+                                    <textarea class="form-control text-dark bg-light pt-0" name="paddress2" id="padrs2" onkeyup="clearaddreass(this.id)"></textarea>
+                                </div>
+                            </div>
+                            <div class="row pb-4">
+                                <div class="col-6">
+                                    <label for="">Temporary Address</label>
+                                </div>
+                                <div class="col-6">
+                                    <input class="mx-2" type="checkbox" id="filladdress" name="filladdress">
+                                    <label style="font-size: .8rem;">Same as permanent address</label>
+                                    <textarea class="form-control text-dark bg-light mb-2 pt-0" name="address" id="adrs1" onkeyup="clearaddreass(this.id)"></textarea>
+                                    <textarea class="form-control text-dark bg-light pt-0" name="address2" id="adrs2" onkeyup="clearaddreass(this.id)"></textarea>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Attachments</label>
+                                </div>
+                                <div class="col-6">
+                                    <input class="form-control" id="file-upload" type="file" name="attach" style="background: transparent;">
+                                </div>
+                            </div>
+                            <div class="row pb-4">
+                                <div class="col-6">
+                                    <label for="">Provide Bank Details</label>
+                                </div>
+                                <div class="col-6"><select class="form-control text-dark bg-light" name="bank" id="dropId"
+                                        onchange="bankdisplay()" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="bank" id="bank" style="display: none;">
+                                <br>
+                                <br>
+                                <h4 class="text-center py-2 text-light">Bank information</h4>
+                                <hr class="text-warning font-weight-bold">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Account Number</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text"  class="form-control text-dark bg-light" name="acc_no" id="acc_no" pattern="[0-9]{14}">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">IFSC</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="ifsc" id="ifsc">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Name of Bank</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="b_name" id="b_name">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Branch Name</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="branch" id="branch">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Transaction Type</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <select class="form-control text-dark bg-light" name="ttype" id="ttype">
+                                            <option value="" selected hidden>Select</option>
+                                            <option value="ATM">ATM</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Check">Check</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                                
+
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">TDS Applicable</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="tds" id="tds" onchange="tdsFunction()"
+                                        required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="tds-div" style="display: none;">
+                                <br>
+                                <br>
+                                <h5 class="text-center py-1 text-light">For Banking</h5>
+                                <hr class="text-warning font-weight-bold">
+                                
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Percentage/Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <select class="form-control text-dark bg-light" name="pora" id="pora" onchange="tdsFunction2()">
+                                            <option value="" selected hidden>Select</option>
+                                            <option value="Percentage">Percentage</option>
+                                            <option value="Amount">Amount</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="p" style="display: none;">
+                                    <div class="row pb-3">
+                                        <div class="col-6">
+                                            <label for="">Percentage</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control text-dark bg-light" name="pcnt" id="pcnt">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="a" style="display: none;">
+                                    <div class="row pb-3">
+                                        <div class="col-6">
+                                            <label for="">Amount</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control text-dark bg-light" name="amnt" id="amnt" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <br>
+                        <br>
+                      
+
+                        </div>
+                        <br>
+                        <br>
+                        <div class="row">
+                            <h4 class="text-center py-2 text-light">Statutary information</h4>
+                            <hr class="text-warning font-weight-bold">
+                            <div class=" col-sm-9 col-lg-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Income Tax Number(PAN)</label>
+                                </div>
+                                <div class="col-6"><input type="text" class="form-control text-dark bg-light" name="itn" id="itn" pattern="^[A-Z]{5}[0-9]{4}[A-Z]$" placeholder="ABCDE0051C"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Aadhar Number(*)</label>
+                                </div>
+                                <div class="col-6"><input type="text"class="form-control text-dark bg-light" name="an" id="an" requiredpattern="[0-9\s]{14}"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Universal Account Number(UAN)</label>
+                                </div>
+                                <div class="col-6"><input type="number"  class="form-control text-dark bg-light" name="uan" id="uan" ></div>
+                            </div>
+                            </div>
+                            <div class=" col-sm-9 col-lg-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">PF Account Number (PFN)</label>
+                                </div>
+                                <div class="col-6"><input type="number"  class="form-control text-dark bg-light" name="pfn"  id="pfn"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">PR Account Number (PRAN)</label>
+                                </div>
+                                <div class="col-6"><input type="text"  class="form-control text-dark bg-light" name="pran" id="pran" ></div>
+                            </div>
+                        </div>
+                        </div>
+        
+                    </div>
+                    <hr>
+                    <div class="action-button">
+                        <button class="btn text-light" type="submit" style="background-color: chocolate; width: 150px; font-size: medium;" id="saveEmployee" onclick="validateform()">Add</button>
+                        <button class="btn btn-danger" type="reset" style="background-color: chocolate; width: 150px; font-size: medium;" onclick="goToTop()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
 
 
 
@@ -610,7 +1077,14 @@
 
 
 
-       
+
+
+
+
+
+
+
+
 
 
         </div>
@@ -653,8 +1127,7 @@
     </script>
 
 
-
-<!-- <script>
+<script>
         var itemDetails = {
             {% for i in item %}
                 "{{ i.id }}": { "hsn": "{{ i.hsn_code }}", "price": "{{ i.selling_price }}" },
@@ -665,9 +1138,12 @@
             var selectedItemId = selectElement.value;
             var itemDetail = itemDetails[selectedItemId];
             if (itemDetail) {
+                // Update HSN field
                 document.getElementById('hsnInput').value = itemDetail.hsn;
+                // Update price field
                 document.getElementById('priceInput').value = itemDetail.price;
             } else {
+                // Clear fields if item not found
                 document.getElementById('hsnInput').value = '';
                 document.getElementById('priceInput').value = '';
             }
@@ -681,62 +1157,9 @@
         function deleteContact(buttonElement) {
             console.log("Sample function for deleting contact.");
         }
-</script> -->
-
-
-
-
-<script>
-    var itemDetails = {
-        {% for i in item %}
-            "{{ i.id }}": { 
-                "hsn": "{{ i.hsn_code }}", 
-                "price": "{{ i.selling_price }}", 
-                "intrastate_tax": "{{ i.intrastate_tax }}", 
-                "interstate_tax": "{{ i.interstate_tax }}", 
-                "place_of_supply": "{{ i.place_of_supply }}" 
-            },
-        {% endfor %}
-    };
-
-    function updateItemDetails(selectElement, customerPlaceOfSupply, companyState) {
-        var selectedItemId = selectElement.value;
-        var itemDetail = itemDetails[selectedItemId];
-        if (itemDetail) {
-            document.getElementById('hsnInput').value = itemDetail.hsn;
-            document.getElementById('priceInput').value = itemDetail.price;
-            var defaultTaxRate;
-            if (customerPlaceOfSupply === companyState) {
-                // If customer's place of supply is the same as company state
-                defaultTaxRate = itemDetail.intrastate_tax;
-            } else {
-                // If customer's place of supply is different from company state
-                defaultTaxRate = itemDetail.interstate_tax;
-            }
-            document.getElementById('taxRateInput').value = defaultTaxRate;
-        } else {
-            document.getElementById('hsnInput').value = '';
-            document.getElementById('priceInput').value = '';
-            document.getElementById('taxRateInput').value = '';
-        }
-    }
-
-    function sample1() {
-        console.log("Sample function for tax rate calculation.");
-    }
-
-    function sample() {
-        console.log("Sample function for discount calculation.");
-    }
-
-    function deleteContact(buttonElement) {
-        console.log("Sample function for deleting contact.");
-    }
 </script>
-
-
-
-
+    
+    
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" ></script>
@@ -1524,12 +1947,6 @@ $('#mphone').on('input', function() {
         });
     });
 </script>
-
-
-
-
-
-
 
 
 {% endblock %}

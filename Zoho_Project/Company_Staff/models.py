@@ -878,7 +878,7 @@ class SalesOrderItems(models.Model):
     hsn = models.CharField(max_length=255)
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    tax_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2,blank=True, null=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 

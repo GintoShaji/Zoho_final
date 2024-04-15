@@ -524,13 +524,21 @@
                                 <div class="d-flex">
                                     <div class="w-100">
                                         <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
-                                            <input required type="text" id="item1" value="" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                                            <!-- <input required type="text" id="item1" value="" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
                                             <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu1"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                                 {% for i in item %}
                                                 <li class="dropdown-item items-options text-white" onclick="getItemDetails($(this).parent().prev().attr('id'),`{{i.item_name}}`)">{{i.item_name}}</li>
                                                 {% endfor %}
-                                            </ul>
+                                            </ul> -->
                                             
+                                            <select class="dropdown-toggle form-control bg-black text-white" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off"  name="itemname" onkeyup="filterFunction($(this).attr('id'))"  onchange="updateItemDetails(this, '{{ customer_place_of_supply }}', '{{ company_state }}')" style="width: 110px;">
+                                                <option selected>Select item</option>
+                                                {% for i in item %}
+                                                    <option value="{{ i.id }}" >{{ i.item_name }}</option>
+                                                {% endfor %}
+                                            </select>
+            
+            
                                         </div>
                                     </div>
                                     <a href="#">
@@ -541,21 +549,21 @@
                             </td>
                             <td>
                                 <input type="hidden" name="item_id[]" id="itemId1">
-                                <input type="text" name='hsn[]' id="hsn1" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
+                                <input type="text" name='hsn' id="hsn1" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
                             </td>
                             <td >
-                                <input type="number" name='qty[]' id="qty1"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value=0 onchange="changeItemQty(this.id)" required/>
+                                <input type="number" name='quantity' id="qty1"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value=0 onchange="changeItemQty(this.id)" required/>
                                 <input type="text" id="avl1" style="display: none;">
                                 <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan1" class=''></span></div>
                             </td>
                             <td>
-                                <input type="number" name='price[]' id="price1" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value=0 readonly />
+                                <input type="number" name='price' id="price1" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value=0 readonly />
                                 <input type="number" name='priceListPrice[]' id="priceListPrice1" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value=0 readonly />
                             </td>
                             
                             <td>
                                 <!-- <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex"> -->
-                                <select name='taxGST[]' id="taxGST1" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
+                                <select name='tax_rate' id="taxGST1" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
                                     <option selected disabled hidden>Select GST</option>
                                     <option value=28 >28.0% GST</option>
                                     <option value=18 >18.0% GST</option>
@@ -564,7 +572,7 @@
                                     <option value=3 >03.0% GST</option>
                                     <option value=0 >0.0% GST</option>
                                 </select>
-                                <select name='taxIGST[]' id="taxIGST1" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
+                                <select name='tax_rate' id="taxIGST1" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
                                     <option selected disabled hidden >Select IGST</option>
                                     <option value=28 >28.0% IGST</option>
                                     <option value=18 >18.0% IGST</option>
@@ -576,10 +584,10 @@
                                 <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax1" style="display: none;"> Invalid Tax %</span> </div>    
                             </td>
                             <td >
-                                <input type="number" name='discount[]'  placeholder='Enter Discount' id="disc1" value=0 class="form-control bg-black text-white disc" step='any' min=0  />
+                                <input type="number" name='discount'  placeholder='Enter Discount' id="disc1" value=0 class="form-control bg-black text-white disc" step='any' min=0  />
                             </td>
             
-                            <td><input type="number" name='total[]' id="total1" class="form-control bg-black text-white total" value=0 readonly /></td>
+                            <td><input type="number" name='total' id="total1" class="form-control bg-black text-white total" value=0 readonly /></td>
                             <td style="display: none;"><input type="hidden" id="taxamount1" class="form-control itemTaxAmount" /></td>
                             <td>
                               <i class="fa fa-trash text-danger remove_row" style="cursor: pointer;" title="Remove Row" id="1"></i>
@@ -594,6 +602,53 @@
               </div>
             
             
+            <script>
+                var itemDetails = {
+                    {% for i in item %}
+                        "{{ i.id }}": { 
+                            "hsn": "{{ i.hsn_code }}", 
+                            "price": "{{ i.selling_price }}", 
+                            "intrastate_tax": "{{ i.intrastate_tax }}", 
+                            "interstate_tax": "{{ i.interstate_tax }}", 
+                            "place_of_supply": "{{ i.place_of_supply }}" 
+                        },
+                    {% endfor %}
+                };
+            
+                function updateItemDetails(selectElement, customerPlaceOfSupply, companyState) {
+                    var selectedItemId = selectElement.value;
+                    var itemDetail = itemDetails[selectedItemId];
+                    if (itemDetail) {
+                        document.getElementById('hsn1').value = itemDetail.hsn;
+                        document.getElementById('price1').value = itemDetail.price;
+                        var defaultTaxRate;
+                        if (customerPlaceOfSupply === companyState) {
+                            // If customer's place of supply is the same as company state
+                            defaultTaxRate = itemDetail.intrastate_tax;
+                        } else {
+                            // If customer's place of supply is different from company state
+                            defaultTaxRate = itemDetail.interstate_tax;
+                        }
+                        document.getElementById('taxGST1').value = defaultTaxRate;
+                    } else {
+                        document.getElementById('hsn1').value = '';
+                        document.getElementById('price1').value = '';
+                        document.getElementById('taxGST1').value = '';
+                    }
+                }
+            
+                function sample1() {
+                    console.log("Sample function for tax rate calculation.");
+                }
+            
+                function sample() {
+                    console.log("Sample function for discount calculation.");
+                }
+            
+                function deleteContact(buttonElement) {
+                    console.log("Sample function for deleting contact.");
+                }
+            </script>      
 
 
 
@@ -764,56 +819,7 @@
 </div>
 
 
-<!-- Repeat Every -->
-<div class="modal fade" id="newRepeatEvery">
-  <div class="modal-dialog modal-md">
-  <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
-      <div class="modal-header px-3" style="background: rgb(32, 35, 37);">
-          <h3 class="text-uppercase" style="color: white;">Add Repeat Every</h3>
-          <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-          </button>
-      </div>
-      <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card px-2 py-4" style="background-color: #141414a2;">
-          <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="newRepeatEveryForm">
-            {% csrf_token %}
 
-            <div class="row mt-2">
-              <div class="col-6">
-                  <label class="text-white" for="name">Duration*</label>
-                  <input type="number" name="repeat_duration" min="0" step="any" id="repeatEveryDuration" class="form-control text-dark bg-light w-100">
-              </div>
-              <div class="col-6">
-                  <label class="text-white" for="name">Type*</label>
-                  <select name="repeat_type" id="repeatEveryType" class="form-control text-dark bg-light w-100">
-                      <option value="Month">Month</option>
-                      <option value="Year">Year</option>
-                  </select>
-              </div>
-          </div>
-          
-                <div class="row mt-5">
-                  <div class="col-lg-12 col-md-12 col-sm-12">
-                    <div class="d-flex">
-                      <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
-                      type="submit" data-dismiss="modal" id="saveRepeatEvery">Save
-                      </button> 
-                      
-
-                      <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
-                      data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">Cancel</span>
-                      </button>
-                    </div>
-                  </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-  </div>  
-</div>
 
 
 
@@ -1137,8 +1143,8 @@
                 
                 <div class=" col-sm-12 col-md-3 col-lg-3">
                     <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">
-                        {% for pay_terms in pTerms %}
-                        <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
+                        {% for term in comp_payment_terms %}
+                        <option value="{{pay_terms.id}}" >{{term.term_name}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -1756,6 +1762,8 @@
       </div>
     </div>  
 </div>
+
+
 
 <!-- New Unit Modal-->     
 
@@ -3089,6 +3097,10 @@
       calc();
     });
 
+
+
+    
+
     $(document).ready(function(){
       $('#add').click(function(){
         var roinc = $("#items-table-body tr").length;
@@ -3101,12 +3113,13 @@
                   <div class="d-flex">
                       <div class="w-100">
                           <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
-                              <input required type="text" id="item${roinc}" value="" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
-                              <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu${roinc}"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
-                                  {% for i in item %}
-                                  <li class="dropdown-item items-options text-white" onclick="getItemDetails($(this).parent().prev().attr('id'),'{{i.item_name}}')">{{i.item_name}}</li>
-                                  {% endfor %}
-                              </ul>
+
+                            <select class="dropdown-toggle form-control bg-black text-white" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off"  name="itemname" onkeyup="filterFunction($(this).attr('id'))"  onchange="updateItemDetails(this, '{{ customer_place_of_supply }}', '{{ company_state }}')" style="width: 110px;">
+                            <option selected>Select item</option>
+                            {% for i in item %}
+                                <option value="{{ i.id }}">{{ i.item_name }}</option>
+                            {% endfor %}
+                            </select>
                               
                           </div>
                       </div>
@@ -3118,20 +3131,20 @@
               </td>
               <td>
                   <input type="hidden" name="item_id[]" id="itemId${roinc}">
-                  <input type="text" name='hsn[]' id="hsn${roinc}" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
+                  <input type="text" name='hsn' id="hsn1${roinc}" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
               </td>
               <td >
-                  <input type="number" name='qty[]' id="qty${roinc}"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value=0 onchange="changeItemQty(this.id)" required/>
-                  <input type="text" id="avl${roinc}" style="display: none;">
-                  <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan${roinc}" class=''></span></div>
+                  <input type="number" name='quantity' id="qty1${roinc}"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value=0 onchange="changeItemQty(this.id)" required/>
+                  <input type="text" id="avl1${roinc}" style="display: none;">
+                  <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan1${roinc}" class=''></span></div>
               </td>
               <td>
-                  <input type="number" name='price[]' id="price${roinc}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value=0 readonly />
-                  <input type="number" name='priceListPrice[]' id="priceListPrice${roinc}" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value=0 readonly />
+                  <input type="number" name='price' id="price1${roinc}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value=0 readonly />
+                  <input type="number" name='priceListPrice[]' id="priceListPrice1${roinc}" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value=0 readonly />
               </td>
               
               <td>
-                  <select name='taxGST[]' id="taxGST${roinc}" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
+                  <select name='tax_rate' id="taxGST${roinc}" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
                       <option selected disabled hidden>Select GST</option>
                       <option value=28 >28.0% GST</option>
                       <option value=18 >18.0% GST</option>
@@ -3140,7 +3153,7 @@
                       <option value=3 >03.0% GST</option>
                       <option value=0 >0.0% GST</option>
                   </select>
-                  <select name='taxIGST[]' id="taxIGST${roinc}" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
+                  <select name='tax_rate' id="taxIGST${roinc}" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
                       <option selected disabled hidden >Select IGST</option>
                       <option value=28 >28.0% IGST</option>
                       <option value=18 >18.0% IGST</option>
@@ -3152,11 +3165,11 @@
                   <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax${roinc}" style="display: none;"> Invalid Tax %</span> </div>    
               </td>
               <td >
-                  <input type="number" name='discount[]'  placeholder='Enter Discount' id="disc${roinc}" value=0 class="form-control bg-black text-white disc" step='any' min=0  />
+                  <input type="number" name='discount'  placeholder='Enter Discount' id="disc1${roinc}" value=0 class="form-control bg-black text-white disc" step='any' min=0  />
               </td>
 
-              <td><input type="number" name='total[]' id="total${roinc}" class="form-control bg-black text-white total" value=0 readonly /></td>
-              <td style="display: none;"><input type="hidden" id="taxamount${roinc}" class="form-control itemTaxAmount" /></td>
+              <td><input type="number" name='total1' id="total${roinc}" class="form-control bg-black text-white total" value=0 readonly /></td>
+              <td style="display: none;"><input type="hidden" id="taxamount1${roinc}" class="form-control itemTaxAmount" /></td>
               <td>
                 <i class="fa fa-trash text-danger remove_row" style="cursor: pointer;" title="Remove Row" id="${roinc}"></i>
               </td>
@@ -3168,6 +3181,10 @@
         reloadItems();
     });
  
+
+
+
+
   
     function validateForm() {
         var cust = $('#customer').val();
