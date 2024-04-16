@@ -366,10 +366,18 @@ urlpatterns = [
     path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
     path('getselBankAccountNumber',views.getselBankAccountNumber,name='getselBankAccountNumber'),
     path('newselPaymentTerm',views.newselPaymentTerm,name='newselPaymentTerm'),
-    path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
-    
     path('createsalesCustomer',views.createsalesCustomer,name='createsalesCustomer'),
     path('getsalesCustomers',views.getsalesCustomers,name='getsalesCustomers'),
+    
+    path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
+    
+    path('show_unit_dropdownsel',views.show_unit_dropdownsel,name='show_unit_dropdownsel'),
+    path('createNewItemsel',views.createNewItemsel,name='createNewItemsel'),
+    path('getAllItemssel',views.getAllItemssel,name='getAllItemssel'),
+    path('addsel_unit',views.addsel_unit,name='addsel_unit'),
+    path('getAllselAccounts',views.getAllselAccounts,name='getAllselAccounts'),
+    path('createNewselAccountFromItems',views.createNewselAccountFromItems,name='createNewselAccountFromItems'),
+    # path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
     
     
     

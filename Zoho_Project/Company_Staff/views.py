@@ -12952,10 +12952,24 @@ def salesorder(request):
         
         customer=Customer.objects.all()
         item=Items.objects.all()
+        units = Unit.objects.filter(company=comp_details)
+        accounts=Chart_of_Accounts.objects.filter(company=comp_details)
+        bnk = Banking.objects.filter(company = comp_details)
          
         comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
         price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
-        return render(request,'zohomodules/sales_order/add_salesorder.html',{'item':item, 'customer':customer, 'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details,'price_lists':price_lists}) 
+        
+
+        # latest_sel = SaleOrder.objects.filter(company = comp_details).order_by('-id').first()
+        # new_number = int(latest_sel.reference_number) + 1 if latest_sel else 1
+        # if SalesOrderReference.objects.filter(company = comp_details).exists():
+        #     deleted = SalesOrderReference.objects.get(company = comp_details)
+        #     if deleted:
+        #         while int(deleted.reference_number) >= new_number:
+        #             new_number+=1
+
+        
+        return render(request,'zohomodules/sales_order/add_salesorder.html',{'comp_details':comp_details, 'units': units,'accounts':accounts,'banks':bnk,'item':item, 'customer':customer, 'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details,'price_lists':price_lists}) 
     else:
         return redirect('/')  
 
@@ -12983,7 +12997,7 @@ def salesorder_list(request):
     return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale': sale,'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
     
 
-        # sales_data.terms_and_condition=request.POST['terms_and_condition']
+       
         
         
               
@@ -13007,16 +13021,17 @@ def add_salesorder(request):
         return redirect('/')
 
     if request.method == "POST":
-
+        # selNum = request.POST['sales_order_number']
+        # if SaleOrder.objects.filter(company = comp_details, sales_order_number__iexact = selNum).exists():
+        #     res = f'<script>alert("Salesorder Number `{selNum}` already exists, try another!");window.history.back();</script>'
+        #     return HttpResponse(res)
+    
         if 'save_as_draft' in request.POST:
             status = 'Draft'
         elif 'save' in request.POST:
             status = 'Save'
         else:
             return redirect('/')
-
-        # select = request.POST["select"]
-        # customer = Customer.objects.get(id=select)
         
         customer_id = request.POST['customerId']
         customer = Customer.objects.get(id=customer_id)
@@ -13027,21 +13042,21 @@ def add_salesorder(request):
         customer_gst_number = request.POST['customer_gst_number']
         customer_place_of_supply = request.POST['customer_place_of_supply']
         sales_order_date = request.POST['sales_order_date']
-        # payment_terms = Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
         payment_terms = None  
         payment_terms_id = request.POST['payment_terms']
         payment_terms = Company_Payment_Term.objects.get(id=payment_terms_id)
        
         expiration_date = request.POST['expiration_date']
         reference_number = request.POST['reference_number']
+        # sales_order_number =selNum,
         sales_order_number = request.POST['sales_order_number']
+        
         payment_method = request.POST['payment_method']
         cheque_number = request.POST.get('cheque_number', '')
         upi_number = request.POST.get('upi_number', '')
         bank_account_number = request.POST.get('bank_account_number', '')
         
         description=request.POST['description']
-        # document = request.FILES['file']
         if len(request.FILES) != 0:
                 document=request.FILES.get('file')
                 
@@ -13055,6 +13070,7 @@ def add_salesorder(request):
         grand_total=request.POST['grand_total']
         advanced_paid=request.POST['advanced_paid']
         balance=request.POST['balance']
+        terms_and_condition=request.POST['terms_and_condition']
         
         place_of_supply = request.POST['customer_place_of_supply']
         company_state = comp_details.state 
@@ -13090,14 +13106,15 @@ def add_salesorder(request):
             adjustment=adjustment,
             grand_total=grand_total,
             advanced_paid=advanced_paid,
-            balance=balance
+            balance=balance,
+            terms_and_condition=terms_and_condition
             )
         
-        
         item_name = request.POST["itemname"]
-        item = Items.objects.get(id=item_name)
-        default_tax_rate = item.intrastate_tax if place_of_supply == company_state else item.interstate_tax
+        item = Items.objects.get(item_name=item_name)
+        # default_tax_rate = item.intrastate_tax if place_of_supply == company_state else item.interstate_tax
         
+        tax_rate = float(request.POST['tax_rate'])
         quantity = float(request.POST['quantity'])
         price = float(request.POST['price'])
         discount = float(request.POST['discount'])
@@ -13111,7 +13128,7 @@ def add_salesorder(request):
             hsn=hsn,
             quantity=quantity,
             price=price,
-            tax_rate=default_tax_rate,
+            tax_rate=tax_rate,
             discount=discount,
             total=total,
             sales_order=sale)
@@ -13127,13 +13144,79 @@ def add_salesorder(request):
         sales_history_obj.action='Created'
         sales_history_obj.save()
         
+        
         messages.success(request, 'Sales Order created successfully!')
         return render(request, 'zohomodules/sales_order/salesorder_list.html', {
         'details': dash_details,'allmodules': allmodules,'data': data,'log_details': log_details})
     else:
         return redirect('/')
 
+# def checksalesorderNumber(request):
+#     if 'login_id' in request.session:
+#         log_id = request.session['login_id']
+#         log_details= LoginDetails.objects.get(id=log_id)
+#         if log_details.user_type == 'Company':
+#             comp_details = CompanyDetails.objects.get(login_details = log_details)
+#         else:
+#             comp_details = StaffDetails.objects.get(login_details = log_details).company
         
+#         RecSelNo = request.GET['RecSelNum']
+
+#         # Finding next rec_invoice number w r t last rec_invoice number if exists.
+#         nxtSel = ""
+#         lastSel = SaleOrder.objects.filter(company = comp_details).last()
+
+#         if lastSel:
+#             sel_no = str(lastSel.sales_order_number)
+
+#             numbers = []
+#             stri = []
+#             for word in sel_no:
+#                 if word.isdigit():
+#                     numbers.append(word)
+#                 else:
+#                     stri.append(word)
+            
+#             num=''
+#             for i in numbers:
+#                 num +=i
+            
+#             st = ''
+#             for j in stri:
+#                 st = st+j            
+
+#             sel_num = int(num)+1
+        
+#             padding_length = len(num) - 1
+   
+#             nxtSel = f"{st}{num[0]}{sel_num:0{padding_length}d}"
+#             print(nxtSel)
+            
+
+#         PatternStr = []
+#         for word in RecSelNo:
+#             if word.isdigit():
+#                 pass
+#             else:
+#                 PatternStr.append(word)
+        
+#         pattern = ''
+#         for j in PatternStr:
+#             pattern += j
+#             print("patern")
+#             print(pattern)
+
+#         if SaleOrder.objects.filter(company = comp_details, sales_order_number__iexact = RecSelNo).exists():
+#             return JsonResponse({'status':False, 'message':'Salesorder No. already Exists.!'})
+#         elif nxtSel != "" and RecSelNo != nxtSel:
+#             return JsonResponse({'status':False, 'message':'Salesorder No. is not continuous.!'})
+#         else:
+#             return JsonResponse({'status':True, 'message':'Number is okay.!'})
+#     else:
+#        return redirect('/')
+
+    
+           
                 
 def sort_customer_name(request):
      if 'login_id' in request.session:
@@ -13434,128 +13517,6 @@ def edit_salesorder_page(request, pk):
     else:
         return redirect('/')
         
-    
-
-# def edit_salesorder(request, pk):
-#     if 'login_id' in request.session:
-#         log_id = request.session.get('login_id')
-#         if not log_id:
-#             return redirect('/')
-#         try:
-#             log_details = LoginDetails.objects.get(id=log_id)
-#         except LoginDetails.DoesNotExist:
-#             return redirect('/')
-#         try:
-#             if log_details.user_type == 'Staff':
-#                 dash_details = StaffDetails.objects.get(login_details=log_details)
-#                 comp_details = dash_details.company
-#             else:
-#                 dash_details = CompanyDetails.objects.get(login_details=log_details)
-#                 comp_details = dash_details
-#         except (StaffDetails.DoesNotExist, CompanyDetails.DoesNotExist):
-#             return redirect('/')    
-#         try:
-#             allmodules = ZohoModules.objects.get(company=comp_details, status='New')
-#         except ZohoModules.DoesNotExist:
-#             allmodules = None
-   
-#         sale = get_object_or_404(SaleOrder, id=pk)
-
-#         customer_objs = Customer.objects.filter(company=comp_details)
-#         items = SalesOrderItems.objects.filter(sales_order=sale)
-#         sales_history = SalesOrderHistory.objects.filter(sales_order=sale)
-
-#         if request.method == "POST":
-#             sale.customer_email = request.POST.get('customer_email', '')
-#             sale.customer_billing_address = request.POST.get('customer_billing_address', '')
-#             sale.customer_gst_type = request.POST.get('customer_gst_type', '')
-#             sale.customer_gst_number = request.POST.get('customer_gst_number', '')
-#             sale.customer_place_of_supply = request.POST.get('customer_place_of_supply', '')
-#             sale.payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_term'])
-            
-#             sales_order_date_str = request.POST.get('sales_order_date', '')
-#             if sales_order_date_str:
-#                 try:
-#                    sale.sales_order_date = datetime.strptime(sales_order_date_str, '%Y-%m-%d').date()
-#                 except ValueError:
-#                    pass
-#             expiration_date_str = request.POST.get('expiration_date', '')
-#             if expiration_date_str:
-#                 try:
-#                    sale.expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d').date()
-#                 except ValueError: 
-#                    pass
-            
-#             sale.reference_number = request.POST.get('reference_number', '')
-#             sale.sales_order_number = request.POST.get('sales_order_number', '')
-#             sale.payment_method = request.POST.get('payment_method', '')
-#             sale.cheque_number = request.POST.get('cheque_number', '')
-#             sale.upi_number = request.POST.get('upi_number', '')
-#             sale.bank_account_number = request.POST.get('bank_account_number', '')
-#             sale.description = request.POST.get('description', '')
-#             sale.sub_total = request.POST.get('sub_total', '')
-#             sale.tax_amount_igst = request.POST.get('tax_amount_igst', '')
-#             sale.shipping_charge = request.POST.get('shipping_charge', '')
-#             sale.adjustment = request.POST.get('adjustment', '')
-#             sale.grand_total = request.POST.get('grand_total', '')
-#             sale.advanced_paid = request.POST.get('advanced_paid', '')
-#             sale.balance = request.POST.get('balance', '')
-            
-#             old=sale.document
-#             new=request.FILES.get('file')
-        
-#             if old!=None and new == None:
-#                sale.document=old
-#             else:
-#                sale.document=new
-            
-#             sale.save()
-
-#             quantity = float(request.POST.get('quantity', 0))
-#             price = float(request.POST.get('price', 0))
-#             discount = float(request.POST.get('discount', 0))
-#             total = (quantity * price) - discount
-#             hsn = request.POST.get('hsn', '')
-            
-#             order_item = SalesOrderItems.objects.filter(sales_order=sale).first()
-#             if order_item:
-#                 order_item.quantity = quantity
-#                 order_item.price = price
-#                 order_item.discount = discount
-#                 order_item.total = total
-#                 order_item.hsn = hsn
-#                 order_item.save()
-#             else:
-#                 pass
-                
-#             sales_history_obj = SalesOrderHistory.objects.create(
-#                 company=sale.company,
-#                 login_details=log_details,
-#                 sales_order=sale,
-#                 date=sale.sales_order_date,
-#                 current_date=date.today(),
-#                 action='Edited'
-#             )
-            
-#             messages.success(request, 'Sales Order edited successfully!')
-#             return redirect('view_salesorder_details',pk) 
-            
-#         else:
-#             context = {
-#                 'details': dash_details,
-#                 'allmodules': allmodules,
-#                 'log_details': log_details,
-#                 'sale': sale,
-#                 'items': items,
-#                 'customer_objs': customer_objs,
-#                 'sales_history': sales_history,
-#                 'sales_history_obj':sales_history_obj,
-#             }
-#             return render(request, 'zohomodules/sales_order/edit_salesorder.html', context)
-    
-#     else:
-#         return redirect('/')
-
 
 def edit_salesorder(request, pk):
     if 'login_id' in request.session:
@@ -13960,66 +13921,6 @@ def newselPaymentTerm(request):
     else:
         return redirect('/')
     
-    
-def getselItemDetails(request):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        log_details= LoginDetails.objects.get(id=log_id)
-        if log_details.user_type == 'Company':
-            cmp = CompanyDetails.objects.get(login_details = log_details)
-        else:
-            cmp = StaffDetails.objects.get(login_details = log_details).company
-        
-        itemName = request.GET['item']
-        priceListId = request.GET['listId']
-        item = Items.objects.filter(company = cmp, item_name = itemName).first()
-
-        if priceListId != "":
-            priceList = PriceList.objects.get(id = int(priceListId))
-
-            if priceList.item_rate_type == 'Each Item':
-                try:
-                    priceListPrice = float(PriceListItem.objects.get(company = cmp, price_list = priceList, item = item).custom_rate)
-                except:
-                    priceListPrice = item.selling_price
-            else:
-                mark = priceList.percentage_type
-                percentage = float(priceList.percentage_value)
-                roundOff = priceList.round_off
-
-                if mark == 'Markup':
-                    price = float(item.selling_price) + float((item.selling_price) * (percentage/100))
-                else:
-                    price = float(item.selling_price) - float((item.selling_price) * (percentage/100))
-
-                if priceList.round_off != 'Never Mind':
-                    if roundOff == 'Nearest Whole Number':
-                        finalPrice = round(price)
-                    else:
-                        finalPrice = int(price) + float(roundOff)
-                else:
-                    finalPrice = price
-
-                priceListPrice = finalPrice
-        else:
-            priceListPrice = None
-
-        context = {
-            'status':True,
-            'id': item.id,
-            'hsn':item.hsn_code,
-            'sales_rate':item.selling_price,
-            'purchase_rate':item.purchase_price,
-            'avl':item.current_stock,
-            'tax': True if item.tax_reference == 'taxable' else False,
-            'gst':item.intrastate_tax,
-            'igst':item.interstate_tax,
-            'PLPrice':priceListPrice,
-
-        }
-        return JsonResponse(context)
-    else:
-       return redirect('/')
        
 def createsalesCustomer(request):
     if 'login_id' in request.session:
@@ -14078,9 +13979,6 @@ def createsalesCustomer(request):
             else:
                 customer_data.price_list='Price list not selected'
 
-
-
-
             # customer_data.portal_language=request.POST['plang']
             plang=request.POST.get('plang')
             if plang!=0:
@@ -14098,10 +13996,6 @@ def createsalesCustomer(request):
             else:
                 customer_data.customer_type='Customer type not selected'
 
-
-
-
-            
             customer_data.billing_attention=request.POST['battention']
             customer_data.billing_country=request.POST['bcountry']
             customer_data.billing_address=request.POST['baddress']
@@ -14130,14 +14024,6 @@ def createsalesCustomer(request):
             vendor_history_obj.action='Completed'
             vendor_history_obj.save()
 
-            # vdata=Customer.objects.get(id=customer_data.id)
-            # rdata=Customer_remarks_table()
-            # rdata.remarks=request.POST['remark']
-            # rdata.company=com
-            # rdata.customer=vdata
-            # rdata.save()
-
-        
             title =request.POST.getlist('tsalutation[]')
             first_name =request.POST.getlist('tfirstName[]')
             last_name =request.POST.getlist('tlastName[]')
@@ -14180,11 +14066,334 @@ def getsalesCustomers(request):
         return redirect('/')
     
     
+# def getselItemDetails(request):
+#     if 'login_id' in request.session:
+#         log_id = request.session['login_id']
+#         log_details= LoginDetails.objects.get(id=log_id)
+#         if log_details.user_type == 'Company':
+#             cmp = CompanyDetails.objects.get(login_details = log_details)
+#         else:
+#             cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+#         itemName = request.GET['item']
+#         priceListId = request.GET['listId']
+#         item = Items.objects.filter(company = cmp, item_name = itemName).first()
 
+#         if priceListId != "":
+#             priceList = PriceList.objects.get(id = int(priceListId))
+
+#             if priceList.item_rate_type == 'Each Item':
+#                 try:
+#                     priceListPrice = float(PriceListItem.objects.get(company = cmp, price_list = priceList, item = item).custom_rate)
+#                 except:
+#                     priceListPrice = item.selling_price
+#             else:
+#                 mark = priceList.percentage_type
+#                 percentage = float(priceList.percentage_value)
+#                 roundOff = priceList.round_off
+
+#                 if mark == 'Markup':
+#                     price = float(item.selling_price) + float((item.selling_price) * (percentage/100))
+#                 else:
+#                     price = float(item.selling_price) - float((item.selling_price) * (percentage/100))
+
+#                 if priceList.round_off != 'Never Mind':
+#                     if roundOff == 'Nearest Whole Number':
+#                         finalPrice = round(price)
+#                     else:
+#                         finalPrice = int(price) + float(roundOff)
+#                 else:
+#                     finalPrice = price
+
+#                 priceListPrice = finalPrice
+#         else:
+#             priceListPrice = None
+
+#         context = {
+#             'status':True,
+#             'id': item.id,
+#             'hsn':item.hsn_code,
+#             'sales_rate':item.selling_price,
+#             'purchase_rate':item.purchase_price,
+#             'avl':item.current_stock,
+#             'tax': True if item.tax_reference == 'taxable' else False,
+#             'gst':item.intrastate_tax,
+#             'igst':item.interstate_tax,
+#             'PLPrice':priceListPrice,
+
+#         }
+#         return JsonResponse(context)
+#     else:
+#        return redirect('/')
     
+  
+def getselItemDetails(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details = LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details=log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details=log_details).company
+        
+        item_name = request.GET.get('item', '')
+        item = Items.objects.filter(company=cmp, item_name=item_name).first()
+
+        if item:
+            context = {
+                'status': True,
+                'id': item.id,
+                'hsn': item.hsn_code,
+                'sales_rate': item.selling_price,
+                'purchase_rate': item.purchase_price,
+                'avl': item.current_stock,
+                'tax': True if item.tax_reference == 'taxable' else False,
+                'gst': item.intrastate_tax,
+                'igst': item.interstate_tax,
+                'PLPrice': None,  # Since priceListId related content is removed, set to None
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'status': False, 'message': 'Item not found'})
+    else:
+        return redirect('/')
+  
+  
+  
+  
+  
+  
+  
+  
+  
+def addsel_unit(request):                                                               
+    login_id = request.session['login_id']
+    log_user = LoginDetails.objects.get(id=login_id)
+
+    if log_user.user_type == 'Company':
+        if request.method == 'POST':
+            c = CompanyDetails.objects.get(login_details=login_id)
+            unit_name = request.POST['units']
+            
+            if Unit.objects.filter(unit_name=unit_name, company=c).exists():
+                return JsonResponse({"message": "error"})
+            else:
+                unit = Unit(unit_name=unit_name, company=c)  
+                unit.save()  
+                return JsonResponse({"message": "success"})
+  
+    
+def show_unit_dropdownsel(request):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+            options = {}
+            option_objects = Unit.objects.filter(company=com)
+            for option in option_objects:
+                options[option.id] = [option.id,option.unit_name]
+            return JsonResponse(options)
+
+def createNewItemsel(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        name = request.POST['name']
+        type = request.POST['type']
+        unit = request.POST.get('unit')
+        hsn = request.POST['hsn']
+        tax = request.POST['taxref']
+        gstTax = 0 if tax == 'None-Taxable' else request.POST['intra_st']
+        igstTax = 0 if tax == 'None-Taxable' else request.POST['inter_st']
+        purPrice = request.POST['pcost']
+        purAccount = None if not 'pur_account' in request.POST or request.POST['pur_account'] == "" else request.POST['pur_account']
+        purDesc = request.POST['pur_desc']
+        salePrice = request.POST['salesprice']
+        saleAccount = None if not 'sale_account' in request.POST or request.POST['sale_account'] == "" else request.POST['sale_account']
+        saleDesc = request.POST['sale_desc']
+        inventory = request.POST.get('invacc')
+        stock = 0 if request.POST.get('stock') == "" else request.POST.get('stock')
+        stockUnitRate = 0 if request.POST.get('stock_rate') == "" else request.POST.get('stock_rate')
+        minStock = request.POST['min_stock']
+        createdDate = date.today()
+        
+        #save item and transaction if item or hsn doesn't exists already
+        if Items.objects.filter(company=com, item_name__iexact=name).exists():
+            res = f"{name} already exists, try another!"
+            return JsonResponse({'status': False, 'message':res})
+        elif Items.objects.filter(company = com, hsn_code__iexact = hsn).exists():
+            res = f"HSN - {hsn} already exists, try another.!"
+            return JsonResponse({'status': False, 'message':res})
+        else:
+            item = Items(
+                company = com,
+                login_details = com.login_details,
+                item_name = name,
+                item_type = type,
+                unit = None if unit == "" else Unit.objects.get(id = int(unit)),
+                hsn_code = hsn,
+                tax_reference = tax,
+                intrastate_tax = gstTax,
+                interstate_tax = igstTax,
+                sales_account = saleAccount,
+                selling_price = salePrice,
+                sales_description = saleDesc,
+                purchase_account = purAccount,
+                purchase_price = purPrice,
+                purchase_description = purDesc,
+                date = createdDate,
+                minimum_stock_to_maintain = minStock,
+                inventory_account = inventory,
+                opening_stock = stock,
+                current_stock = stock,
+                opening_stock_per_unit = stockUnitRate,
+                track_inventory = int(request.POST['trackInv']),
+                activation_tag ='active',
+                type ='Opening Stock'
+            )
+            item.save()
+
+            #save transaction
+
+            Item_Transaction_History.objects.create(
+                company = com,
+                logindetails = com.login_details,
+                items = item,
+                Date = createdDate,
+                action = 'Created'
+
+            )
+            
+            return JsonResponse({'status': True})
+    else:
+       return redirect('/')
 
 
+def getAllItemssel(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
 
+        items = {}
+        option_objects = Items.objects.filter(company = com, activation_tag='active')
+        for option in option_objects:
+            items[option.id] = [option.id,option.item_name]
+
+        return JsonResponse(items)
+    else:
+        return redirect('/')
+
+def getAllselAccounts(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        acc = {}
+        acc_objects = Chart_of_Accounts.objects.filter(company = com, status = 'Active')
+        for option in acc_objects:
+            acc[option.id] = [option.account_name,option.account_type]
+
+        return JsonResponse(acc)
+    else:
+        return redirect('/')
+
+
+def createNewselAccountFromItems(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        if request.method=='POST':
+            a=Chart_of_Accounts()
+            b=Chart_of_Accounts_History()
+            b.company=com
+            b.logindetails=com.login_details
+            b.action="Created"
+            b.Date=date.today()
+            a.login_details=com.login_details
+            a.company=com
+          
+        
+            a.account_type = request.POST.get("account_type",None)
+            a.account_name = request.POST.get("account_name",None)
+            a.account_code = request.POST.get("account_code",None)
+            a.account_number = request.POST.get("account_number",None)
+            a.account_description = request.POST['description']
+            a.sub_account = request.POST.get("sub_acc",None)
+            a.parent_account = request.POST.get("parent_acc",None)
+               
+            account_type=request.POST.get("account_type",None)
+            if account_type == 'Other Assets':
+                a.description = 'Track special assets like goodwill and other intangible assets'
+            if account_type == 'Other Current Assets':
+                a.description = 'Any short term asset that can be converted into cash or cash equivalents easily Prepaid expenses Stocks and Mutual Funds'
+            if account_type == 'Cash':
+                a.description = 'To keep track of cash and other cash equivalents like petty cash, undeposited funds, etc., use an organized accounting system  financial software'
+            if account_type == 'Bank':
+                a.description = 'To keep track of bank accounts like Savings, Checking, and Money Market accounts.'
+            if account_type == 'Fixed Asset':
+                a.description = 'Any long-term investment or asset that cannot be easily converted into cash includes: Land and Buildings, Plant, Machinery, and Equipment, Computers, Furniture.'
+            if account_type == 'Stock':
+                a.description = 'To keep track of your inventory assets.'
+            if account_type == 'Payment Clearing':
+                a.description = 'To keep track of funds moving in and out via payment processors like Stripe, PayPal, etc.'
+            if account_type == 'Other Liability':
+                a.description = 'Obligation of an entity arising from past transactions or events which would require repayment.Tax to be paid Loan to be Repaid Accounts Payableetc.'
+            if account_type == 'Other Current Liability':
+                a.description = 'Any short term liability like: Customer Deposits Tax Payable'
+            if account_type == 'Credit Card':
+                a.description = 'Create a trail of all your credit card transactions by creating a credit card account.'
+            if account_type == 'Long Term Liability':
+                a.description = 'Liabilities that mature after a minimum period of one year like: Notes Payable Debentures Long Term Loans '
+            if account_type == 'Overseas Tax Payable':
+                a.description = 'Track your taxes in this account if your business sells digital services to foreign customers.'
+            if account_type == 'Equity':
+                a.description = 'Owners or stakeholders interest on the assets of the business after deducting all the liabilities.'
+            if account_type == 'Income':
+                a.description = 'Income or Revenue earned from normal business activities like sale of goods and services to customers.'
+            if account_type == 'Other Income':
+                a.description = 'Income or revenue earned from activities not directly related to your business like : Interest Earned Dividend Earned'
+            if account_type == 'Expense':
+                a.description = 'Reflects expenses incurred for running normal business operations, such as : Advertisements and Marketing Business Travel Expenses License Fees Utility Expenses'
+            if account_type == 'Cost Of Goods Sold':
+                a.description = 'This indicates the direct costs attributable to the production of the goods sold by a company such as: Material and Labor costs Cost of obtaining raw materials'
+            if account_type == 'Other Expense':
+                a.description = 'Track miscellaneous expenses incurred for activities other than primary business operations or create additional accounts to track default expenses like insurance or contribution towards charity.'
+    
+            a.Create_status="added"
+            a.status = 'Active'
+            ac_name=request.POST.get("account_name",None)
+            if Chart_of_Accounts.objects.filter(account_name=ac_name,company=com).exists():
+                return JsonResponse({'status': False, 'message':'Account Name already exists.!'})
+            else:
+                a.save()
+                b.chart_of_accounts=a
+                b.save()
+                return JsonResponse({'status': True})
+
+    else:
+        return redirect('/')
         
 
 #---------------- Zoho Final sales order - Ginto Shaji - End--------------------

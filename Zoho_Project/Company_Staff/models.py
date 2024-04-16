@@ -850,7 +850,7 @@ class SaleOrder(models.Model):
     
     description = models.CharField(max_length=255)
     terms_and_condition = models.TextField()
-    document = models.FileField(upload_to='documents/')
+    document = models.FileField(upload_to='documents/',blank=True, null=True)
     sub_total = models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True)
     igst = models.FloatField(default=0.0, null=True, blank=True)
     cgst = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
