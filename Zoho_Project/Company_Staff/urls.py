@@ -362,28 +362,20 @@ urlpatterns = [
     path('sort_salesorder/<int:selectId>/<int:pk>',views.sort_salesorder,name='sort_salesorder'),
     path('salesorder_status_change/<int:statusId>/<int:pk>',views.salesorder_status_change,name='salesorder_status_change'),
     path('import_salesorder_excel',views.import_salesorder_excel,name='import_salesorder_excel'),
-    
     path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
     path('getselBankAccountNumber',views.getselBankAccountNumber,name='getselBankAccountNumber'),
     path('newselPaymentTerm',views.newselPaymentTerm,name='newselPaymentTerm'),
     path('createsalesCustomer',views.createsalesCustomer,name='createsalesCustomer'),
     path('getsalesCustomers',views.getsalesCustomers,name='getsalesCustomers'),
-    
     path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
-    
     path('show_unit_dropdownsel',views.show_unit_dropdownsel,name='show_unit_dropdownsel'),
     path('createNewItemsel',views.createNewItemsel,name='createNewItemsel'),
     path('getAllItemssel',views.getAllItemssel,name='getAllItemssel'),
     path('addsel_unit',views.addsel_unit,name='addsel_unit'),
     path('getAllselAccounts',views.getAllselAccounts,name='getAllselAccounts'),
     path('createNewselAccountFromItems',views.createNewselAccountFromItems,name='createNewselAccountFromItems'),
-    # path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
+    path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
     
-    
-    
-    
-    
-   
     
     #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
     

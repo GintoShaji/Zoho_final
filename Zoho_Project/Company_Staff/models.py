@@ -896,7 +896,7 @@ class SalesOrderHistory(models.Model):
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE, blank=True, null=True)
     login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE, blank=True, null=True)
     sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
-    date = models.DateField()
+    date = models.DateField(blank=True, null=True)
     current_date = models.DateField()
     action = models.CharField(max_length=255)
     

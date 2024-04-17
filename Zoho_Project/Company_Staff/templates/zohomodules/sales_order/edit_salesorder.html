@@ -311,7 +311,7 @@
                   <div class="col-md-6">
                     <input hidden value="{{comp_details.state}}" id="cmpstate">
                     <select name="customer_place_of_supply" id="placeOfSupply" class="form-control bg-black text-white">
-                      <option value="{{sale.customer_place_of_supply}}" selected>{{sale.customer_place_of_supply}}</option>
+                      <option value="" selected>Select Place of Supply</option>
                       <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                       <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                       <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
@@ -426,7 +426,7 @@
                       <label for="" class="col-md-3 labels">Payment Type</label>
                       <div class="col-md-9">
                         <select class="form-control bg-black text-white" id="paymentMethod" name="payment_method">
-                          <option value="{{sale.payment_method}}" selected>Select Payment Method</option>
+                          <option value="" selected>Select Payment Method</option>
                           <option value="Cash">Cash</option>
                           <option value="Cheque">Cheque</option>
                           <option value="UPI">UPI</option>
@@ -529,7 +529,7 @@
                                 <div class="d-flex">
                                     <div class="w-100">
                                         <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
-                                            <input required type="text" id="item1" value="{{ saleitem.item.item_name }}" name="itemname" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                                            <input required type="text" id="item1" value="{{ saleitem.item.item_name }}" name="item" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
                                             <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu1"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                                 {% for i in item %}
                                                 <li class="dropdown-item items-options text-white" onclick="getItemDetails($(this).parent().prev().attr('id'),`{{i.item_name}}`)">{{i.item_name}}</li>
@@ -2423,6 +2423,83 @@
 
 
 <script>
+    $(document).ready(function(){
+        getCustomerDetails(`{{sale.customer.id}}`,`{{sale.customer.title}} {{sale.customer.first_name}} {{sale.customer.last_name}}`);
+        console.log(`{{sale.price_list_applied}}`)
+        if (`{{sale.price_list_applied}}` == 'True'){
+            $('#applyPriceList').prop('checked', true);
+            $('#priceListDropdown').css('display','block');
+            $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
+            $('#custPriceListName').css('display','inline-flex');
+            checkPriceList();
+        }
+        var paymentMeth = `{{sale.payment_method}}`;
+        // var entryType = `{{invoice.entry_type}}`;
+
+        document.querySelector('#placeOfSupply').value = `{{sale.customer_place_of_supply}}`;
+        paymentMeth == 'None' ? document.querySelector('#paymentMethod').value = "" : document.querySelector('#paymentMethod').value = `{{sale.payment_method}}`;
+        // entryType == 'None' ? document.querySelector('#entryType').value ="" : document.querySelector('#entryType').value = `{{recInvoice.entry_type}}`;
+
+        var x='{{sale.payment_method}}';
+        if(x==='Cash'){
+            $('#chequediv').hide()
+            $('#bnkdiv').hide()
+            $('#upidiv').hide()
+            document.getElementById('cheque_id').value=""
+            document.getElementById('upi_id').value=""
+            document.getElementById('bnk_id').value=""
+        }else if(x==='Cheque'){
+            $('#chequediv').show()
+            $('#bnkdiv').hide()
+            $('#upidiv').hide()
+            document.getElementById('upi_id').value=""
+            document.getElementById('bnk_id').value=""
+        }else if(x==='UPI'){
+            $('#upidiv').show()
+            $('#bnkdiv').hide()
+            $('#chequediv').hide()
+            document.getElementById('cheque_id').value=""
+            document.getElementById('bnk_id').value=""
+        }else{
+            $('#bnkdiv').show()
+            $('#chequediv').hide()
+            $('#upidiv').hide()
+            document.getElementById('cheque_id').value=""
+            document.getElementById('upi_id').value=""
+
+            $.ajax({
+                type: "GET",
+                url: "{% url 'getselBankAccountNumber' %}",
+                data: {
+                    id: $('#paymentMethod').find(':selected').attr('text'),
+                },
+                success: function (response) {
+                    if (response.status){
+                        document.getElementById('cheque_id').value="";
+                        document.getElementById('upi_id').value="";
+                        document.getElementById("bnk_id").value = response.account;
+                    }else{
+                        alert(response.message);
+                    }
+                }
+            });
+        }
+        // $('#placeOfSupply').val('{{invoice.place_of_supply}}')
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   function filterCustomers(){
       var options = $('#cust_drop').children();
       var search_text = $("#customer").val().toLowerCase();
@@ -3040,7 +3117,7 @@ function getItemDetails(inpId, value) {
                     <div class="d-flex">
                         <div class="w-100">
                             <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
-                                <input required type="text" id="item${roinc}" value="" name="itemname" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                                <input required type="text" id="item${roinc}" value="" name="item" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
                                 <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu${roinc}"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                     {% for i in item %}
                                     <li class="dropdown-item items-options text-white" onclick="getItemDetails($(this).parent().prev().attr('id'),'{{i.item_name}}')">{{i.item_name}}</li>
