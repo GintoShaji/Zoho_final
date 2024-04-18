@@ -13091,7 +13091,8 @@ def salesorder_list(request):
     
     sale = SaleOrder.objects.all()
     return render(request,'zohomodules/sales_order/salesorder_list.html',{'sale': sale,'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details})
-    
+
+
 
 def add_salesorder(request):
     if 'login_id' in request.session:
@@ -13122,8 +13123,8 @@ def add_salesorder(request):
                 sales_order_number =selNum,
                 payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_terms']),
                 sales_order_date = request.POST['sales_order_date'],
-                # expiration_date = datetime.strptime(request.POST['expiration_date'], '%d-%m-%Y').date(),
-                expiration_date = request.POST['expiration_date'],
+                expiration_date = datetime.strptime(request.POST['expiration_date'], '%d-%m-%Y').date(),
+                # expiration_date = request.POST['expiration_date'],
 
                 payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method'],
                 cheque_number = None if request.POST['cheque_number'] == "" else request.POST['cheque_number'],
@@ -13158,35 +13159,26 @@ def add_salesorder(request):
             sale.save()
 
             
-            item_name = request.POST["item"]
-            items = Items.objects.filter(item_name=item_name)
-            if items.exists():
-                item = items.first()   
-            else:
-               error_message = "No item found with the provided name."
-            
-            tax_rate = float(request.POST['tax_rate'])
-            quantity = float(request.POST['quantity'])
-            price = float(request.POST['price'])
-            discount = float(request.POST['discount'])
-            total = float(request.POST['total'])
-            hsn = request.POST['hsn']
-        
-            order_item = SalesOrderItems.objects.create(
-                login_details=log_details,
-                company=comp_details,
-                item=item,
-                hsn=hsn,
-                quantity=quantity,
-                price=price,
-                tax_rate=tax_rate,
-                discount=discount,
-                total=total,
-                sales_order=sale)
-            order_item.save()
+            itemId = request.POST.getlist("item_id[]")
+            itemName = request.POST.getlist("item_name[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxGST[]") if request.POST['customer_place_of_supply'] == comp_details.state else request.POST.getlist("taxIGST[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+
+            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                    itm = Items.objects.get(id = int(ele[0]))
+                    SalesOrderItems.objects.create(company=comp_details, login_details=log_details, sales_order=sale, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                    itm.current_stock -= int(ele[3])
+                    itm.save()
             
 
-            # Save transactio
+            # Save transaction
                  
             SalesOrderHistory.objects.create(
                 company=comp_details,
@@ -13203,6 +13195,8 @@ def add_salesorder(request):
             return redirect(salesorder_list)
     else:
        return redirect('/')
+
+
 
          
 def sort_customer_name(request):
@@ -13490,6 +13484,7 @@ def edit_salesorder_page(request, pk):
         accounts=Chart_of_Accounts.objects.filter(company=comp_details)
         bnk = Banking.objects.filter(company = comp_details)
         
+        
         context = {
             'details': dash_details,
             'allmodules': allmodules,
@@ -13541,9 +13536,6 @@ def edit_salesorder(request, pk):
         
         sale.sales_order_date = datetime.strptime(request.POST.get('sales_order_date'), '%Y-%m-%d') if request.POST.get('sales_order_date') else None
         sale.expiration_date = datetime.strptime(request.POST.get('expiration_date'), '%d-%m-%Y') if request.POST.get('expiration_date') else None
-        
-        # sale.sales_order_date = request.POST['sales_order_date']
-        # sale.expiration_date = request.POST['expiration_date']
        
         sale.payment_method = request.POST['payment_method']
         sale.cheque_number = request.POST.get('cheque_number', '')
@@ -13567,36 +13559,67 @@ def edit_salesorder(request, pk):
         
         sale.save()
         
-        # order_item = SalesOrderItems.objects.get(sales_order=sale)
+        
+        itemId = request.POST.getlist("item_id[]")
+        itemName = request.POST.getlist("item_name[]")
+        hsn  = request.POST.getlist("hsn[]")
+        qty = request.POST.getlist("qty[]")
+        price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+        tax = request.POST.getlist("taxGST[]") if request.POST['customer_place_of_supply'] == comp_details.state else request.POST.getlist("taxIGST[]")
+        discount = request.POST.getlist("discount[]")
+        total = request.POST.getlist("total[]")
+        inv_item_ids = request.POST.getlist("id[]")
+        invItem_ids = [int(id) for id in inv_item_ids]
 
-        item_name = request.POST["item"]
-        items = Items.objects.filter(item_name=item_name)
-        if items.exists():
-            item = items.first()   
-        else:
-            error_message = "No item found with the provided name."
-       
-        tax_rate = float(request.POST['tax_rate'])
-        quantity = float(request.POST['quantity'])
-        price = float(request.POST['price'])
-        discount = float(request.POST['discount'])
-        total = float(request.POST['total'])
-        hsn = request.POST['hsn']
-        
-        order_item = SalesOrderItems.objects.create(
-                login_details=log_details,
-                company=comp_details,
-                item=item,
-                hsn=hsn,
-                quantity=quantity,
-                price=price,
-                tax_rate=tax_rate,
-                discount=discount,
-                total=total,
-                sales_order=sale)
-        order_item.save()
-        
-        # Record sales order edit in the sales history
+        inv_items = SalesOrderItems.objects.filter(sales_order=sale)
+        object_ids = [obj.id for obj in inv_items]
+
+        ids_to_delete = [obj_id for obj_id in object_ids if obj_id not in invItem_ids]
+        for itmId in ids_to_delete:
+            invItem = SalesOrderItems.objects.get(id = itmId)
+            item = Items.objects.get(id = invItem.item.id)
+            item.current_stock += invItem.quantity
+            item.save()
+
+        SalesOrderItems.objects.filter(id__in=ids_to_delete).delete()
+            
+        count = SalesOrderItems.objects.filter(sales_order=sale).count()
+
+        if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total)==len(invItem_ids) and invItem_ids and itemId and itemName and hsn and qty and price and tax and discount and total:
+            mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total,invItem_ids)
+            mapped = list(mapped)
+            for ele in mapped:
+                if int(len(itemId))>int(count):
+                    if ele[8] == 0:
+                        itm = Items.objects.get(id = int(ele[0]))
+                        SalesOrderItems.objects.create(company=comp_details, login_details = log_details, sales_order=sale, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                        itm.current_stock -= int(ele[3])
+                        itm.save()
+                    else:
+                        itm = Items.objects.get(id = int(ele[0]))
+                        inItm = SalesOrderItems.objects.get(id = int(ele[8]))
+                        crQty = int(inItm.quantity)
+                            
+                        SalesOrderItems.objects.filter( id = int(ele[8])).update(sales_order=sale, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+
+                        if crQty < int(ele[3]):
+                            itm.current_stock -=  abs(crQty - int(ele[3]))
+                        elif crQty > int(ele[3]):
+                            itm.current_stock += abs(crQty - int(ele[3]))
+                        itm.save()
+                else:
+                    itm = Items.objects.get(id = int(ele[0]))
+                    inItm = SalesOrderItems.objects.get(id = int(ele[8]))
+                    crQty = int(inItm.quantity)
+
+                    SalesOrderItems.objects.filter( id = int(ele[8])).update(sales_order=sale, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+
+                    if crQty < int(ele[3]):
+                        itm.current_stock -=  abs(crQty - int(ele[3]))
+                    elif crQty > int(ele[3]):
+                        itm.current_stock += abs(crQty - int(ele[3]))
+                    itm.save()
+
         sales_history_obj = SalesOrderHistory()
         sales_history_obj.company = comp_details
         sales_history_obj.login_details = log_details
@@ -13611,6 +13634,12 @@ def edit_salesorder(request, pk):
     else:
         return redirect('/')
 
+  
+  
+  
+  
+  
+  
       
 def salesorder_shareemail(request,pk):
      if 'login_id' in request.session:
