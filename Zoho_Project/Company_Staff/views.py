@@ -14324,6 +14324,455 @@ def createNewselAccountFromItems(request):
 
     else:
         return redirect('/')
+    
+def convert_invoice_page(request,id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+
+        allmodules= ZohoModules.objects.get(company = cmp)
+        cust = Customer.objects.filter(company = cmp, customer_status = 'Active')
+        comp_payment_terms=Company_Payment_Term.objects.filter(company=cmp)
+        repeat = CompanyRepeatEvery.objects.filter(company = cmp)
+        bnk = Banking.objects.filter(company = cmp)
+        priceList = PriceList.objects.filter(company = cmp, status = 'Active')
+        item = Items.objects.filter(company = cmp, activation_tag = 'active')
+        units = Unit.objects.filter(company=cmp)
+        accounts=Chart_of_Accounts.objects.filter(company=cmp)
+        
+        sale = get_object_or_404(SaleOrder, id=id)
+        sale_items = SalesOrderItems.objects.filter(sales_order=sale)
+
+        # invoices = invoice.objects.get(id=id)
+        # invItems = invoiceitems.objects.filter(invoice = invoices)
+        
+        # Fetching last rec_invoice and assigning upcoming ref no as current + 1
+        # Also check for if any bill is deleted and ref no is continuos w r t the deleted rec_invoice
+        latest_inv = invoice.objects.filter(company = cmp).order_by('-id').first()
+
+        new_number = int(latest_inv.reference_number) + 1 if latest_inv else 1
+
+        if invoiceReference.objects.filter(company = cmp).exists():
+            deleted = invoiceReference.objects.get(company = cmp)
+            
+            if deleted:
+                while int(deleted.reference_number) >= new_number:
+                    new_number+=1
+
+        # Finding next rec_invoice number w r t last rec_invoice number if exists.
+        nxtInv = ""
+        lastInv = invoice.objects.filter(company = cmp).last()
+        if lastInv:
+            inv_no = str(lastInv.invoice_number)
+            numbers = []
+            stri = []
+            for word in inv_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+            
+            num=''
+            for i in numbers:
+                num +=i
+            
+            st = ''
+            for j in stri:
+                st = st+j
+
+            inv_num = int(num)+1
+
+            padding_length = len(num) - 1
+
+                    
+            nxtInv = f"{st}{num[0]}{inv_num:0{padding_length}d}"
+        else:
+            nxtInv = 'in-01'
+
+
+
+
+
+        context = {
+              'sale':sale,
+              'sale_items': sale_items,
+              'cmp':cmp,
+              'allmodules':allmodules, 
+              'details':dash_details, 
+              'customer': cust,
+              'comp_payment_terms':comp_payment_terms,
+              'repeat':repeat, 
+              'banks':bnk, 
+              'priceListItems':priceList, 
+              'item':item,
+              'units': units,
+              'accounts':accounts, 
+              'invNo':nxtInv, 'ref_no':new_number,
+            #   'invoice':invoices,
+            #   'invItems': invItems, 
+        }
+    
+        
+        return render(request,'zohomodules/sales_order/convert_invoice.html',context)
+    else:
+       return redirect('/')
+       
+def ConvertInvoice(request, id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+          
+        inv = invoice.objects.get(id = id)
+        # inv = SaleOrder.objects.get(id = id)
+        if request.method == 'POST':
+            invNum = request.POST['rec_invoice_no']
+            if invoice.objects.filter(company = com, invoice_number__iexact = invNum).exists():
+                res = f'<script>alert("Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
+                return HttpResponse(res)
+
+            inv.customer = Customer.objects.get(id = request.POST['customerId'])
+            inv.customer_email = request.POST['customer_email']
+            inv.customer_billingaddress = request.POST['bill_address']
+            inv.customer_GSTtype = request.POST['customer_gst_type']
+            y=request.POST['customer_gst_type']
+            print(y)
+            inv.customer_GSTnumber = request.POST['customer_gstin']
+            inv.customer_place_of_supply = request.POST['place_of_supply']
+            x=request.POST['place_of_supply']
+            print(x)
+           
+            inv.reference_number = request.POST['reference_number']
+            inv.invoice_number = invNum,
+            inv.payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term'])
+            inv.date = request.POST['start_date']
+            inv.expiration_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date()
+            # inv.order_no = request.POST['order_number']
+            inv.price_list_applied = True if 'priceList' in request.POST else False
+            inv.price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id'])
+            # inv.repeat_every = CompanyRepeatEvery.objects.get(id = request.POST['repeat_every'])
+            inv.payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method']
+            inv.cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id']
+            inv.UPI_number = None if request.POST['upi_id'] == "" else request.POST['upi_id']
+            inv.bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id']
+            inv.sub_total = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal'])
+            inv.IGST = 0.0 if request.POST['igst'] == "" else float(request.POST['igst'])
+            inv.CGST = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst'])
+            inv.SGST = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst'])
+            inv.tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount'])
+            inv.adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj'])
+            inv.shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship'])
+            inv.grand_total = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal'])
+            inv.advanced_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance'])
+            inv.balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance'])
+            inv.description = request.POST['note']
+            inv.terms_and_condition = request.POST['terms']
+            inv.save()
+
+            if len(request.FILES) != 0:
+                inv.document=request.FILES.get('file')
+            inv.save()
+
+
+            # Save rec_invoice items.
+
+            itemId = request.POST.getlist("item_id[]")
+            itemName = request.POST.getlist("item_name[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+    
+            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                    itm = Items.objects.get(id = int(ele[0]))
+                    # invoiceitems.objects.create(company = com, logindetails = com.login_details, invoice = inv, Items = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                    # itm.current_stock -= int(ele[3])
+                    # itm.save()
+                    new_invoice_item = invoiceitems.objects.create(
+                                    company=com,
+                                    logindetails=com.login_details,
+                                    invoice=inv,  # Ensure 'inv' is an instance of the 'invoice' model
+                                    Items=itm,
+                                    hsn=ele[2],
+                                    quantity=int(ele[3]),
+                                    price=float(ele[4]),
+                                    tax_rate=ele[5],
+                                    discount=float(ele[6]),
+                                    total=float(ele[7])
+                    )
+
+
+  
+                    itm.current_stock -= int(ele[3])
+                    itm.save()
+                    
+            
+            # Save transaction
+                    
+            invoiceHistory.objects.create(
+                company = com,
+                login_details = com.login_details,
+                invoice = inv,
+                action = 'Created'
+            )
+
+            return redirect(view, id)
+        else:
+            return redirect(editInvoice, id)
+    else:
+       return redirect('/')
+   
+   
+
+def convert_recurringinvoice_page(request, id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+
+        allmodules= ZohoModules.objects.get(company = cmp)
+        cust = Customer.objects.filter(company = cmp, customer_status = 'Active')
+        comp_payment_terms=Company_Payment_Term.objects.filter(company=cmp)
+        repeat = CompanyRepeatEvery.objects.filter(company = cmp)
+        bnk = Banking.objects.filter(company = cmp)
+        priceList = PriceList.objects.filter(company = cmp, type = 'Sales', status = 'Active')
+        item = Items.objects.filter(company = cmp, activation_tag = 'active')
+        units = Unit.objects.filter(company=cmp)
+        accounts=Chart_of_Accounts.objects.filter(company=cmp)
+
+        sale = get_object_or_404(SaleOrder, id=id)
+        sale_items = SalesOrderItems.objects.filter(sales_order=sale)
+        
+        # Fetching last rec_invoice and assigning upcoming ref no as current + 1
+        # Also check for if any bill is deleted and ref no is continuos w r t the deleted rec_invoice
+        latest_inv = RecurringInvoice.objects.filter(company = cmp).order_by('-id').first()
+
+        new_number = int(latest_inv.reference_no) + 1 if latest_inv else 1
+
+        if Reccurring_Invoice_Reference.objects.filter(company = cmp).exists():
+            deleted = Reccurring_Invoice_Reference.objects.get(company = cmp)
+            
+            if deleted:
+                while int(deleted.reference_number) >= new_number:
+                    new_number+=1
+
+        # Finding next rec_invoice number w r t last rec_invoice number if exists.
+        nxtInv = ""
+        lastInv = RecurringInvoice.objects.filter(company=cmp).last()
+
+        if lastInv:
+            inv_no = str(lastInv.rec_invoice_no)
+            numbers = []
+            stri = []
+            for word in inv_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+
+            num = ''.join(numbers)
+            st = ''.join(stri)
+
+            inv_num = int(num) + 1
+            if num[0] == 0:
+                nxtInv = st + num.zfill(len(num)) 
+            else:
+                nxtInv = st + str(inv_num).zfill(len(num))
+        else:
+            nxtInv = 'RI001'
+
+
+        context = {
+            'sale':sale,
+            'sale_items': sale_items,
+            'cmp':cmp,
+            'allmodules':allmodules, 
+            'details':dash_details, 
+            'customer': cust,
+            'comp_payment_terms':comp_payment_terms,
+            'repeat':repeat, 
+            'banks':bnk, 
+            'priceListItems':priceList,
+            'item':item,
+            'units': units,
+            'accounts':accounts, 
+            'invNo':nxtInv, 
+            'ref_no':new_number,
+            
+        }
+        return render(request, 'zohomodules/sales_order/convert_recurring_invoice.html', context)
+    else:
+        return redirect('/')
+
+
+def ConvertRecurringInvoice(request, id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        rec_inv = RecurringInvoice.objects.get(id = id)
+        if request.method == 'POST':
+            invNum = request.POST['rec_invoice_no']
+
+            PatternStr = []
+            for word in invNum:
+                if word.isdigit():
+                    pass
+                else:
+                    PatternStr.append(word)
+            
+            pattern = ''
+            for j in PatternStr:
+                pattern += j
+
+            pattern_exists = checkRecInvNumberPattern(pattern)
+
+            if pattern !="" and pattern_exists:
+                res = f'<script>alert("Rec. Invoice No. Pattern already Exists.! Try another!");window.history.back();</script>'
+                return HttpResponse(res)
+
+            if rec_inv.rec_invoice_no != invNum and RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = invNum).exists():
+                res = f'<script>alert("Recurring Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
+                return HttpResponse(res)
+
+            rec_inv.customer = Customer.objects.get(id = request.POST['customerId'])
+            rec_inv.customer_email = request.POST['customer_email']
+            rec_inv.billing_address = request.POST['bill_address']
+            rec_inv.gst_type = request.POST['customer_gst_type']
+            rec_inv.gstin = request.POST['customer_gstin']
+            rec_inv.place_of_supply = request.POST['place_of_supply']
+            rec_inv.profile_name = request.POST['profile_name']
+            rec_inv.entry_type = None if request.POST['entry_type'] == "" else request.POST['entry_type']
+            rec_inv.reference_no = request.POST['reference_number']
+            rec_inv.rec_invoice_no = invNum
+            rec_inv.payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term'])
+            rec_inv.start_date = request.POST['start_date']
+            rec_inv.end_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date()
+            rec_inv.salesOrder_no = request.POST['order_number']
+            rec_inv.price_list_applied = True if 'priceList' in request.POST else False
+            rec_inv.price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id'])
+            rec_inv.repeat_every = CompanyRepeatEvery.objects.get(id = request.POST['repeat_every'])
+            rec_inv.payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method']
+            rec_inv.cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id']
+            rec_inv.upi_number = None if request.POST['upi_id'] == "" else request.POST['upi_id']
+            rec_inv.bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id']
+            rec_inv.subtotal = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal'])
+            rec_inv.igst = 0.0 if request.POST['igst'] == "" else float(request.POST['igst'])
+            rec_inv.cgst = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst'])
+            rec_inv.sgst = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst'])
+            rec_inv.tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount'])
+            rec_inv.adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj'])
+            rec_inv.shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship'])
+            rec_inv.grandtotal = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal'])
+            rec_inv.advance_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance'])
+            rec_inv.balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance'])
+            rec_inv.description = request.POST['note']
+            rec_inv.terms_and_conditions = request.POST['terms']
+
+            if len(request.FILES) != 0:
+                rec_inv.document=request.FILES.get('file')
+            rec_inv.save()
+
+
+            # Save rec_invoice items.
+
+            itemId = request.POST.getlist("item_id[]")
+            itemName = request.POST.getlist("item_name[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+            inv_item_ids = request.POST.getlist("id[]")
+            invItem_ids = [int(id) for id in inv_item_ids]
+
+            inv_items = Reccurring_Invoice_item.objects.filter(reccuring_invoice = rec_inv)
+            object_ids = [obj.id for obj in inv_items]
+
+            ids_to_delete = [obj_id for obj_id in object_ids if obj_id not in invItem_ids]
+            for itmId in ids_to_delete:
+                invItem = Reccurring_Invoice_item.objects.get(id = itmId)
+                item = Items.objects.get(id = invItem.item.id)
+                item.current_stock += invItem.quantity
+                item.save()
+
+            Reccurring_Invoice_item.objects.filter(id__in=ids_to_delete).delete()
+            
+            count = Reccurring_Invoice_item.objects.filter(reccuring_invoice = rec_inv).count()
+
+            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total)==len(invItem_ids) and invItem_ids and itemId and itemName and hsn and qty and price and tax and discount and total:
+                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total,invItem_ids)
+                mapped = list(mapped)
+                for ele in mapped:
+                    if int(len(itemId))>int(count):
+                        if ele[8] == 0:
+                            itm = Items.objects.get(id = int(ele[0]))
+                            Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = rec_inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                            itm.current_stock -= int(ele[3])
+                            itm.save()
+                        else:
+                            itm = Items.objects.get(id = int(ele[0]))
+                            inItm = Reccurring_Invoice_item.objects.get(id = int(ele[8]))
+                            crQty = int(inItm.quantity)
+                            
+                            Reccurring_Invoice_item.objects.filter( id = int(ele[8])).update(reccuring_invoice = rec_inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+
+                            if crQty < int(ele[3]):
+                                itm.current_stock -=  abs(crQty - int(ele[3]))
+                            elif crQty > int(ele[3]):
+                                itm.current_stock += abs(crQty - int(ele[3]))
+                            itm.save()
+                    else:
+                        itm = Items.objects.get(id = int(ele[0]))
+                        inItm = Reccurring_Invoice_item.objects.get(id = int(ele[8]))
+                        crQty = int(inItm.quantity)
+
+                        Reccurring_Invoice_item.objects.filter( id = int(ele[8])).update(reccuring_invoice = rec_inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+
+                        if crQty < int(ele[3]):
+                            itm.current_stock -=  abs(crQty - int(ele[3]))
+                        elif crQty > int(ele[3]):
+                            itm.current_stock += abs(crQty - int(ele[3]))
+                        itm.save()
+            
+            # Save transaction
+                    
+            RecurringInvoiceHistory.objects.create(
+                company = com,
+                login_details = log_details,
+                recurring_invoice = rec_inv,
+                action = 'Edited'
+            )
+
+            return redirect(viewRecurringInvoice, id)
+        else:
+            return redirect(editRecurringInvoice, id)
+    else:
+       return redirect('/')
         
 
 #---------------- Zoho Final sales order - Ginto Shaji - End--------------------

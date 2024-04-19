@@ -376,6 +376,11 @@ urlpatterns = [
     path('createNewselAccountFromItems',views.createNewselAccountFromItems,name='createNewselAccountFromItems'),
     path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
     
+    path('convert_invoice_page/<int:id>',views.convert_invoice_page,name='convert_invoice_page'),
+    path('ConvertInvoice/<int:id>',views.ConvertInvoice,name='ConvertInvoice'),
+    path('convert_recurringinvoice_page/<int:id>',views.convert_recurringinvoice_page,name='convert_recurringinvoice_page'),
+    path('ConvertRecurringInvoice/<int:id>',views.ConvertRecurringInvoice,name='ConvertRecurringInvoice'),
+    
     
     #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
     
