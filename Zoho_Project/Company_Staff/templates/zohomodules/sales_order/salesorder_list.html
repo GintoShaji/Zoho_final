@@ -156,61 +156,55 @@
               </thead>
              
               <tbody>
-                {% for i in sale %}
-                <tr id="over" class="clickable-row" data-href="{% url 'view_salesorder_details' i.id %}">
-                  <td style="text-align: center;">{{forloop.counter}}</td>
-                  <td>{{i.sales_order_date}}</td>
-                  <td>{{i.sales_order_number}}</td>
-                  <td>{{i.customer.first_name}} {{i.customer.last_name}}</td>
-                  <td>{{i.customer_email}}</td>
-                  <td>{{i.grand_total}}</td>
-                  <td>{{i.status}}</td>
-                  <td>{{i.balance}}</td>
-                  <td></td>
+              {% for i in sale %}
+                <tr id="over" class="" data-href="{% url 'view_salesorder_details' i.id %}">
+                  <td style="text-align: center;"><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{forloop.counter}}</a></td>
+                  <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.sales_order_date}}</a></td>
+                  <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.sales_order_number}}</a></td>
+                  <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.customer.first_name}} {{i.customer.last_name}}</a></td>
+                  <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.customer_email}}</a></td>
+                  <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.grand_total}}</a></td>
+                  <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.status}}</a></td>
+                  <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.balance}}</a></td>
+                  <td>
+                    <div class="dropdown">
+                      
+
+                      
+                    {% if i.convert_to_invoice %}
+                        Converted to Invoice - #{{ i.convert_to_invoice.id }}
+                    {% elif i.convert_to_recurringinvoice %}
+                        Converted to RecurringInvoice - #{{ i.convert_to_recurringinvoice.id }}
+                    {% else %}
+                        <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Convert
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'convert_invoice_page' i.id %}">Invoice</a></li>
+                            <li><a class="dropdown-item" href="{% url 'convert_recurringinvoice_page' i.id %}">Recurring Invoice</a></li>
+                        </ul>
+                    {% endif %}
+                      
+                    </div>  
+                  </td>
                 </tr>
                 {% endfor %}
+                
+
               </tbody>
             </table>
 
           </div>
         </div>
        
-        <!-- <div class="row" hidden>
-          <table id="employeemodeltable">
-            <thead>
-              <th>Customer</th>
-              <th>Customer Email</th>
-              <th>Customer Billing Address</th>
-              <th>GST TREATMENT</th>
-              <th>Customer gst Number</th>
-             <th>Customer Place of supply([KL]-Kerala)</th>
-             <th>sales_order_date</th>
-             <th>payment term(NET 30)</th>
-             <th>expiration date</th>
-             <th>reference number</th>
-             <th>sales order number</th>
-              <th>payment method</th>
-              <th>cheque number</th>
-              <th> upi number</th>
-              <th>bank account number</th>
-              <th>terms and condition</th>
-              <th>document</th>
-              <th>sub total</th>
-              <th>cgst</th>
-              <th>sgst</th>
-              <th>tax amount igst</th>
-              <th>shipping charge</th>
-              <th>adjustment</th>
-              <th>grand total</th>
-              <th>advanced paid</th>
-              <th>balance</th>
-             
-            </thead>
-            <tbody>
-             
-            </tbody>
-          </table>
-        </div> -->
+
+
+
+
+
+
+
+
 
 
       </div>

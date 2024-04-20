@@ -868,10 +868,13 @@ class SaleOrder(models.Model):
         ('Save', 'Save'),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft') 
+    convert_to_invoice=models.ForeignKey(invoice,on_delete=models.CASCADE,null=True,blank=True)
+    convert_to_recurringinvoice=models.ForeignKey(RecurringInvoice,on_delete=models.CASCADE,null=True,blank=True)
     
     def getNumFieldName(self):
         return 'sales_order_number'   
- 
+    
+     
 
 class SalesOrderItems(models.Model):
     item = models.ForeignKey(Items, on_delete=models.CASCADE, blank=True, null=True)
@@ -888,7 +891,7 @@ class SalesOrderItems(models.Model):
     
     
 class SalesOrderReference(models.Model):
-    reference_number = models.CharField(max_length=255)
+    reference_number = models.BigIntegerField(null=True, blank=True)
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE, blank=True, null=True)
     staff = models.ForeignKey(StaffDetails, on_delete=models.CASCADE, blank=True, null=True)
     

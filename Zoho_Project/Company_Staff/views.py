@@ -12947,6 +12947,7 @@ def salesorder(request):
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
             comp_details=CompanyDetails.objects.get(login_details=log_details)
+            
    
         allmodules= ZohoModules.objects.get(company=comp_details,status='New')
         
@@ -12960,13 +12961,30 @@ def salesorder(request):
         price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
         
 
-        latest_sel = SaleOrder.objects.filter(company = comp_details).order_by('-id').first()
-        new_number = int(latest_sel.reference_number) + 1 if latest_sel else 1
-        if SalesOrderReference.objects.filter(company = comp_details).exists():
-            deleted = SalesOrderReference.objects.get(company = comp_details)
+        # latest_sel = SaleOrder.objects.filter(company = comp_details).order_by('-id').first()
+        # new_number = int(latest_sel.reference_number) + 1 if latest_sel else 1
+        # if SalesOrderReference.objects.filter(company = comp_details).exists():
+        #     deleted = SalesOrderReference.objects.get(company = comp_details)
+        #     if deleted:
+        #         while int(deleted.reference_number) >= new_number:
+        #             new_number+=1
+        
+        latest_sel = SaleOrder.objects.filter(company=comp_details).order_by('-id').first()
+        new_number = int(latest_sel.reference_number) + 1 if latest_sel and latest_sel.reference_number else 1
+
+        if SalesOrderReference.objects.filter(company=comp_details).exists():
+            deleted = SalesOrderReference.objects.filter(company=comp_details).first()
             if deleted:
-                while int(deleted.reference_number) >= new_number:
-                    new_number+=1
+                while True:
+                    try:
+                        if int(deleted.reference_number) >= new_number:
+                           new_number += 1
+                        else:
+                           break
+                    except (ValueError, TypeError):
+                        break
+        
+        
         
         nxtSel = ""
         lastSel = SaleOrder.objects.filter(company = comp_details).last()
@@ -13188,6 +13206,13 @@ def add_salesorder(request):
                 current_date=date.today(),
                 action='Created'
             )
+            
+            SalesOrderReference.objects.create(
+                company=comp_details,
+                reference_number=request.POST['reference_number'],
+  
+            )
+                
 
             messages.success(request, 'Sales Order created successfully!')
             return redirect(salesorder_list)
@@ -14395,10 +14420,6 @@ def convert_invoice_page(request,id):
         else:
             nxtInv = 'in-01'
 
-
-
-
-
         context = {
               'sale':sale,
               'sale_items': sale_items,
@@ -14413,128 +14434,116 @@ def convert_invoice_page(request,id):
               'item':item,
               'units': units,
               'accounts':accounts, 
-              'invNo':nxtInv, 'ref_no':new_number,
-            #   'invoice':invoices,
-            #   'invItems': invItems, 
+              'invNo':nxtInv, 
+              'ref_no':new_number,
+    
         }
     
-        
         return render(request,'zohomodules/sales_order/convert_invoice.html',context)
     else:
        return redirect('/')
        
 def ConvertInvoice(request, id):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        log_details= LoginDetails.objects.get(id=log_id)
-        if log_details.user_type == 'Company':
-            com = CompanyDetails.objects.get(login_details = log_details)
-        else:
-            com = StaffDetails.objects.get(login_details = log_details).company
-          
-        inv = invoice.objects.get(id = id)
-        # inv = SaleOrder.objects.get(id = id)
-        if request.method == 'POST':
-            invNum = request.POST['rec_invoice_no']
-            if invoice.objects.filter(company = com, invoice_number__iexact = invNum).exists():
-                res = f'<script>alert("Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
-                return HttpResponse(res)
-
-            inv.customer = Customer.objects.get(id = request.POST['customerId'])
-            inv.customer_email = request.POST['customer_email']
-            inv.customer_billingaddress = request.POST['bill_address']
-            inv.customer_GSTtype = request.POST['customer_gst_type']
-            y=request.POST['customer_gst_type']
-            print(y)
-            inv.customer_GSTnumber = request.POST['customer_gstin']
-            inv.customer_place_of_supply = request.POST['place_of_supply']
-            x=request.POST['place_of_supply']
-            print(x)
-           
-            inv.reference_number = request.POST['reference_number']
-            inv.invoice_number = invNum,
-            inv.payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term'])
-            inv.date = request.POST['start_date']
-            inv.expiration_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date()
-            # inv.order_no = request.POST['order_number']
-            inv.price_list_applied = True if 'priceList' in request.POST else False
-            inv.price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id'])
-            # inv.repeat_every = CompanyRepeatEvery.objects.get(id = request.POST['repeat_every'])
-            inv.payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method']
-            inv.cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id']
-            inv.UPI_number = None if request.POST['upi_id'] == "" else request.POST['upi_id']
-            inv.bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id']
-            inv.sub_total = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal'])
-            inv.IGST = 0.0 if request.POST['igst'] == "" else float(request.POST['igst'])
-            inv.CGST = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst'])
-            inv.SGST = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst'])
-            inv.tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount'])
-            inv.adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj'])
-            inv.shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship'])
-            inv.grand_total = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal'])
-            inv.advanced_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance'])
-            inv.balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance'])
-            inv.description = request.POST['note']
-            inv.terms_and_condition = request.POST['terms']
-            inv.save()
-
-            if len(request.FILES) != 0:
-                inv.document=request.FILES.get('file')
-            inv.save()
-
-
-            # Save rec_invoice items.
-
-            itemId = request.POST.getlist("item_id[]")
-            itemName = request.POST.getlist("item_name[]")
-            hsn  = request.POST.getlist("hsn[]")
-            qty = request.POST.getlist("qty[]")
-            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
-            tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
-            discount = request.POST.getlist("discount[]")
-            total = request.POST.getlist("total[]")
+        if 'login_id' in request.session:
+            log_id = request.session['login_id']
+            log_details= LoginDetails.objects.get(id=log_id)
+            if log_details.user_type == 'Company':
+                com = CompanyDetails.objects.get(login_details = log_details)
+            else:
+                com = StaffDetails.objects.get(login_details = log_details).company
+     
+            if request.method == 'POST':
+                invNum = request.POST['rec_invoice_no']
+                if invoice.objects.filter(company = com, invoice_number__iexact = invNum).exists():
+                    res = f'<script>alert("Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
+                    return HttpResponse(res)
     
-            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
-                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
-                mapped = list(mapped)
-                for ele in mapped:
-                    itm = Items.objects.get(id = int(ele[0]))
-                    # invoiceitems.objects.create(company = com, logindetails = com.login_details, invoice = inv, Items = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
-                    # itm.current_stock -= int(ele[3])
-                    # itm.save()
-                    new_invoice_item = invoiceitems.objects.create(
-                                    company=com,
-                                    logindetails=com.login_details,
-                                    invoice=inv,  # Ensure 'inv' is an instance of the 'invoice' model
-                                    Items=itm,
-                                    hsn=ele[2],
-                                    quantity=int(ele[3]),
-                                    price=float(ele[4]),
-                                    tax_rate=ele[5],
-                                    discount=float(ele[6]),
-                                    total=float(ele[7])
-                    )
-
-
-  
-                    itm.current_stock -= int(ele[3])
-                    itm.save()
+                inv = invoice(
+                    company = com,
+                    login_details = com.login_details,
+                    customer = Customer.objects.get(id = request.POST['customerId']),
+                    customer_email = request.POST['customer_email'],
+                    customer_billingaddress = request.POST['bill_address'],
+                    customer_GSTtype = request.POST['customer_gst_type'],
+                    customer_GSTnumber = request.POST['customer_gstin'],
+                    customer_place_of_supply = request.POST['place_of_supply'],
+                   
+                    reference_number = request.POST['reference_number'],
+                    invoice_number = invNum,
+                    payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term']),
+                    date = request.POST['start_date'],
+                    expiration_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date(),
+                    # Order_number = request.POST['order_number'],
+                    price_list_applied = True if 'priceList' in request.POST else False,
+                    price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id']),
+                    payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method'],
+                    cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id'],
+                    UPI_number = None if request.POST['upi_id'] == "" else request.POST['upi_id'],
+                    bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id'],
+                    sub_total = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal']),
+                    IGST = 0.0 if request.POST['igst'] == "" else float(request.POST['igst']),
+                    CGST = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst']),
+                    SGST = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst']),
+                    tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount']),
+                    adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj']),
+                    shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship']),
+                    grand_total = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal']),
+                    advanced_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance']),
+                    balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance']),
+                    description = request.POST['note'],
+                    terms_and_condition = request.POST['terms']
                     
-            
-            # Save transaction
-                    
-            invoiceHistory.objects.create(
-                company = com,
-                login_details = com.login_details,
-                invoice = inv,
-                action = 'Created'
-            )
-
-            return redirect(view, id)
+                )
+    
+                inv.save()
+    
+                if len(request.FILES) != 0:
+                    inv.document=request.FILES.get('file')
+                inv.save()
+    
+                if 'Draft' in request.POST:
+                    inv.status = "Draft"
+                elif "Saved" in request.POST:
+                    inv.status = "Saved" 
+                inv.save()
+    
+                # Save rec_invoice items.
+    
+                itemId = request.POST.getlist("item_id[]")
+                itemName = request.POST.getlist("item_name[]")
+                hsn  = request.POST.getlist("hsn[]")
+                qty = request.POST.getlist("qty[]")
+                price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+                tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+                discount = request.POST.getlist("discount[]")
+                total = request.POST.getlist("total[]")
+    
+                if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                    mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                    mapped = list(mapped)
+                    for ele in mapped:
+                        itm = Items.objects.get(id = int(ele[0]))
+                        invoiceitems.objects.create(company = com, logindetails = com.login_details, invoice = inv, Items = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                        itm.current_stock -= int(ele[3])
+                        itm.save()
+    
+                # Save transaction
+                        
+                invoiceHistory.objects.create(
+                    company = com,
+                    login_details = com.login_details,
+                    invoice = inv,
+                    action = 'Created'
+                )
+                sale=SaleOrder.objects.get(id=id)
+                sale.convert_to_invoice=inv
+                sale.save()
+    
+                return redirect(invoice_list_out)
+            else:
+                return redirect(createInvoice)
         else:
-            return redirect(editInvoice, id)
-    else:
-       return redirect('/')
+            return redirect('/')
    
    
 
@@ -14600,7 +14609,6 @@ def convert_recurringinvoice_page(request, id):
         else:
             nxtInv = 'RI001'
 
-
         context = {
             'sale':sale,
             'sale_items': sale_items,
@@ -14625,155 +14633,126 @@ def convert_recurringinvoice_page(request, id):
 
 
 def ConvertRecurringInvoice(request, id):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        log_details= LoginDetails.objects.get(id=log_id)
-        if log_details.user_type == 'Company':
-            com = CompanyDetails.objects.get(login_details = log_details)
-        else:
-            com = StaffDetails.objects.get(login_details = log_details).company
-
-        rec_inv = RecurringInvoice.objects.get(id = id)
-        if request.method == 'POST':
-            invNum = request.POST['rec_invoice_no']
-
-            PatternStr = []
-            for word in invNum:
-                if word.isdigit():
-                    pass
-                else:
-                    PatternStr.append(word)
-            
-            pattern = ''
-            for j in PatternStr:
-                pattern += j
-
-            pattern_exists = checkRecInvNumberPattern(pattern)
-
-            if pattern !="" and pattern_exists:
-                res = f'<script>alert("Rec. Invoice No. Pattern already Exists.! Try another!");window.history.back();</script>'
-                return HttpResponse(res)
-
-            if rec_inv.rec_invoice_no != invNum and RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = invNum).exists():
-                res = f'<script>alert("Recurring Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
-                return HttpResponse(res)
-
-            rec_inv.customer = Customer.objects.get(id = request.POST['customerId'])
-            rec_inv.customer_email = request.POST['customer_email']
-            rec_inv.billing_address = request.POST['bill_address']
-            rec_inv.gst_type = request.POST['customer_gst_type']
-            rec_inv.gstin = request.POST['customer_gstin']
-            rec_inv.place_of_supply = request.POST['place_of_supply']
-            rec_inv.profile_name = request.POST['profile_name']
-            rec_inv.entry_type = None if request.POST['entry_type'] == "" else request.POST['entry_type']
-            rec_inv.reference_no = request.POST['reference_number']
-            rec_inv.rec_invoice_no = invNum
-            rec_inv.payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term'])
-            rec_inv.start_date = request.POST['start_date']
-            rec_inv.end_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date()
-            rec_inv.salesOrder_no = request.POST['order_number']
-            rec_inv.price_list_applied = True if 'priceList' in request.POST else False
-            rec_inv.price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id'])
-            rec_inv.repeat_every = CompanyRepeatEvery.objects.get(id = request.POST['repeat_every'])
-            rec_inv.payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method']
-            rec_inv.cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id']
-            rec_inv.upi_number = None if request.POST['upi_id'] == "" else request.POST['upi_id']
-            rec_inv.bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id']
-            rec_inv.subtotal = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal'])
-            rec_inv.igst = 0.0 if request.POST['igst'] == "" else float(request.POST['igst'])
-            rec_inv.cgst = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst'])
-            rec_inv.sgst = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst'])
-            rec_inv.tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount'])
-            rec_inv.adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj'])
-            rec_inv.shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship'])
-            rec_inv.grandtotal = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal'])
-            rec_inv.advance_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance'])
-            rec_inv.balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance'])
-            rec_inv.description = request.POST['note']
-            rec_inv.terms_and_conditions = request.POST['terms']
-
-            if len(request.FILES) != 0:
-                rec_inv.document=request.FILES.get('file')
-            rec_inv.save()
-
-
-            # Save rec_invoice items.
-
-            itemId = request.POST.getlist("item_id[]")
-            itemName = request.POST.getlist("item_name[]")
-            hsn  = request.POST.getlist("hsn[]")
-            qty = request.POST.getlist("qty[]")
-            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
-            tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
-            discount = request.POST.getlist("discount[]")
-            total = request.POST.getlist("total[]")
-            inv_item_ids = request.POST.getlist("id[]")
-            invItem_ids = [int(id) for id in inv_item_ids]
-
-            inv_items = Reccurring_Invoice_item.objects.filter(reccuring_invoice = rec_inv)
-            object_ids = [obj.id for obj in inv_items]
-
-            ids_to_delete = [obj_id for obj_id in object_ids if obj_id not in invItem_ids]
-            for itmId in ids_to_delete:
-                invItem = Reccurring_Invoice_item.objects.get(id = itmId)
-                item = Items.objects.get(id = invItem.item.id)
-                item.current_stock += invItem.quantity
-                item.save()
-
-            Reccurring_Invoice_item.objects.filter(id__in=ids_to_delete).delete()
-            
-            count = Reccurring_Invoice_item.objects.filter(reccuring_invoice = rec_inv).count()
-
-            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total)==len(invItem_ids) and invItem_ids and itemId and itemName and hsn and qty and price and tax and discount and total:
-                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total,invItem_ids)
-                mapped = list(mapped)
-                for ele in mapped:
-                    if int(len(itemId))>int(count):
-                        if ele[8] == 0:
-                            itm = Items.objects.get(id = int(ele[0]))
-                            Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = rec_inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
-                            itm.current_stock -= int(ele[3])
-                            itm.save()
-                        else:
-                            itm = Items.objects.get(id = int(ele[0]))
-                            inItm = Reccurring_Invoice_item.objects.get(id = int(ele[8]))
-                            crQty = int(inItm.quantity)
-                            
-                            Reccurring_Invoice_item.objects.filter( id = int(ele[8])).update(reccuring_invoice = rec_inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
-
-                            if crQty < int(ele[3]):
-                                itm.current_stock -=  abs(crQty - int(ele[3]))
-                            elif crQty > int(ele[3]):
-                                itm.current_stock += abs(crQty - int(ele[3]))
-                            itm.save()
-                    else:
-                        itm = Items.objects.get(id = int(ele[0]))
-                        inItm = Reccurring_Invoice_item.objects.get(id = int(ele[8]))
-                        crQty = int(inItm.quantity)
-
-                        Reccurring_Invoice_item.objects.filter( id = int(ele[8])).update(reccuring_invoice = rec_inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
-
-                        if crQty < int(ele[3]):
-                            itm.current_stock -=  abs(crQty - int(ele[3]))
-                        elif crQty > int(ele[3]):
-                            itm.current_stock += abs(crQty - int(ele[3]))
-                        itm.save()
-            
-            # Save transaction
-                    
-            RecurringInvoiceHistory.objects.create(
-                company = com,
-                login_details = log_details,
-                recurring_invoice = rec_inv,
-                action = 'Edited'
-            )
-
-            return redirect(viewRecurringInvoice, id)
-        else:
-            return redirect(editRecurringInvoice, id)
-    else:
-       return redirect('/')
-        
+            if 'login_id' in request.session:
+               log_id = request.session['login_id']
+               log_details= LoginDetails.objects.get(id=log_id)
+               if log_details.user_type == 'Company':
+                   com = CompanyDetails.objects.get(login_details = log_details)
+               else:
+                   com = StaffDetails.objects.get(login_details = log_details).company
+       
+               if request.method == 'POST':
+                   invNum = request.POST['rec_invoice_no']
+       
+                   PatternStr = []
+                   for word in invNum:
+                       if word.isdigit():
+                           pass
+                       else:
+                           PatternStr.append(word)
+                   
+                   pattern = ''
+                   for j in PatternStr:
+                       pattern += j
+       
+                   pattern_exists = checkRecInvNumberPattern(pattern)
+       
+                   if pattern !="" and pattern_exists:
+                       res = f'<script>alert("Rec. Invoice No. Pattern already Exists.! Try another!");window.history.back();</script>'
+                       return HttpResponse(res)
+       
+                   if RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = invNum).exists():
+                       res = f'<script>alert("Rec. Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
+                       return HttpResponse(res)
+       
+                   inv = RecurringInvoice(
+                       company = com,
+                       login_details = com.login_details,
+                       customer = Customer.objects.get(id = request.POST['customerId']),
+                       customer_email = request.POST['customer_email'],
+                       billing_address = request.POST['bill_address'],
+                       gst_type = request.POST['customer_gst_type'],
+                       gstin = request.POST['customer_gstin'],
+                       place_of_supply = request.POST['place_of_supply'],
+                       profile_name = request.POST['profile_name'],
+                       entry_type = None if request.POST['entry_type'] == "" else request.POST['entry_type'],
+                       reference_no = request.POST['reference_number'],
+                       rec_invoice_no = invNum,
+                       payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term']),
+                       start_date = request.POST['start_date'],
+                       end_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date(),
+                       salesOrder_no = request.POST['order_number'],
+                       price_list_applied = True if 'priceList' in request.POST else False,
+                       price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id']),
+                       repeat_every = CompanyRepeatEvery.objects.get(id = request.POST['repeat_every']),
+                       payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method'],
+                       cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id'],
+                       upi_number = None if request.POST['upi_id'] == "" else request.POST['upi_id'],
+                       bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id'],
+                       subtotal = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal']),
+                       igst = 0.0 if request.POST['igst'] == "" else float(request.POST['igst']),
+                       cgst = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst']),
+                       sgst = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst']),
+                       tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount']),
+                       adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj']),
+                       shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship']),
+                       grandtotal = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal']),
+                       advance_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance']),
+                       balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance']),
+                       description = request.POST['note'],
+                       terms_and_conditions = request.POST['terms']
+                   )
+       
+                   inv.save()
+       
+                   if len(request.FILES) != 0:
+                       inv.document=request.FILES.get('file')
+                   inv.save()
+       
+                   if 'Draft' in request.POST:
+                       inv.status = "Draft"
+                   elif "Saved" in request.POST:
+                       inv.status = "Saved" 
+                   inv.save()
+       
+                   # Save rec_invoice items.
+       
+                   itemId = request.POST.getlist("item_id[]")
+                   itemName = request.POST.getlist("item_name[]")
+                   hsn  = request.POST.getlist("hsn[]")
+                   qty = request.POST.getlist("qty[]")
+                   price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+                   tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+                   discount = request.POST.getlist("discount[]")
+                   total = request.POST.getlist("total[]")
+       
+                   if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                       mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                       mapped = list(mapped)
+                       for ele in mapped:
+                           itm = Items.objects.get(id = int(ele[0]))
+                           Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                           itm.current_stock -= int(ele[3])
+                           itm.save()
+       
+                   # Save transaction
+                           
+                   RecurringInvoiceHistory.objects.create(
+                       company = com,
+                       login_details = log_details,
+                       recurring_invoice = inv,
+                       action = 'Created'
+                   )
+                   
+                   sale=SaleOrder.objects.get(id=id)
+                   sale.convert_to_recurringinvoice=inv
+                   sale.save()
+       
+                   return redirect(recurringInvoice)
+               else:
+                   return redirect(addRecurringInvoice)
+            else:
+              return redirect('/')
 
 #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
 

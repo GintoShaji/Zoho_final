@@ -340,7 +340,7 @@ urlpatterns = [
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
     
 
-    #---------------- Zoho Final Sales order - Ginto Shaji - Start--------------------
+      #---------------- Zoho Final Sales order - Ginto Shaji - Start--------------------
     
     path('salesorder',views.salesorder,name='salesorder'),
     path('salesorder_list',views.salesorder_list,name='salesorder_list'),
@@ -375,12 +375,10 @@ urlpatterns = [
     path('getAllselAccounts',views.getAllselAccounts,name='getAllselAccounts'),
     path('createNewselAccountFromItems',views.createNewselAccountFromItems,name='createNewselAccountFromItems'),
     path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
-    
     path('convert_invoice_page/<int:id>',views.convert_invoice_page,name='convert_invoice_page'),
     path('ConvertInvoice/<int:id>',views.ConvertInvoice,name='ConvertInvoice'),
     path('convert_recurringinvoice_page/<int:id>',views.convert_recurringinvoice_page,name='convert_recurringinvoice_page'),
     path('ConvertRecurringInvoice/<int:id>',views.ConvertRecurringInvoice,name='ConvertRecurringInvoice'),
-    
     
     #---------------- Zoho Final sales order - Ginto Shaji - End--------------------
     
