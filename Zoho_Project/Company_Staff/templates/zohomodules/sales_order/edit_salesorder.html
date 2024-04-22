@@ -299,7 +299,7 @@
                   </div>
                 </div>
 
-                <div class="row mt-2">
+                <div class="row mt-2" id="billAddressSection">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
                     <textarea class="form-control text-white bg-black" name="customer_billing_address" id="billAddress" rows="4" readonly>{{sale.customer_billing_address}}</textarea>
@@ -310,17 +310,17 @@
                   <label for="" class="col-md-3 labels">Place of Supply</label>
                   <div class="col-md-6">
                     <input hidden value="{{comp_details.state}}" id="cmpstate">
-                    <select name="customer_place_of_supply" id="placeOfSupply" class="form-control bg-black text-white">
-                      <option value="" selected>Select Place of Supply</option>
+                    <select name="customer_place_of_supply"  id="placeOfSupply" class="form-control bg-black text-white">
+                      <option value="{{sale.customer_place_of_supply}}" selected>{{sale.customer_place_of_supply}}</option>
                       <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                       <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                       <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
-                      <option value="volvo">[AS]-Assam</option>
+                      <option value="[AS]-Assam">[AS]-Assam</option>
                       <option value="[BR]-Bihar">[BR]-Bihar</option> 
-                      <option value="volvo">[CH]-	Chandhigarh</option>
+                      <option value="[CH]-Chandhigarh">[CH]-Chandhigarh</option>
                       <option value="[CG]-Chattisgarh">[CG]-Chattisgarh</option>
                       <option value="[DD]-Daman Diu">[DD]-Daman Diu</option>
-                      <option value="volvo">[DL]-	Delhi</option>
+                      <option value="[DL]-Delhi">[DL]-Delhi</option>
                       <option value="[GA]-Goa">[GA]-Goa</option> 
                       <option value="[GJ]-Gujarat">[GJ]-Gujarat</option>
                       <option value="[HR]-Haryana">[HR]-Haryana</option> 
@@ -2513,51 +2513,52 @@
       })
   }
 
-    function getCustomerDetails(custId, name){
-      $('#customer').val(name)
-      console.log('name',name);
-      if($('#customer').val() != ""){
-          $('#custErr').text('');
-          $.ajax({
-              type : 'POST',
-              url: "{% url 'getselCustomerDetails' %}",
-              data: {
-                  id: custId,
-                  csrfmiddlewaretoken: '{{ csrf_token }}',
-              },
-              
-              success: function(data){
-                  console.log('AJAX-Response-->',data);
-                  document.getElementById('customerId').value = data.id;
-                  document.getElementById('customerEmail').value = data.email;
-                  document.getElementById('placeOfSupply').value = data.shipState;
-                  var placeOfSupplySelect = document.getElementById('placeOfSupply');
-                  var newOption = new Option(data.shipState, data.shipState); // Create a new option element
-                  placeOfSupplySelect.appendChild(newOption); // Append the new option to the select element
-                  placeOfSupplySelect.value = data.shipState;
-                  document.getElementById('customerGstType').value = data.gstType;
+  function getCustomerDetails(custId, name){
+    $('#customer').val(name)
+    console.log('name',name);
+    if($('#customer').val() != ""){
+        $('#custErr').text('');
+        $.ajax({
+            type : 'POST',
+            url: "{% url 'getselCustomerDetails' %}",
+            data: {
+                id: custId,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            
+            success: function(data){
+                console.log('AJAX-Response-->',data);
+                document.getElementById('customerId').value = data.id;
+                document.getElementById('customerEmail').value = data.email;
+                document.getElementById('placeOfSupply').value = data.shipState;
+                document.getElementById('customerGstType').value = data.gstType;
+                if(data.street == "" && data.city == "" && data.state == ""){
+                  $("#billAddressSection").hide();
+                }else{
+                  $('#billAddressSection').show();
                   document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
-                  if(data.gstin){
-                      document.getElementById('customerGstInDisplay').style.display = 'flex';
-                      document.getElementById('customerGSTIN').value = data.gstNo;
-                  }else{
-                      document.getElementById('customerGstInDisplay').style.display = 'none';
-                      document.getElementById('customerGSTIN').value = '';
-                  }
-                  $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
-                  refreshTax();
-                  checkPriceList();
-              }
-          });
-      }else{
-          document.getElementById('customerEmail').value = "";
-          document.getElementById('placeOfSupply').value = "";
-          document.getElementById('customerGstType').value = "";
-          document.getElementById('billAddress').value ="";
-          document.getElementById('customerGSTIN').value = "";
-          $('#custErr').text('Select a customer..');
-      }
-  }
+                }
+                if(data.gstin){
+                    document.getElementById('customerGstInDisplay').style.display = 'flex';
+                    document.getElementById('customerGSTIN').value = data.gstNo;
+                }else{
+                    document.getElementById('customerGstInDisplay').style.display = 'none';
+                    document.getElementById('customerGSTIN').value = '';
+                }
+                $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
+                refreshTax();
+                checkPriceList();
+            }
+        });
+    }else{
+        document.getElementById('customerEmail').value = "";
+        document.getElementById('placeOfSupply').value = "";
+        document.getElementById('customerGstType').value = "";
+        document.getElementById('billAddress').value ="";
+        document.getElementById('customerGSTIN').value = "";
+        $('#custErr').text('Select a customer..');
+    }
+}
 
 
   $(document).ready(function() {

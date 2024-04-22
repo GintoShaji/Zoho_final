@@ -96,12 +96,6 @@
                     <div class="col-sm-12 col-lg-6 col-md-6  ">
                       <div class="d-flex justify-content-end g-1">
 
-                        <a onclick="ExportToExcel()" class="btn text-center pt-2 btn-outline-warning " >
-                          <i class='fas fa-file-export' style='font-size:18px'></i> <span > Export</span>
-                        </a>
-                        <a data-toggle="modal" data-target="#importmodal" class="btn text-center pt-2 btn-outline-warning" onclick="sampleexcel()">
-                          <i class="fas fa-file-import" style='font-size:18px'></i> <span style="margin-top: 3px;"> Import</span>
-                        </a>
                         <div class="dropdown">
                         <a class="btn text-center  pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
                           <i class="fa fa-filter mt-1"></i>
@@ -112,6 +106,12 @@
                           <a class="dropdown-item" href="{% url 'view_salesorder_save' %}">Saved</a>
                         </div>
                         </div>
+                        <a data-toggle="modal" data-target="#importmodal" class="btn text-center pt-2 btn-outline-warning" onclick="sampleexcel()">
+                          <i class="fas fa-file-import" style='font-size:18px'></i> <span style="margin-top: 3px;"> Import</span>
+                        </a>
+                        <a onclick="ExportToExcel()" class="btn text-center pt-2 btn-outline-warning " >
+                          <i class='fas fa-file-export' style='font-size:18px'></i> <span > Export</span>
+                        </a>
                         <a  class="btn btn-outline-warning text-right px-3 py-2 flex-sm-row" role="button"  href="{% url 'salesorder' %}">
                           <i class="fa fa-plus fs-4" ><span> New</span></i>
                         </a>
@@ -172,9 +172,9 @@
 
                       
                     {% if i.convert_to_invoice %}
-                        Converted to Invoice - #{{ i.convert_to_invoice.id }}
+                        Converted to Invoice - #{{ i.convert_to_invoice.invoice_number }}
                     {% elif i.convert_to_recurringinvoice %}
-                        Converted to RecurringInvoice - #{{ i.convert_to_recurringinvoice.id }}
+                        Converted to RecurringInvoice - #{{ i.convert_to_recurringinvoice.rec_invoice_no }}
                     {% else %}
                         <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Convert

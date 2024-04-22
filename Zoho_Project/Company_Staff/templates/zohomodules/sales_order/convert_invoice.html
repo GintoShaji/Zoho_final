@@ -300,7 +300,7 @@
                   </div>
                 </div>
 
-                <div class="row mt-2">
+                <div class="row mt-2" id="billAddressSection">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
                     <textarea class="form-control text-white bg-black" name="bill_address" id="billAddress" rows="4" readonly>{{sale.customer_billing_address}}</textarea>
@@ -724,7 +724,8 @@
                   </div>
                 </div>
                 <div class="mt-4">
-                  <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" id="save">
+                  <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" name="Saved" id="save">
+                  <input class="btn save_btn" style="background-color: chocolate; color: white;" type="submit" value="DRAFT" name="Draft" id="draft">
                   <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=``" value="CANCEL" id="cancel">
                 </div>
               </form>
@@ -2590,54 +2591,54 @@
     }
 
     function getCustomerDetails(custId, name){
-      $('#customer').val(name)
-      console.log('name',name);
-      if($('#customer').val() != ""){
-          $('#custErr').text('');
-          $.ajax({
-              type : 'POST',
-              url: "{% url 'getinvCustomerDetails' %}",
-              data: {
-                  id: custId,
-                  csrfmiddlewaretoken: '{{ csrf_token }}',
-              },
-              
-              success: function(data){
-                  console.log('AJAX-Response-->',data);
-                  document.getElementById('customerId').value = data.id;
-                  document.getElementById('customerEmail').value = data.email;
-                  document.getElementById('placeOfSupply').value = data.shipState;
-                  var placeOfSupplySelect = document.getElementById('placeOfSupply');
-                  var newOption = new Option(data.shipState, data.shipState); // Create a new option element
-                  placeOfSupplySelect.appendChild(newOption); // Append the new option to the select element
-                  placeOfSupplySelect.value = data.shipState; // Set the value of the select element to the desired value
-                 
-                  document.getElementById('customerGstType').value = data.gstType;
-                  document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
-                  if(data.gstin){
-                      document.getElementById('customerGstInDisplay').style.display = 'flex';
-                      document.getElementById('customerGSTIN').value = data.gstNo;
-                  }else{
-                      document.getElementById('customerGstInDisplay').style.display = 'none';
-                      document.getElementById('customerGSTIN').value = '';
-                  }
-                  if(`{{invoice.price_list_applied}}` != "True"){
-                        $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
+        $('#customer').val(name)
+        console.log('name',name);
+        if($('#customer').val() != ""){
+            $('#custErr').text('');
+            $.ajax({
+                type : 'POST',
+                url: "{% url 'getinvCustomerDetails' %}",
+                data: {
+                    id: custId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                
+                success: function(data){
+                    console.log('AJAX-Response-->',data);
+                    document.getElementById('customerId').value = data.id;
+                    document.getElementById('customerEmail').value = data.email;
+                    document.getElementById('placeOfSupply').value = data.shipState;
+                    document.getElementById('customerGstType').value = data.gstType;
+                    if(data.street == "" && data.city == "" && data.state == ""){
+                      $("#billAddressSection").hide();
+                    }else{
+                      $('#billAddressSection').show();
+                      document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
                     }
-                //   $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
-                  refreshTax();
-                  checkPriceList();
-              }
-          });
-      }else{
-          document.getElementById('customerEmail').value = "";
-          document.getElementById('placeOfSupply').value = "";
-          document.getElementById('customerGstType').value = "";
-          document.getElementById('billAddress').value ="";
-          document.getElementById('customerGSTIN').value = "";
-          $('#custErr').text('Select a customer..');
-      }
-  }
+                    if(data.gstin){
+                        document.getElementById('customerGstInDisplay').style.display = 'flex';
+                        document.getElementById('customerGSTIN').value = data.gstNo;
+                    }else{
+                        document.getElementById('customerGstInDisplay').style.display = 'none';
+                        document.getElementById('customerGSTIN').value = '';
+                    }
+                    $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
+                    refreshTax();
+                    checkPriceList();
+                }
+            });
+        }else{
+            document.getElementById('customerEmail').value = "";
+            document.getElementById('placeOfSupply').value = "";
+            document.getElementById('customerGstType').value = "";
+            document.getElementById('billAddress').value ="";
+            document.getElementById('customerGSTIN').value = "";
+            $('#custErr').text('Select a customer..');
+        }
+    }
+    
+    
+    
 
 
   $(document).ready(function() {

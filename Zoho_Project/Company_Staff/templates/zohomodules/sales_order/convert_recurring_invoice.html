@@ -301,7 +301,7 @@
                   </div>
                 </div>
 
-                <div class="row mt-2">
+                <div class="row mt-2" id="billAddressSection">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
                     <textarea class="form-control text-white bg-black" name="bill_address" id="billAddress" rows="4" readonly>{{sale.customer_billing_address}}</textarea>
@@ -753,7 +753,8 @@
                   </div>
                 </div>
                 <div class="mt-4">
-                  <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" id="save">
+                  <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" name="Saved" id="save">
+                  <input class="btn save_btn" style="background-color: chocolate; color: white;" type="submit" value="DRAFT" name="Draft" id="draft">
                   <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=``" value="CANCEL" id="cancel">
                 </div>
               </form>

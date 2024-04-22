@@ -299,7 +299,7 @@
                   </div>
                 </div>
 
-                <div class="row mt-2">
+                <div class="row mt-2" id="billAddressSection">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
                     <textarea class="form-control text-white bg-black" name="customer_billing_address" id="billAddress" rows="4" readonly></textarea>
@@ -315,12 +315,12 @@
                       <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                       <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                       <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
-                      <option value="volvo">[AS]-Assam</option>
+                      <option value="[AS]-Assam">[AS]-Assam</option>
                       <option value="[BR]-Bihar">[BR]-Bihar</option> 
-                      <option value="volvo">[CH]-	Chandhigarh</option>
+                      <option value="[CH]-Chandhigarh">[CH]-Chandhigarh</option>
                       <option value="[CG]-Chattisgarh">[CG]-Chattisgarh</option>
                       <option value="[DD]-Daman Diu">[DD]-Daman Diu</option>
-                      <option value="volvo">[DL]-	Delhi</option>
+                      <option value="[DL]-Delhi">[DL]-Delhi</option>
                       <option value="[GA]-Goa">[GA]-Goa</option> 
                       <option value="[GJ]-Gujarat">[GJ]-Gujarat</option>
                       <option value="[HR]-Haryana">[HR]-Haryana</option> 
@@ -597,7 +597,7 @@
               <div class="row clearfix" style="margin-top:20px">
                 <div class="col-md-6">
                     <textarea class="form-control bg-black text-white mt-3"  id="" name="description" placeholder="Note" style="height: 190px;"></textarea>
-                    <input type="file" class="form-control" name="file"  style="margin-top: 10px;" required>
+                    <input type="file" class="form-control" name="file"  style="margin-top: 10px;">
                     <textarea class="form-control bg-black text-white mt-3"  id="" name="terms_and_condition" placeholder="Terms & conditions" style="height: 130px;"></textarea>
                 </div>            
                 <div class="col-md-1"></div>
@@ -938,12 +938,12 @@
                         <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                         <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                         <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
-                        <option value="volvo">[AS]-Assam</option>
+                        <option value="[AS]-Assam">[AS]-Assam</option>
                         <option value="[BR]-Bihar">[BR]-Bihar</option> 
-                        <option value="volvo">[CH]-	Chandhigarh</option>
+                        <option value="[CH]-Chandhigarh">[CH]-Chandhigarh</option>
                         <option value="[CG]-Chattisgarh">[CG]-Chattisgarh</option>
                         <option value="[DD]-Daman Diu">[DD]-Daman Diu</option>
-                        <option value="volvo">[DL]-	Delhi</option>
+                        <option value="[DL]-Delhi">[DL]-Delhi</option>
                         <option value="[GA]-Goa">[GA]-Goa</option> 
                         <option value="[GJ]-Gujarat">[GJ]-Gujarat</option>
                         <option value="[HR]-Haryana">[HR]-Haryana</option> 
@@ -2427,51 +2427,53 @@
       })
   }
 
-    function getCustomerDetails(custId, name){
-      $('#customer').val(name)
-      console.log('name',name);
-      if($('#customer').val() != ""){
-          $('#custErr').text('');
-          $.ajax({
-              type : 'POST',
-              url: "{% url 'getselCustomerDetails' %}",
-              data: {
-                  id: custId,
-                  csrfmiddlewaretoken: '{{ csrf_token }}',
-              },
-              
-              success: function(data){
-                  console.log('AJAX-Response-->',data);
-                  document.getElementById('customerId').value = data.id;
-                  document.getElementById('customerEmail').value = data.email;
-                  document.getElementById('placeOfSupply').value = data.shipState;
-                  var placeOfSupplySelect = document.getElementById('placeOfSupply');
-                  var newOption = new Option(data.shipState, data.shipState); // Create a new option element
-                  placeOfSupplySelect.appendChild(newOption); // Append the new option to the select element
-                  placeOfSupplySelect.value = data.shipState;
-                  document.getElementById('customerGstType').value = data.gstType;
+  function getCustomerDetails(custId, name){
+    $('#customer').val(name)
+    console.log('name',name);
+    if($('#customer').val() != ""){
+        $('#custErr').text('');
+        $.ajax({
+            type : 'POST',
+            url: "{% url 'getselCustomerDetails' %}",
+            data: {
+                id: custId,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            
+            success: function(data){
+                console.log('AJAX-Response-->',data);
+                document.getElementById('customerId').value = data.id;
+                document.getElementById('customerEmail').value = data.email;
+                document.getElementById('placeOfSupply').value = data.shipState;
+                document.getElementById('customerGstType').value = data.gstType;
+                if(data.street == "" && data.city == "" && data.state == ""){
+                  $("#billAddressSection").hide();
+                }else{
+                  $('#billAddressSection').show();
                   document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
-                  if(data.gstin){
-                      document.getElementById('customerGstInDisplay').style.display = 'flex';
-                      document.getElementById('customerGSTIN').value = data.gstNo;
-                  }else{
-                      document.getElementById('customerGstInDisplay').style.display = 'none';
-                      document.getElementById('customerGSTIN').value = '';
-                  }
-                  $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
-                  refreshTax();
-                  checkPriceList();
-              }
-          });
-      }else{
-          document.getElementById('customerEmail').value = "";
-          document.getElementById('placeOfSupply').value = "";
-          document.getElementById('customerGstType').value = "";
-          document.getElementById('billAddress').value ="";
-          document.getElementById('customerGSTIN').value = "";
-          $('#custErr').text('Select a customer..');
-      }
-  }
+                }
+                if(data.gstin){
+                    document.getElementById('customerGstInDisplay').style.display = 'flex';
+                    document.getElementById('customerGSTIN').value = data.gstNo;
+                }else{
+                    document.getElementById('customerGstInDisplay').style.display = 'none';
+                    document.getElementById('customerGSTIN').value = '';
+                }
+                $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
+                refreshTax();
+                checkPriceList();
+            }
+        });
+    }else{
+        document.getElementById('customerEmail').value = "";
+        document.getElementById('placeOfSupply').value = "";
+        document.getElementById('customerGstType').value = "";
+        document.getElementById('billAddress').value ="";
+        document.getElementById('customerGSTIN').value = "";
+        $('#custErr').text('Select a customer..');
+    }
+}
+
 
 
   $(document).ready(function() {

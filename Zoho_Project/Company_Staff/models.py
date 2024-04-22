@@ -875,6 +875,7 @@ class SaleOrder(models.Model):
         return 'sales_order_number'   
     
      
+ 
 
 class SalesOrderItems(models.Model):
     item = models.ForeignKey(Items, on_delete=models.CASCADE, blank=True, null=True)
