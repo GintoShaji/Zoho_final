@@ -2437,7 +2437,7 @@
         var paymentMeth = `{{sale.payment_method}}`;
         // var entryType = `{{invoice.entry_type}}`;
 
-        document.querySelector('#placeOfSupply').value = `{{sale.customer_place_of_supply}}`;
+        
         paymentMeth == 'None' ? document.querySelector('#paymentMethod').value = "" : document.querySelector('#paymentMethod').value = `{{sale.payment_method}}`;
         // entryType == 'None' ? document.querySelector('#entryType').value ="" : document.querySelector('#entryType').value = `{{recInvoice.entry_type}}`;
 
@@ -2485,7 +2485,7 @@
                 }
             });
         }
-        // $('#placeOfSupply').val('{{invoice.place_of_supply}}')
+        
     })
 
 
@@ -2530,7 +2530,7 @@
                 console.log('AJAX-Response-->',data);
                 document.getElementById('customerId').value = data.id;
                 document.getElementById('customerEmail').value = data.email;
-                document.getElementById('placeOfSupply').value = data.shipState;
+                
                 document.getElementById('customerGstType').value = data.gstType;
                 if(data.street == "" && data.city == "" && data.state == ""){
                   $("#billAddressSection").hide();

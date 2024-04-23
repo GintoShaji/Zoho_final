@@ -2575,7 +2575,7 @@
                 }
             });
         }
-        // $('#placeOfSupply').val('{{invoice.place_of_supply}}')
+        
     })
 
     function filterCustomers(){
@@ -2607,7 +2607,7 @@
                     console.log('AJAX-Response-->',data);
                     document.getElementById('customerId').value = data.id;
                     document.getElementById('customerEmail').value = data.email;
-                    document.getElementById('placeOfSupply').value = data.shipState;
+                    
                     document.getElementById('customerGstType').value = data.gstType;
                     if(data.street == "" && data.city == "" && data.state == ""){
                       $("#billAddressSection").hide();
