@@ -12932,7 +12932,7 @@ def delete_godown(request,pk):
     return redirect('list_godown')
 
 
-# < -------------------- >Zoho Final Sales order - Ginto Shaji - Start-------------------->
+ # < -------------------- >Zoho Final Sales order - Ginto Shaji - Start--------------------
 
 def salesorder(request):
     if 'login_id' in request.session:
@@ -13893,7 +13893,7 @@ def getselCustomerDetails(request):
       
         if cust:
             context = {
-                'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None else True, 'gstNo':cust.GST_number,
+                'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None or cust.GST_number == "null" else True, 'gstNo':cust.GST_number,
                 'street':cust.billing_address, 'city':cust.billing_city, 'state':cust.billing_state, 'country':cust.billing_country, 'pincode':cust.billing_pincode
             }
             return JsonResponse(context)

@@ -142,7 +142,7 @@
           <div class="table-responsive example">
             <table class="table  text-white" id="myTable" >
               <thead>
-                <tr>
+                <tr class="text-center">
                   <th style="text-align: center;">#</th>
                   <th style="text-align: center;">DATE</th>
                   <th style="text-align: center;">SALES ORDER NO</th>
@@ -157,7 +157,7 @@
              
               <tbody>
               {% for i in sale %}
-                <tr id="over" class="" data-href="{% url 'view_salesorder_details' i.id %}">
+                <tr id="over" class="text-center" data-href="{% url 'view_salesorder_details' i.id %}">
                   <td style="text-align: center;"><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{forloop.counter}}</a></td>
                   <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.sales_order_date}}</a></td>
                   <td><a class="link-light" href="{% url 'view_salesorder_details' i.id %}">{{i.sales_order_number}}</a></td>

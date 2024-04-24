@@ -299,6 +299,8 @@
                   </div>
                 </div>
 
+                
+
                 <div class="row mt-2" id="billAddressSection">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
@@ -2429,7 +2431,7 @@
 
   function getCustomerDetails(custId, name){
     $('#customer').val(name)
-    console.log('name',name);
+    
     if($('#customer').val() != ""){
         $('#custErr').text('');
         $.ajax({
@@ -2441,7 +2443,7 @@
             },
             
             success: function(data){
-                console.log('AJAX-Response-->',data);
+                
                 document.getElementById('customerId').value = data.id;
                 document.getElementById('customerEmail').value = data.email;
                 document.getElementById('placeOfSupply').value = data.shipState;
@@ -2452,6 +2454,7 @@
                   $('#billAddressSection').show();
                   document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
                 }
+                console.log(data.gstin)
                 if(data.gstin){
                     document.getElementById('customerGstInDisplay').style.display = 'flex';
                     document.getElementById('customerGSTIN').value = data.gstNo;
@@ -2472,7 +2475,7 @@
         document.getElementById('customerGSTIN').value = "";
         $('#custErr').text('Select a customer..');
     }
-}
+ }
 
 
 
@@ -5213,7 +5216,7 @@ function reloadItems() {
     function show_parent() {
 
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 if (vals == "Other Current Assets") {
 
     var chk = document.getElementById("sub_account").checked;
@@ -5243,7 +5246,7 @@ if (vals == "Other Current Assets") {
 
 function show_parent22() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 
 if (vals == "Cash") {
     var chk = document.getElementById("sub_account22").checked;
@@ -5270,7 +5273,7 @@ if (vals == "Cash") {
 
 function show_parent33() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 
 if (vals == "Fixed Asset") {
     var chk1 = document.getElementById("sub_account33").checked;
@@ -5299,7 +5302,7 @@ if (vals == "Fixed Asset") {
 function show_parent44() {
 
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 
 if (vals == "Stock") {
     var chk = document.getElementById("sub_account44").checked
@@ -5326,7 +5329,7 @@ if (vals == "Stock") {
 
 function show_parent55() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 if (vals == "Other Current Liability") {
     var chk = document.getElementById("sub_account55").checked
     if (chk == true) {
@@ -5350,7 +5353,7 @@ if (vals == "Other Current Liability") {
 
 function show_parent66() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 if (vals == "Long Term Liability") {
     var chk = document.getElementById("sub_account66").checked
     if (chk == true) {
@@ -5374,7 +5377,7 @@ if (vals == "Long Term Liability") {
 
 function show_parent77() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 if (vals == "Other Liability") {
     var chk = document.getElementById("sub_account77").checked
     if (chk == true) {
@@ -5398,7 +5401,7 @@ if (vals == "Other Liability") {
 
 function show_parent88() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 if (vals == "Equity") {
     var chk = document.getElementById("sub_account88").checked
     if (chk == true) {
@@ -5422,7 +5425,7 @@ if (vals == "Equity") {
 
 function show_parent99() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 if (vals == "Income") {
     var chk = document.getElementById("sub_account99").checked
     if (chk == true) {
@@ -5446,7 +5449,7 @@ if (vals == "Income") {
 
 function show_parent100() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 
 if (vals == "Expense") {
     var chk = document.getElementById("sub_account100").checked;
@@ -5473,7 +5476,6 @@ if (vals == "Expense") {
 
 function show_parent111() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
 
 
 if (vals == "Cost Of Goods Sold") {
@@ -5501,7 +5503,7 @@ if (vals == "Cost Of Goods Sold") {
 
 function show_parent222() {
 var vals = document.getElementById('soValue1').value;
-console.log(vals);
+
 
 if (vals == "Other Expense") {
     var chk = document.getElementById("sub_account222").checked;
